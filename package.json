@@ -1,0 +1,23 @@
+{
+  "name": "e-sparepart-system",
+  "version": "1.0.0",
+  "description": "Micropage E-Sparepart System - Backend autentikasi berbasis Google Sheets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node scripts/seedMasterDB.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "body-parser": "^2.3.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "googleapis": "^181.0.0",
+    "xlsx": "^0.18.5"
+  }
+}

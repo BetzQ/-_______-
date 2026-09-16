@@ -1,0 +1,28 @@
+# Dependensi
+node_modules/
+
+# Environment — JANGAN pernah commit .env atau credentials.json
+.env
+.env.*
+!.env.example
+
+# Kredensial Service Account Google (rahasia!)
+credentials.json
+*.pem
+*.key
+
+# Vercel & Build
+.vercel/
+dist/
+build/
+
+# Log & OS
+*.log
+npm-debug.log*
+.DS_Store
+
+# Dokumen Capstone (tidak dibutuhkan saat runtime/deploy)
+CP Kelompok A 127/
+
+# Dokumen Capstone (tidak dibutuhkan saat runtime/deploy)
+CP Kelompok A 127/

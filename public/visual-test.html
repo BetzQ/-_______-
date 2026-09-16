@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visual UI Automation - E-Sparepart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{height:100%}
+    #log-box::-webkit-scrollbar{width:8px}
+    #log-box::-webkit-scrollbar-track{background:#0f172a}
+    #log-box::-webkit-scrollbar-thumb{background:#334155;border-radius:8px}
+    #log-box::-webkit-scrollbar-thumb:hover{background:#475569}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+    .pulse-dot{animation:pulse-dot 1.2s ease-in-out infinite}
+  </style>
+</head>
+<body class="bg-slate-950 text-white antialiased flex flex-col h-screen overflow-hidden">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="bg-slate-900 border-b border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between gap-4 shrink-0 z-20">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 border border-blue-500/30">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="min-w-0">
+        <h1 class="text-white font-extrabold text-sm sm:text-base leading-tight truncate">Visual UI Automation — E-Sparepart</h1>
+        <p class="text-slate-400 text-[11px] leading-tight truncate">Pengujian End-to-End di dalam iframe, diperlambat agar dapat ditonton</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 shrink-0">
+      <span id="scn-badge" class="hidden text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700"></span>
+      <button id="btn-run"
+        class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs tracking-wide transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+        <span id="btn-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span id="btn-txt">Mulai Animasi Pengujian</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== SPLIT SCREEN ==================== -->
+  <main class="flex-1 flex flex-col lg:flex-row min-h-0">
+
+    <!-- KIRI / ATAS: IFRAME APLIKASI -->
+    <section class="relative flex flex-col h-[52vh] lg:h-auto lg:flex-1 min-h-0 border-b lg:border-b-0 lg:border-r border-slate-800 bg-slate-900/40">
+      <div class="flex items-center gap-2 px-4 py-2 bg-slate-900/90 border-b border-slate-800 text-[11px] text-slate-400 font-semibold shrink-0">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+        Aplikasi Utama (index.html) — dirender di iframe
+      </div>
+      <div class="relative flex-1 min-h-0">
+        <iframe id="app-frame" src="index.html" class="absolute inset-0 w-full h-full border-0 bg-white"></iframe>
+      </div>
+    </section>
+
+    <!-- KANAN / BAWAH: PANEL LOG -->
+    <section class="flex flex-col w-full lg:w-[400px] xl:w-[460px] min-h-0">
+      <div class="flex items-center justify-between px-4 py-2 bg-slate-900/90 border-b border-slate-800 text-[11px] text-slate-400 font-semibold shrink-0">
+        <span>Panel Log Pengujian</span>
+        <span class="text-slate-600 font-mono">frame = 2 detik/aksi</span>
+      </div>
+      <div id="log-box" class="flex-1 overflow-y-auto p-3 font-mono text-xs min-h-0"></div>
+    </section>
+  </main>
+
+  <!-- ==================== SCRIPT ==================== -->
+  <script>
+    // =================== ELEMEN ===================
+    const btnRun  = document.getElementById('btn-run');
+    const btnTxt  = document.getElementById('btn-txt');
+    const btnIco  = document.getElementById('btn-ico');
+    const scnBadge = document.getElementById('scn-badge');
+    const box     = document.getElementById('log-box');
+    const FRAME   = () => document.getElementById('app-frame');
+    const fWin    = () => FRAME().contentWindow;
+    const fDoc    = () => FRAME().contentWindow.document;
+
+    // =================== UTILITAS ===================
+    const delay = (ms) => new Promise(function (r) { setTimeout(r, ms); });
+
+    function log(msg, state) {
+      const s = state || 'info';
+      const colors = { info: '#93c5fd', ok: '#34d399', err: '#fb7185', wait: '#fbbf24', scn: '#f1f5f9' };
+      const glyphs = { info: '•', ok: '✔', err: '✘', wait: '⏳', scn: '▸' };
+      const time = new Date().toLocaleTimeString('id-ID', { hour12: false });
+      const line = document.createElement('div');
+      line.className = 'flex gap-2 leading-relaxed px-1 py-0.5';
+      line.innerHTML =
+        '<span style="color:#64748b">' + time + '</span>' +
+        '<span style="color:' + (colors[s] || '#93c5fd') + ';font-weight:' + (s === 'scn' ? 700 : 400) + '">' +
+        (glyphs[s] || '•') + ' ' + msg + '</span>';
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function section(title) {
+      const d = document.createElement('div');
+      d.className = 'flex items-center gap-2 text-slate-200 font-bold text-[11px] uppercase tracking-widest mt-4 mb-1 px-1';
+      d.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>' + title;
+      box.appendChild(d);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function setBadge(text) {
+      scnBadge.textContent = text;
+      scnBadge.classList.remove('hidden');
+    }
+
+    // Polling menunggu kondisi di dalam iframe
+    function waitFor(fn, timeout) {
+      const end = Date.now() + (timeout || 8000);
+      return new Promise(function (resolve) {
+        (function tick() {
+          if (Date.now() > end) return resolve(false);
+          try {
+            if (fn()) return resolve(true);
+          } catch (e) { /* doc belum siap */ }
+          setTimeout(tick, 200);
+        })();
+      });
+    }
+
+    async function waitForEl(doc, sel, timeout) {
+      const end = Date.now() + (timeout || 10000);
+      while (Date.now() < end) {
+        const el = doc.querySelector(sel);
+        if (el) return el;
+        await delay(200);
+      }
+      throw new Error('Elemen tidak ditemukan di dalam iframe: ' + sel);
+    }
+
+    async function assertOk(ok, desc) {
+      if (ok) log(desc + ' ✓', 'ok');
+      else log(desc + ' — GAGAL (timeout 8 dtk)', 'err');
+      return ok;
+    }
+
+    // Otomatis-scroll aplikasi ke elemen agar terlihat di iframe
+    function visible(el, doc) {
+      try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    }
+
+    function markBadge(mode) {
+      if (mode === 'run') { btnTxt.textContent = 'Menjalankan…'; btnIco.style.opacity = '0.5'; btnRun.disabled = true; }
+      else { btnTxt.textContent = 'Ulangi Pengujian'; btnIco.style.opacity = '1'; btnRun.disabled = false; }
+    }
+
+    // =================== KOMANDO ATAS IFRAME ===================
+    async function typeInto(doc, sel, value, label) {
+      log('Mengetik ' + label + ' "' + value + '"…', 'info');
+      const el = await waitForEl(doc, sel);
+      visible(el, doc);
+      el.focus();
+      el.value = value;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      log(label + ' terisi ✓', 'ok');
+      await delay(2000);
+    }
+
+    async function clearInput(doc, sel, label) {
+      const el = await waitForEl(doc, sel);
+      el.value = '';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      log(label + ' dibersihkan ✓', 'ok');
+      await delay(1000);
+    }
+
+    async function submitLogin(doc) {
+      log('Mengklik tombol MASUK…', 'info');
+      const btn = await waitForEl(doc, '#btn-login');
+      visible(btn, doc);
+      btn.click();
+      log('Form login dikirim ke /api/login ✓', 'ok');
+      await delay(2000);
+    }
+
+    // Reload aplikasi di iframe (keadaan bersih, sesi dibersihkan dahulu)
+    function reloadApp() {
+      return new Promise(function (resolve) {
+        const f = FRAME();
+        const onload = function () { f.removeEventListener('load', onload); resolve(); };
+        f.addEventListener('load', onload);
+        f.src = 'index.html?' + Date.now();
+      });
+    }
+
+    // =================== KREDENSIAL UJI ===================
+    // Ganti nilai berikut sesuai password asli di "Master DB_User.xlsx" / Google Sheets perusahaan.
+    const CRED = {
+      teknisi: { user: 'AAA', pass: '04AAA10' },
+      manager: { user: 'KSW', pass: '01KSW10' }, // TODO: isi password asli KSW dari database spreadsheet
+    };
+
+    // =================== SKENARIO ===================
+    async function scenarioA(doc) {
+      setBadge('Skenario A · Login Gagal');
+      section('Skenario A — Login Gagal (kredensial ngawur)');
+      log('Menguji login gagal…', 'scn');
+
+      await typeInto(doc, '#inp-user', 'Ngawur', 'username');
+      await typeInto(doc, '#inp-pass', 'Salah123', 'password');
+      await submitLogin(doc);
+
+      const got = await waitFor(function () {
+        return !!doc.querySelector('#toast-box .slide-right');
+      }, 8000);
+      await assertOk(got, 'Peringatan merah (toast) muncul di pojok layar');
+
+      if (got) {
+        const msg = doc.querySelector('#toast-box .slide-right span');
+        log('Isi peringatan: "' + (msg ? msg.textContent.trim() : '?') + '"', 'info');
+      }
+      log('Menunggu 3 detik agar peringatan terlihat jelas…', 'wait');
+      await delay(3000);
+    }
+
+    async function scenarioB(doc) {
+      setBadge('Skenario B · Login Teknisi');
+      section('Skenario B — Login Teknisi (AAA)');
+      log('Menguji login Teknisi…', 'scn');
+
+      await clearInput(doc, '#inp-user', 'Kolom username');
+      await clearInput(doc, '#inp-pass', 'Kolom password');
+      await typeInto(doc, '#inp-user', 'AAA', 'username');
+      await typeInto(doc, '#inp-pass', CRED.teknisi.pass, 'password');
+      await submitLogin(doc);
+
+      const open = await waitFor(function () {
+        return !fDoc().getElementById('dash-section').classList.contains('hidden');
+      }, 8000);
+      await assertOk(open, 'Dashboard Teknisi terbuka');
+
+      if (open) {
+        const cards = fDoc().querySelectorAll('#menu-grid > a').length;
+        const right = cards === 2;
+        await assertOk(right, 'Jumlah menu Teknisi = 2 (BQ Personal + On Hand Stock)');
+        log('Badan menu terlihat: ' + cards + ' kartu', right ? 'ok' : 'err');
+        const name = fDoc().getElementById('dash-name').textContent;
+        log('Nama di header dashboard: "' + name + '"', 'info');
+        const greet = fDoc().getElementById('greet-title').textContent;
+        log('Sambutan: "' + greet + '"', 'info');
+      }
+      log('Menunggu 3 detik agar dashboard anggota terlihat…', 'wait');
+      await delay(3000);
+    }
+
+    async function scenarioC(doc) {
+      setBadge('Skenario C · Logout');
+      section('Skenario C — Logout dari Dashboard');
+      log('Menguji Logout…', 'scn');
+
+      const btn = await waitForEl(doc, '#btn-logout');
+      visible(btn, doc);
+      log('Mengklik tombol Logout…', 'info');
+      btn.click();
+      await delay(2000);
+
+      const back = await waitFor(function () {
+        return !fDoc().getElementById('login-section').classList.contains('hidden');
+      }, 8000);
+      await assertOk(back, 'Kembali ke form login');
+
+      const session = fWin().sessionStorage.getItem('user');
+      await assertOk(session === null, 'sessionStorage bersih (user terhapus)');
+      log('Menunggu 2 detik…', 'wait');
+      await delay(2000);
+    }
+
+    async function scenarioD(doc) {
+      setBadge('Skenario D · Login Manager');
+      section('Skenario D — Login Manager (KSW)');
+      log('Menguji login Manager…', 'scn');
+
+      await typeInto(doc, '#inp-user', CRED.manager.user, 'username');
+      await typeInto(doc, '#inp-pass', CRED.manager.pass, 'password');
+      await submitLogin(doc);
+
+      const open = await waitFor(function () {
+        return !fDoc().getElementById('dash-section').classList.contains('hidden');
+      }, 8000);
+      await assertOk(open, 'Dashboard Manager terbuka');
+
+      if (open) {
+        const cards = fDoc().querySelectorAll('#menu-grid > a').length;
+        const right = cards === 3;
+        await assertOk(right, 'Jumlah menu Manager = 3 (PR Summary + BQ Monitoring + Critical Part List)');
+        log('Badan menu terlihat: ' + cards + ' kartu', right ? 'ok' : 'err');
+        const role = fDoc().getElementById('badge-role').textContent;
+        log('Role badge: "' + role + '"', 'info');
+      } else {
+        log('Catatan: periksa kembali kredensial Manager di Master DB (username/password).', 'wait');
+      }
+      log('Menunggu 3 detik agar dashboard manager terlihat…', 'wait');
+      await delay(3000);
+    }
+
+    // =================== ORKESTRATOR ===================
+    async function run() {
+      markBadge('run');
+      box.innerHTML = '';
+      scnBadge.classList.add('hidden');
+
+      try {
+        section('Memulai Visual UI Automation');
+        log('Membersihkan sesi tab agar aplikasi mulai dari form login…', 'info');
+        sessionStorage.removeItem('user');          // storage dibagi dengan iframe (same-origin)
+        log('Reload aplikasi ke keadaan bersih…', 'wait');
+        await reloadApp();
+        await waitFor(function () { return !!fDoc().getElementById('login-form'); }, 10000);
+        log('Aplikasi siap di dalam iframe (form login tampil) ✓', 'ok');
+        await delay(2000);
+
+        await scenarioA(fDoc());
+        log('Reload aplikasi sebelum logika berikutnya…', 'wait');
+        await reloadApp();
+        await waitFor(function () { return !!fDoc().getElementById('login-form'); }, 10000);
+        log('Aplikasi siap kembali ✓', 'ok');
+        await delay(2000);
+
+        await scenarioB(fDoc());
+        await scenarioC(fDoc());
+
+        log('Reload aplikasi untuk sesi bersih berikutnya…', 'wait');
+        await reloadApp();
+        await waitFor(function () { return !!fDoc().getElementById('login-form'); }, 10000);
+        log('Aplikasi siap kembali ✓', 'ok');
+        await delay(2000);
+
+        await scenarioD(fDoc());
+
+        section('PENGUJIAN SELESAI');
+        log('Seluruh skenario berjalan tanpa galat. Amati log di atas untuk hasil tiap langkah.', 'ok');
+      } catch (err) {
+        log('ERROR: ' + err.message, 'err');
+      } finally {
+        markBadge('done');
+      }
+    }
+
+    btnRun.addEventListener('click', run);
+  </script>
+</body>
+</html>

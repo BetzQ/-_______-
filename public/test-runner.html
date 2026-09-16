@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automated API QA Test - Tahap 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse-soft { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+    .pulse-soft { animation: pulse-soft 0.9s ease-in-out infinite; }
+    @keyframes row-glow { from { box-shadow: 0 0 0 0 rgba(251,191,36,.35); } to { box-shadow: 0 0 0 6px rgba(251,191,36,0); } }
+    .row-active { border-color: rgba(251,191,36,.5); background: rgba(251,191,36,.06); animation: row-glow 1s ease-out infinite; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased min-h-screen flex flex-col">
+
+  <header class="border-b border-slate-800/70 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-4xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-soft"></span>
+          <span class="text-[11px] font-mono tracking-widest uppercase text-emerald-300">Server: localhost:3000</span>
+        </div>
+        <h1 class="text-xl font-extrabold text-white tracking-tight">Automated API QA Test - Tahap 1</h1>
+        <p class="text-xs text-slate-400 mt-0.5">Micropage E-Sparepart System — Pengujian otomatis endpoint backend</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <label class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="font-semibold">Kecepatan:</span>
+          <select id="speed-select" name="speed"
+            class="bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono rounded-lg px-2 py-2 outline-none focus:border-blue-500">
+            <option value="500" selected>⚡ Cepat (0,5s)</option>
+            <option value="1500">🐢 Normal (1,5s)</option>
+            <option value="0">🏁 Instan (0s)</option>
+          </select>
+        </label>
+        <button id="run-btn" onclick="startTests()"
+          class="px-8 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-extrabold text-white text-sm shadow-lg shadow-blue-900/40 btn-run">
+          ▶ &nbsp;Mulai Pengujian
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-6 space-y-5">
+
+    <!-- Ringkasan -->
+    <section class="grid grid-cols-4 gap-3">
+      <div class="stats-card rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-center col-span-4 sm:col-span-1">
+        <div id="stat-total" class="text-3xl font-black text-white">5</div>
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 mt-1">Total Uji</div>
+      </div>
+      <div class="stats-card rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-center col-span-4 sm:col-span-1">
+        <div id="stat-pass" class="text-3xl font-black text-emerald-400">0</div>
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 mt-1">Lulus ✅</div>
+      </div>
+      <div class="stats-card rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-center col-span-4 sm:col-span-1">
+        <div id="stat-fail" class="text-3xl font-black text-rose-400">0</div>
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 mt-1">Gagal ❌</div>
+      </div>
+      <div class="stats-card rounded-2xl border border-slate-800 bg-slate-900/70 p-4 text-center col-span-4 sm:col-span-1">
+        <div id="stat-progress" class="text-3xl font-black text-amber-400">–</div>
+        <div class="text-[11px] uppercase tracking-wider text-slate-400 mt-1">Sedang Berjalan</div>
+      </div>
+    </section>
+
+    <!-- Progress bar -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+      <div class="flex items-center justify-between text-xs mb-2">
+        <span id="progress-label" class="font-semibold text-slate-300">Menunggu perintah…</span>
+        <span id="progress-pct" class="font-mono text-slate-400">0%</span>
+      </div>
+      <div class="h-2.5 rounded-full bg-slate-800 overflow-hidden">
+        <div id="progress-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all duration-700"></div>
+      </div>
+    </div>
+
+    <!-- Daftar skenario -->
+    <section id="test-list" class="space-y-3"></section>
+
+    <!-- Hasil akhir -->
+    <section id="final-banner" class="hidden rounded-2xl border p-6 text-center"></section>
+
+    <p class="text-[11px] text-slate-500 text-center pb-6">
+      Pastikan <code class="text-slate-300 font-mono">node server.js</code> aktif. Kecepatan jeda antar-pengujian bisa diatur lewat menu <code class="text-slate-300">Kecepatan</code>.
+    </p>
+  </main>
+
+  <script>
+    // ================= KONFIGURASI =================
+    const API_BASE = (window.location.protocol === 'file:')
+      ? 'http://localhost:3000'
+      : window.location.origin;
+
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    async function http(pathname, method, body) {
+      const opts = { method, headers: {} };
+      if (body !== undefined) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(body);
+      }
+      const res = await fetch(API_BASE + pathname, opts);
+      const text = await res.text();
+      let json = null;
+      try { json = JSON.parse(text); } catch (e) {}
+      return { status: res.status, text, json };
+    }
+
+    // ================= SKENARIO PENGUJIAN =================
+    const TESTS = [
+      {
+        name: 'Koneksi Server',
+        desc: 'Memastikan server backend hidup dan merespons.',
+        method: 'GET', path: '/api/health', payload: null,
+        expect: 'HTTP 200 dengan {"status":"ok"}',
+        async request() { return http(this.path, this.method); },
+        validate(r) {
+          const ok = r.status === 200 && r.json && r.json.status === 'ok';
+          return ok
+            ? { pass: true,  msg: `HTTP ${r.status} → ${JSON.stringify(r.json)}` }
+            : { pass: false, msg: `HTTP ${r.status ?? '-'} → ${r.text || 'Server tidak merespons 🚫'}` };
+        }
+      },
+      {
+        name: 'Login Valid (Teknisi)',
+        desc: 'Autentikasi AAA/04AAA10 — harus menghasilkan role "teknisi" + bqLink.',
+        method: 'POST', path: '/api/login', payload: { username: 'AAA', password: '04AAA10' },
+        expect: 'HTTP 200, role="teknisi", bqLink tersedia',
+        async request() { return http(this.path, this.method, this.payload); },
+        validate(r) {
+          const d = r.json && r.json.data;
+          const ok = r.status === 200 && d && d.role === 'teknisi' && !!d.bqLink;
+          return ok
+            ? { pass: true,  msg: `HTTP ${r.status} → role="${d.role}", name="${d.name}", bqLink tersedia ✓ (password tidak bocor)` }
+            : { pass: false, msg: `HTTP ${r.status ?? '-'} → ${r.text || 'tidak ada respons'}` };
+        }
+      },
+      {
+        name: 'Login Valid (Manager)',
+        desc: 'Autentikasi KSW/01KSW10 — harus menghasilkan role "manager".',
+        method: 'POST', path: '/api/login', payload: { username: 'KSW', password: '01KSW10' },
+        expect: 'HTTP 200, role="manager"',
+        async request() { return http(this.path, this.method, this.payload); },
+        validate(r) {
+          const d = r.json && r.json.data;
+          const ok = r.status === 200 && d && d.role === 'manager';
+          return ok
+            ? { pass: true,  msg: `HTTP ${r.status} → role="${d.role}", name="${d.name}"` }
+            : { pass: false, msg: `HTTP ${r.status ?? '-'} → ${r.text || 'tidak ada respons'}` };
+        }
+      },
+      {
+        name: 'Login Gagal (Password Salah)',
+        desc: 'Autentikasi dengan password salah — harus ditolak 401.',
+        method: 'POST', path: '/api/login', payload: { username: 'AAA', password: 'salah123' },
+        expect: 'HTTP 401, pesan "Kombinasi Username atau Password salah"',
+        async request() { return http(this.path, this.method, this.payload); },
+        validate(r) {
+          const ok = r.status === 401 && r.json && r.json.message === 'Kombinasi Username atau Password salah';
+          return ok
+            ? { pass: true,  msg: `HTTP ${r.status} → "${r.json.message}"` }
+            : { pass: false, msg: `HTTP ${r.status ?? '-'} → ${r.text || 'tidak ada respons'}` };
+        }
+      },
+      {
+        name: 'Login Gagal (Input Kosong)',
+        desc: 'Body kosong — harus ditolak validasi 400.',
+        method: 'POST', path: '/api/login', payload: {},
+        expect: 'HTTP 400, pesan "Parameter username dan password wajib diisi"',
+        async request() { return http(this.path, this.method, this.payload); },
+        validate(r) {
+          const ok = r.status === 400 && r.json && r.json.message;
+          return ok
+            ? { pass: true,  msg: `HTTP ${r.status} → "${r.json.message}"` }
+            : { pass: false, msg: `HTTP ${r.status ?? '-'} → ${r.text || 'tidak ada respons'}` };
+        }
+      }
+    ];
+
+    // ================= STATE & DOM =================
+    let isRunning = false;
+    let delayMs = 500;
+
+    function currentDelay() {
+      return parseInt(document.getElementById('speed-select').value, 10) || 0;
+    }
+
+    function buildRows() {
+      const list = document.getElementById('test-list');
+      list.innerHTML = TESTS.map((t, i) => `
+        <article id="row-${i}" class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 transition-all">
+          <div class="flex items-start gap-4">
+            <div id="icon-${i}"
+              class="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-xl border border-slate-700 bg-slate-800 text-slate-400" title="Menunggu">
+              ⏸️
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-1">
+                <h3 class="font-bold text-white text-sm">${String(i + 1).padStart(2, '0')}. ${t.name}</h3>
+                <span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-mono font-bold
+                  ${t.method === 'GET' ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
+                                       : 'bg-violet-500/15 text-violet-300 border border-violet-500/30'}">
+                  ${t.method}
+                </span>
+                <span class="font-mono text-[11px] text-slate-400">${t.path}</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-1.5">${t.desc}</p>
+              <p class="text-[11px] font-mono text-slate-500"><span class="text-slate-400">Ekspektasi:</span> ${t.expect}</p>
+              <div id="result-${i}" class="mt-2.5 text-xs font-medium text-slate-500">Menunggu eksekusi…</div>
+              <pre id="raw-${i}" class="hidden mt-2 rounded-lg bg-slate-950/80 border border-slate-800 p-3 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-24"></pre>
+            </div>
+            <div id="chip-${i}" class="shrink-0 rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider
+              bg-slate-800 text-slate-500 border border-slate-700">Menunggu</div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function setRowState(i, state, verdict) {
+      const icon = document.getElementById(`icon-${i}`);
+      const chip = document.getElementById(`chip-${i}`);
+      const result = document.getElementById(`result-${i}`);
+      const row = document.getElementById(`row-${i}`);
+      const raw = document.getElementById(`raw-${i}`);
+
+      row.classList.remove('row-active');
+      chip.className = 'shrink-0 rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider border';
+
+      if (state === 'running') {
+        icon.textContent = '⏳';
+        icon.className = 'shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-xl border border-amber-400/50 bg-amber-500/10 text-amber-400 pulse-soft';
+        chip.className += ' bg-amber-500/15 text-amber-300 border-amber-500/30';
+        chip.textContent = 'Sedang menguji…';
+        result.className = 'mt-2.5 text-xs font-medium text-amber-300';
+        result.textContent = 'Sedang menguji endpoint…';
+        row.classList.add('row-active');
+        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (state === 'done') {
+        const v = verdict || { pass: false, msg: '?', responseText: '' };
+        if (v.pass) {
+          icon.textContent = '✅';
+          icon.className = 'shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-xl border border-emerald-400/50 bg-emerald-500/10';
+          chip.className += ' bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+          chip.textContent = 'PASS';
+          result.className = 'mt-2.5 text-xs font-medium text-emerald-300';
+        } else {
+          icon.textContent = '❌';
+          icon.className = 'shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-xl border border-rose-400/50 bg-rose-500/10';
+          chip.className += ' bg-rose-500/15 text-rose-300 border-rose-500/30';
+          chip.textContent = 'FAIL';
+          result.className = 'mt-2.5 text-xs font-medium text-rose-300';
+        }
+        result.textContent = v.msg;
+        if (v.responseText !== undefined && v.responseText !== '') {
+          raw.textContent = v.responseText;
+          raw.classList.remove('hidden');
+        }
+      }
+    }
+
+    function updateStats(done, passed, failed, current, total) {
+      document.getElementById('stat-pass').textContent = passed;
+      document.getElementById('stat-fail').textContent = failed;
+      document.getElementById('stat-progress').textContent = isRunning ? `#${current}/${total}` : '–';
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+      document.getElementById('progress-pct').textContent = pct + '%';
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('progress-label').textContent =
+        isRunning ? `Menjalankan skenario #${current} — ${TESTS[current - 1].name}` : (done === total ? 'Pengujian selesai ✓' : 'Menunggu perintah…');
+    }
+
+    // ================= PELAKSANA =================
+    async function startTests() {
+      const btn = document.getElementById('run-btn');
+      if (isRunning) return;
+      isRunning = true;
+      btn.disabled = true;
+      btn.textContent = '⏳ Pengujian Berlangsung…';
+
+      document.getElementById('final-banner').classList.add('hidden');
+      const total = TESTS.length;
+      let done = 0, passed = 0, failed = 0;
+
+      buildRows();
+      updateStats(0, 0, 0, 0, total);
+
+      for (let i = 0; i < total; i++) {
+        const test = TESTS[i];
+        setRowState(i, 'running');
+        updateStats(done, passed, failed, i + 1, total);
+
+        await delay(currentDelay());
+
+        let r;
+        try {
+          r = await test.request();
+        } catch (e) {
+          r = { status: null, text: '', json: null, networkError: e.message };
+        }
+
+        const verdict = test.validate(r);
+        if (r.networkError) verdict.msg = `Gagal terhubung ke server: ${r.networkError} — pastikan node server.js berjalan.`;
+        verdict.responseText = (r.text && r.text.length > 400) ? r.text.slice(0, 400) + '…' : r.text;
+
+        if (verdict.pass) passed++; else failed++;
+        done++;
+        setRowState(i, 'done', verdict);
+        updateStats(done, passed, failed, i + 1, total);
+      }
+
+      showFinalBanner(passed, failed, total);
+
+      isRunning = false;
+      btn.disabled = false;
+      btn.textContent = '↻ &nbsp;Ulangi Pengujian';
+    }
+
+    function showFinalBanner(passed, failed, total) {
+      const banner = document.getElementById('final-banner');
+      const allPass = failed === 0;
+      banner.className = allPass
+        ? 'rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-6 text-center'
+        : 'rounded-2xl border border-rose-500/40 bg-rose-500/10 p-6 text-center';
+      banner.innerHTML = `
+        <div class="text-4xl mb-2">${allPass ? '🎉' : '⚠️'}</div>
+        <h2 class="text-lg font-extrabold text-white">${allPass
+          ? `Semua pengujian lulus (${passed}/${total})`
+          : `Terjadi kegagalan (${failed} dari ${total})`}</h2>
+        <p class="text-xs text-slate-400 mt-1">
+          ${allPass
+            ? 'Backend Tahap 1 siap digunakan — server merespons, autentikasi dinamis, dan penolakan akses bekerja dengan benar.'
+            : 'Silakan periksa hasil baris yang gagal dan kondisi server (node server.js).'}
+        </p>`;
+      banner.classList.remove('hidden');
+      banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Inisialisasi
+    buildRows();
+  </script>
+</body>
+</html>
