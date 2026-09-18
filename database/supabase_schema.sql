@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS pengajuan_bq (
   status_approval_manager VARCHAR(20) NOT NULL DEFAULT 'Menunggu'
                          CHECK (status_approval_manager IN ('Menunggu', 'Disetujui', 'Ditolak')),
   status_pengadaan       VARCHAR(30)  NOT NULL DEFAULT 'BQ Baru'
-                         CHECK (status_pengadaan IN ('BQ Baru', 'Pending', 'Proses PO', 'Barang Dikirim', 'Tiba di Gudang', 'Selesai')),
+                         CHECK (status_pengadaan IN ('BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Penawaran', 'Barang Dikirim', 'Tiba di Gudang', 'Selesai')),
   timestamp              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (no_registrasi)
 );
