@@ -49,7 +49,7 @@ async function verifyLogin(req, res) {
       username: found.username,
       role: found.role,
       name: found.name,
-      bqLink: found.bqLink || '',
+      bqLink: found.bqLink || found.bqlink || '',
     };
 
     return res.status(200).json({

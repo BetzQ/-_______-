@@ -16,12 +16,41 @@
     .shake{animation:shake .4s ease-in-out}
     @keyframes pop{0%{transform:scale(1)}50%{transform:scale(.97)}100%{transform:scale(1)}}
     .pop:active{animation:pop .12s ease-out}
+    /* Tour Guide */
+    .tour-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+    .tour-overlay.active{display:flex}
+    .tour-spotlight{position:absolute;border:3px solid #3b82f6;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.6),0 0 30px rgba(59,130,246,.4);pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1);z-index:1001}
+    .tour-card{position:relative;z-index:1002;background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,.5)}
   </style>
 </head>
 <body class="bg-slate-950 min-h-screen antialiased">
 
   <!-- TOAST CONTAINER -->
   <div id="toast-box" class="fixed top-5 right-5 z-[999] flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- TOUR GUIDE OVERLAY -->
+  <div id="tour-overlay" class="tour-overlay">
+    <div id="tour-spotlight" class="tour-spotlight"></div>
+    <div class="tour-card">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+          <i data-lucide="map" class="text-white" style="width:16px;height:16px"></i>
+        </div>
+        <span id="tour-title" class="text-white font-extrabold text-sm"></span>
+      </div>
+      <p id="tour-desc" class="text-slate-300 text-sm leading-relaxed mb-4"></p>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span id="tour-step" class="text-[11px] text-slate-500 font-bold"></span>
+          <div id="tour-dots" class="flex gap-1"></div>
+        </div>
+        <div class="flex gap-2">
+          <button id="tour-skip" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs font-bold transition-colors">Lewati</button>
+          <button id="tour-next" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold transition-colors">Lanjut</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================== LOGIN ======================== -->
   <section id="login-section" class="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -1284,6 +1313,7 @@
       renderMenu('');
       loadStockSummary();
       lucide.createIcons();
+      setTimeout(function () { startTour(); }, 600);
     }
 
     // =================== TAMPILKAN LOGIN ===================
@@ -2083,6 +2113,101 @@
       stokPage += (btn.dataset.stokPage === 'next' ? 1 : -1);
       applyStokView();
     });
+
+    // =================== TOUR GUIDE ===================
+    var TOUR_STEPS = {
+      'teknisi': [
+        { sel: '#greet-title', title: 'Selamat Datang!', desc: 'Halo! Ini adalah dashboard kamu. Di sini kamu bisa ajukan sparepart yang dibutuhkan.' },
+        { sel: '[data-action="bq"]', title: 'BQ Personal', desc: 'Klik di sini untuk buat pengajuan barang baru (Berita Acara). Isi data barang, jumlah, dan alasan pengajuan.' },
+        { sel: '[data-action="stok"]', title: 'Cek Stok', desc: 'Mau tahu stok barang yang tersedia? Klik di sini untuk lihat daftar sparepart lengkap.' },
+        { sel: '[data-action="bqsummary"]', title: 'BQ Summary', desc: 'Pantau status pengajuan kamu. Sudah disetujui, ditolak, atau masih diproses.' },
+        { sel: '#btn-logout', title: 'Logout', desc: 'Selesai kerja? Klik tombol ini untuk keluar dari sistem. Jangan lupa logout ya!' },
+      ],
+      'supervisor 1': [
+        { sel: '#greet-title', title: 'Selamat Datang, Supervisor 1!', desc: 'Kamu punya akses penuh untuk approve pengajuan, lihat laporan, dan kelola stok.' },
+        { sel: '[data-action="prsummary"]', title: 'PR Summary', desc: 'Lihat ringkasan Purchase Request dari seluruh tim. Pantau semua pengajuan di satu tempat.' },
+        { sel: '[data-action="monitoring"]', title: 'Approval BQ', desc: 'Review dan setujui (atau tolak) pengajuan barang dari teknisi. Klik untuk lihat daftar yang menunggu persetujuan.' },
+        { sel: '[data-action="report"]', title: 'Monthly Report', desc: 'Lihat laporan bulanan pengajuan barang. Bisa export ke Excel juga lho.' },
+        { sel: '[data-action="critical"]', title: 'Critical Part', desc: 'Ini daftar sparepart kritis yang harus selalu tersedia. Pantau jangan sampai kosong.' },
+        { sel: '#btn-logout', title: 'Logout', desc: 'Selesai? Klik logout untuk keluar. Tetap jaga keamanan akun ya!' },
+      ],
+      'supervisor 2': [
+        { sel: '#greet-title', title: 'Selamat Datang, Supervisor 2!', desc: 'Kamu bisa approve pengajuan, lihat stok, dan pantau critical parts.' },
+        { sel: '[data-action="bqsummary"]', title: 'BQ Summary', desc: 'Lihat ringkasan seluruh pengajuan BQ. Semua status ada di sini.' },
+        { sel: '[data-action="monitoring"]', title: 'Approval BQ', desc: 'Review pengajuan dari teknisi. Setujui atau beri catatan jika perlu revisi.' },
+        { sel: '[data-action="critical"]', title: 'Critical Part', desc: 'Pantau sparepart kritis. Jangan sampai stok habis dan mengganggu produksi.' },
+        { sel: '[data-action="stok"]', title: 'On Hand Stock', desc: 'Cek stok semua sparepart yang tersedia di gudang.' },
+        { sel: '#btn-logout', title: 'Logout', desc: 'Klik logout saat selesai bekerja.' },
+      ],
+      'officer': [
+        { sel: '#greet-title', title: 'Selamat Datang, Officer!', desc: 'Kamu bertanggung jawab proses pengadaan barang. Lihat pengajuan dan urus pembelian.' },
+        { sel: '[data-action="bqsummary"]', title: 'BQ Summary', desc: 'Lihat semua pengajuan BQ yang masuk. Cek status dan prioritaskan yang urgent.' },
+        { sel: '[data-action="monitoring"]', title: 'Monitoring', desc: 'Pantau perjalanan setiap pengajuan. Dari diajukan sampai barang sampai.' },
+        { sel: '[data-action="critical"]', title: 'Critical Part', desc: 'Daftar sparepart kritis yang perlu segera diurus jika stok menipis.' },
+        { sel: '[data-action="stok"]', title: 'On Hand Stock', desc: 'Cek stok terkini sebelum proses pengadaan.' },
+        { sel: '#btn-logout', title: 'Logout', desc: 'Selesai? Logout ya biar akun aman.' },
+      ],
+      'manager': [
+        { sel: '#greet-title', title: 'Selamat Datang, Pak Manager!', desc: 'Dashboard ini menampilkan ringkasan seluruh aktivitas sparepart. Kamu bisa approve, pantau laporan, dan cek stok.' },
+        { sel: '[data-action="stok"]', title: 'On Hand Stock', desc: 'Lihat stok semua sparepart secara real-time. Filter berdasarkan kategori atau kata kunci.' },
+        { sel: '[data-action="report"]', title: 'Monthly Report', desc: 'Laporan bulanan pengajuan barang. Bisa export ke Excel untuk presentasi.' },
+        { sel: '[data-action="bqsummary"]', title: 'BQ Summary', desc: 'Ringkasan seluruh pengajuan BQ. Berapa yang menunggu, disetujui, atau sudah selesai.' },
+        { sel: '[data-action="monitoring"]', title: 'Approval BQ', desc: 'Approval akhir untuk pengajuan urgent. Kamu yang punya wewenang terakhir.' },
+        { sel: '[data-action="critical"]', title: 'Critical Part', desc: 'Sparepart kritis yang harus selalu dipantau. Jangan sampai kosong!' },
+        { sel: '#btn-logout', title: 'Logout', desc: 'Klik logout saat selesai. Terima kasih sudah memantau!' },
+      ],
+    };
+
+    function tourKey(role) { return 'tour_done_' + (role || '').toLowerCase(); }
+
+    function startTour() {
+      if (!user) return;
+      var key = tourKey(user.role);
+      if (localStorage.getItem(key)) return;
+      var steps = TOUR_STEPS[user.role];
+      if (!steps || !steps.length) return;
+      var idx = 0;
+      var overlay = $('tour-overlay');
+      var spotlight = $('tour-spotlight');
+
+      function show(i) {
+        var s = steps[i];
+        var el = document.querySelector(s.sel);
+        if (!el) { idx++; if (idx < steps.length) show(idx); else finish(); return; }
+        $('tour-title').textContent = s.title;
+        $('tour-desc').textContent = s.desc;
+        $('tour-step').textContent = (i + 1) + ' / ' + steps.length;
+        var dots = $('tour-dots');
+        dots.innerHTML = '';
+        for (var d = 0; d < steps.length; d++) {
+          var dot = document.createElement('span');
+          dot.className = 'w-2 h-2 rounded-full transition-colors';
+          dot.style.background = d <= i ? '#3b82f6' : '#334155';
+          dots.appendChild(dot);
+        }
+        $('tour-next').textContent = i === steps.length - 1 ? 'Mengerti!' : 'Lanjut';
+        var r = el.getBoundingClientRect();
+        spotlight.style.left = (r.left - 8) + 'px';
+        spotlight.style.top = (r.top - 8) + 'px';
+        spotlight.style.width = (r.width + 16) + 'px';
+        spotlight.style.height = (r.height + 16) + 'px';
+        overlay.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function finish() {
+        overlay.classList.remove('active');
+        localStorage.setItem(key, '1');
+      }
+
+      $('tour-next').onclick = function () {
+        idx++;
+        if (idx >= steps.length) finish();
+        else show(idx);
+      };
+      $('tour-skip').onclick = function () { finish(); };
+      show(0);
+    }
 
     // =================== INIT ===================
     (function () {

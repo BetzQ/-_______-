@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
   password     VARCHAR(255) NOT NULL,
   role         VARCHAR(50)  NOT NULL,
   name         VARCHAR(100) NOT NULL,
-  bqLink       TEXT,
+  "bqLink"     TEXT,
   supervisor_id INT REFERENCES users(id) ON DELETE SET NULL,
   created_at   TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT uk_users_username UNIQUE (username)

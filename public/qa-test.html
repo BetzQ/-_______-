@@ -84,6 +84,7 @@
       <button id="btn-stop" disabled class="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors disabled:opacity-30">Hentikan</button>
       <button id="btn-reset" class="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors">Reset</button>
       <button id="btn-export" class="px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors">Export Hasil</button>
+      <button id="btn-failonly" class="px-3 py-2.5 rounded-xl bg-rose-700/30 hover:bg-rose-700/50 text-rose-300 text-xs font-bold transition-colors border border-rose-600/30">Gagal Saja</button>
     </div>
   </header>
 
@@ -1565,6 +1566,31 @@
       $('btn-stop').addEventListener('click', function () { stopped = true; });
       $('btn-reset').addEventListener('click', function () { resetResults(true); });
       $('btn-export').addEventListener('click', exportResults);
+      $('btn-failonly').addEventListener('click', function () {
+        var btn = this;
+        var showingFailOnly = btn.dataset.mode === 'fail';
+        btn.dataset.mode = showingFailOnly ? '' : 'fail';
+        btn.textContent = showingFailOnly ? 'Gagal Saja' : 'Tampilkan Semua';
+        btn.classList.toggle('bg-rose-700/30', showingFailOnly);
+        btn.classList.toggle('bg-blue-700/30', !showingFailOnly);
+        btn.classList.toggle('text-blue-300', !showingFailOnly);
+        btn.classList.toggle('text-rose-300', showingFailOnly);
+        document.querySelectorAll('.sec').forEach(function (sec) {
+          var hasVisible = false;
+          sec.querySelectorAll('.tcard').forEach(function (card) {
+            if (showingFailOnly) {
+              var show = card.dataset.status === 'fail';
+              card.style.display = show ? '' : 'none';
+              if (show) hasVisible = true;
+            } else {
+              card.style.display = '';
+              hasVisible = true;
+            }
+          });
+          if (!showingFailOnly) { sec.style.display = ''; }
+          else { sec.style.display = hasVisible ? '' : 'none'; }
+        });
+      });
 
       if (!UI_AVAILABLE) { $('chk-ui').disabled = true; }
     })();
