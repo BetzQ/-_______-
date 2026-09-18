@@ -1,0 +1,5 @@
+# Puppeteer & QA Testing (terlalu besar untuk Vercel Free Tier)
+run-qa-test.js
+tests/
+node_modules/puppeteer/
+node_modules/.cache/puppeteer/

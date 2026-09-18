@@ -6,19 +6,24 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const authRoutes = require('./src/routes/authRoutes');
+const apiRoutes = require('./src/routes/api');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server E-Sparepart Aktif' });
 });
 
+// Hentikan request /favicon.ico agar tidak menimbulkan noise 404 di log.
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 app.use('/api', authRoutes);
+app.use('/api', apiRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ status: 'error', message: 'Endpoint tidak ditemukan' });
@@ -36,6 +41,5 @@ if (process.env.VERCEL) {
   // Di lokal: jalankan server dengan app.listen seperti biasa.
   app.listen(PORT, () => {
     console.log(`E-Sparepart System berjalan pada port ${PORT}`);
-    console.log(`Health check : http://localhost:${PORT}/api/health`);
   });
 }
