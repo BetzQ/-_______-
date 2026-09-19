@@ -92,6 +92,13 @@
               class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
               placeholder="Masukkan password" />
           </div>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input id="chk-remember" type="checkbox"
+                class="w-4 h-4 rounded border-slate-600 bg-slate-800/60 text-blue-500 focus:ring-blue-500/40 cursor-pointer" />
+              <span class="text-xs text-slate-400">Ingat saya</span>
+            </label>
+          </div>
           <button id="btn-login" type="submit"
             class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-sm tracking-wide transition-all pop focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-40 disabled:cursor-not-allowed mt-2">
             <span id="lbl-masuk">MASUK</span>
@@ -1335,9 +1342,26 @@
     }
 
     // =================== SESSION ===================
-    function loadSession()  { try { const s = sessionStorage.getItem('user'); return s ? JSON.parse(s) : null; } catch { return null; } }
-    function saveSession(u) { sessionStorage.setItem('user', JSON.stringify(u)); }
-    function clearSession() { sessionStorage.removeItem('user'); }
+    function loadSession() {
+      try {
+        var s = localStorage.getItem('user_remember') || sessionStorage.getItem('user');
+        return s ? JSON.parse(s) : null;
+      } catch { return null; }
+    }
+    function saveSession(u) {
+      var json = JSON.stringify(u);
+      if ($('chk-remember') && $('chk-remember').checked) {
+        localStorage.setItem('user_remember', json);
+        sessionStorage.removeItem('user');
+      } else {
+        sessionStorage.setItem('user', json);
+        localStorage.removeItem('user_remember');
+      }
+    }
+    function clearSession() {
+      sessionStorage.removeItem('user');
+      localStorage.removeItem('user_remember');
+    }
 
     // =================== LOGIN HANDLER ===================
     $('login-form').addEventListener('submit', async function (e) {
@@ -2216,6 +2240,17 @@
         showDash(s);
       } else {
         showLogin();
+        var remembered = localStorage.getItem('user_remember');
+        if (remembered) {
+          try {
+            var rUser = JSON.parse(remembered);
+            if (rUser.username) {
+              $('inp-user').value = rUser.username;
+              $('chk-remember').checked = true;
+              $('inp-pass').focus();
+            }
+          } catch {}
+        }
       }
      // Toggle Jenis Pengajuan: Sparepart/Jasa.
      $('f-jenis').addEventListener('change', function () {
