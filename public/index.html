@@ -2210,13 +2210,15 @@
           dots.appendChild(dot);
         }
         $('tour-next').textContent = i === steps.length - 1 ? 'Mengerti!' : 'Lanjut';
-        var r = el.getBoundingClientRect();
-        spotlight.style.left = (r.left - 8) + 'px';
-        spotlight.style.top = (r.top - 8) + 'px';
-        spotlight.style.width = (r.width + 16) + 'px';
-        spotlight.style.height = (r.height + 16) + 'px';
         overlay.classList.add('active');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'instant', block: 'center' });
+        requestAnimationFrame(function () {
+          var r = el.getBoundingClientRect();
+          spotlight.style.left = (r.left - 8) + 'px';
+          spotlight.style.top = (r.top - 8) + 'px';
+          spotlight.style.width = (r.width + 16) + 'px';
+          spotlight.style.height = (r.height + 16) + 'px';
+        });
       }
 
       function finish() {
