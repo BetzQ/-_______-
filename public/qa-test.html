@@ -127,6 +127,7 @@
       <div class="flex items-center gap-1 px-3 pt-2 bg-slate-900/60 border-b border-slate-800 shrink-0">
         <button data-tab="tests" class="tabbtn px-4 py-2 text-xs font-bold rounded-t-lg text-white bg-slate-800 border-b-2 border-blue-500">Daftar Tes</button>
         <button data-tab="log" class="tabbtn px-4 py-2 text-xs font-bold rounded-t-lg text-slate-400 hover:text-white">Log Lengkap</button>
+        <button data-tab="failed" class="tabbtn px-4 py-2 text-xs font-bold rounded-t-lg text-slate-400 hover:text-white">Gagal <span id="failed-count" class="hidden ml-1 bg-rose-600 text-white text-[10px] px-1.5 py-0.5 rounded-full font-extrabold">0</span></button>
         <div class="ml-auto flex items-center gap-2 pb-1">
           <label class="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 cursor-pointer">
             <input id="chk-autoopen" type="checkbox" checked class="accent-blue-500"> auto-buka log
@@ -136,6 +137,7 @@
 
       <div id="tab-tests" class="flex-1 overflow-y-auto p-3 space-y-2 min-h-0"></div>
       <div id="tab-log" class="hidden flex-1 overflow-y-auto p-3 font-mono text-[11px] min-h-0 bg-slate-950/60"></div>
+      <div id="tab-failed" class="hidden flex-1 overflow-y-auto p-3 space-y-2 min-h-0"></div>
     </section>
   </main>
 
@@ -146,15 +148,15 @@
 
     // Nilai acuan baseline (ubah jika data master berubah).
     var EXPECT = {
-      total_spareparts: 663,
-      critical: 155,
-      low: 284,
-      out: 140,
-      pengajuan: 200,     // jumlah awal (bisa bertambah bila ada pengajuan baru)
+      total_spareparts: 3022,
+      critical: 210,
+      low: 356,
+      out: 1887,
+      pengajuan: 1481,    // jumlah awal (bisa bertambah bila ada pengajuan baru)
       months: 21,
-      pengajuanSep: 8,    // Sep 2026
-      pengajuanFeb: 20,   // Feb 2025
-      pengajuanJan: 16,   // Jan 2025
+      pengajuanSep: 46,   // Sep 2026
+      pengajuanFeb: 132,  // Feb 2025
+      pengajuanJan: 63,   // Jan 2025
       log_count: 3,       // audit trail BQ-2026-09-01-0001
     };
     var FIXED_LOG_NO = 'BQ-2026-09-01-0001';
@@ -1311,6 +1313,9 @@
       $('c-done').textContent = done + ' / ' + TESTS.length + ' selesai';
       $('progress').style.width = (TESTS.length ? (done / TESTS.length * 100) : 0) + '%';
       $('c-time').textContent = startedAt ? ((nowMs() - startedAt) / 1000).toFixed(1) + 's' : '0.0s';
+      var badge = $('failed-count');
+      if (fail > 0) { badge.textContent = fail; badge.classList.remove('hidden'); }
+      else { badge.classList.add('hidden'); }
       SECTIONS.forEach(function (sec) {
         var list = testsOfGroup(sec.group);
         var ok = 0;
@@ -1507,6 +1512,34 @@
       });
       $('tab-tests').classList.toggle('hidden', name !== 'tests');
       $('tab-log').classList.toggle('hidden', name !== 'log');
+      $('tab-failed').classList.toggle('hidden', name !== 'failed');
+      if (name === 'failed') renderFailedTab();
+    }
+    function renderFailedTab() {
+      var el = $('tab-failed');
+      el.innerHTML = '';
+      var failed = TESTS.filter(function (t) { return results[t.id] && results[t.id].status === 'fail'; });
+      if (!failed.length) {
+        el.innerHTML = '<div class="text-center text-slate-500 py-8 text-sm">Tidak ada tes yang gagal.</div>';
+        return;
+      }
+      failed.forEach(function (t) {
+        var r = results[t.id];
+        var card = document.createElement('div');
+        card.className = 'bg-rose-950/40 border border-rose-800/50 rounded-lg p-3';
+        card.innerHTML =
+          '<div class="flex items-center justify-between mb-1">' +
+            '<span class="text-rose-400 font-bold text-xs">' + t.id + '</span>' +
+            '<span class="text-[10px] text-slate-500">' + t.group + ' | P' + t.priority + '</span>' +
+          '</div>' +
+          '<div class="text-white text-xs font-semibold mb-1">' + t.title + '</div>' +
+          '<div class="text-rose-300 text-[11px]">' + (r.message || '-') + '</div>' +
+          '<div class="text-slate-600 text-[10px] mt-1">Expected: ' + t.expected + '</div>';
+        el.appendChild(card);
+      });
+      var badge = $('failed-count');
+      badge.textContent = failed.length;
+      badge.classList.remove('hidden');
     }
     document.querySelectorAll('.tabbtn').forEach(function (b) {
       b.addEventListener('click', function () { switchTab(b.dataset.tab); });

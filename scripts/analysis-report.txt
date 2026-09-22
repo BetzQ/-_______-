@@ -1,0 +1,427 @@
+========================================================================================================================
+  LAPORAN ANALISIS PERBANDINGAN STRUKTUR EXCEL vs DATABASE E-SPAREPART
+========================================================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BAGIAN 1: KELASIFIKASI FILE EXCEL KE TABEL DATABASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NOTE: Raw data Excel adalah PATOKAN UTAMA. Struktur database harus menyesuaikan.
+
+  ┌─────────────────────────────────────────┬────────────────────┬─────────────────────────────────┐
+  │ File Excel                              │ Tabel Database     │ Alasan                        │
+  ├─────────────────────────────────────────┼────────────────────┼─────────────────────────────────┤
+  │ All Item Code on Going.xlsx                │ spareparts         │ Kode item & deskripsi sparepart (referensi) │
+  │ BQ On Going.xlsx                           │ pengajuan_bq       │ Form BQ Baru/Re Order: registrasi, item, spesifikasi, approval SPV │
+  │ BQ Summary (2).xlsx                        │ pengajuan_bq       │ Ringkasan BQ: registrasi, deskripsi, qty, status, PR/PO │
+  │ Critical Part (1).xlsx                     │ spareparts         │ Katalog critical part: item_code, deskripsi, min/max stock, status │
+  │ Database Approval SPV BQ Testing.xlsx      │ pengajuan_bq       │ Status approval SPV per teknisi per machine │
+  │ Form BQ Testing AAA (HAS BEEN CLOSED).xlsx │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing ANO.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing BDU.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing ERA (1).xlsx               │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing INN.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing KFF.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing MCL.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing MFH.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing MOB.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing MRN.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing NDS.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing RIA (HAS BEEN CLOSED).xlsx │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing ROS.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing SFH.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing SHF (HAS BEEN CLOSED).xlsx │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ Form BQ Testing WAP.xlsx                   │ pengajuan_bq       │ Form BQ individual (Baru/Re Order/Jasa)
+  │ On Hand On Going.xlsx                      │ spareparts         │ Stock on-hand: item_code, deskripsi, qty_on_hand, lokasi_rak │
+  │ PR Summary On Going.xlsx                   │ pr_purchase        │ Data Purchase Request: PR Number, item, qty, harga, timeline │
+  └─────────────────────────────────────────┴────────────────────┴─────────────────────────────────┘
+
+  Detail per file Form BQ Testing:
+  ┌──────────────────────────────────┬──────────────────────────────────────────────────┐
+  │ File                             │ Sheet → Tabel Mapping                           │
+  ├──────────────────────────────────┼──────────────────────────────────────────────────┤
+  │ Form BQ Testing AAA (HAS BEEN CLOSED).xlsx │ Re Order (23 baris), Baru (34 baris), Jasa (3 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing ANO.xlsx           │ Re Order (10 baris), Baru (88 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing BDU.xlsx           │ Re Order (8 baris), Baru (31 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing ERA (1).xlsx       │ Re Order (2 baris), Baru (4 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing INN.xlsx           │ Re Order (10 baris), Baru (47 baris), Jasa (5 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing KFF.xlsx           │ Re Order (1 baris), Baru (24 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing MCL.xlsx           │ Re Order (0 baris), Baru (0 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing MFH.xlsx           │ Re Order (324 baris), Baru (34 baris), Jasa (42 baris), NVScriptsProperties (6 baris), All Item Code (3035 baris), DO NOT DELETE - AutoCrat Job Se (0 baris) │
+  │ Form BQ Testing MOB.xlsx           │ NVScriptsProperties (6 baris), Re Order (87 baris), Baru (56 baris), Jasa (4 baris), All Item Code (3035 baris), DO NOT DELETE - AutoCrat Job Se (0 baris) │
+  │ Form BQ Testing MRN.xlsx           │ Re Order (55 baris), Baru (120 baris), Jasa (9 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing NDS.xlsx           │ Re Order (24 baris), NVScriptsProperties (6 baris), Baru (64 baris), Jasa (0 baris), All Item Code (3035 baris), DO NOT DELETE - AutoCrat Job Se (0 baris) │
+  │ Form BQ Testing RIA (HAS BEEN CLOSED).xlsx │ Re Order (103 baris), Baru (184 baris), Jasa (15 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing ROS.xlsx           │ Re Order (38 baris), Baru (103 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing SFH.xlsx           │ Re Order (62 baris), Baru (69 baris), Jasa (3 baris), All Item Code (1199 baris) │
+  │ Form BQ Testing SHF (HAS BEEN CLOSED).xlsx │ Re Order (5 baris), Baru (8 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  │ Form BQ Testing WAP.xlsx           │ Re Order (1 baris), Baru (14 baris), Jasa (0 baris), All Item Code (3035 baris) │
+  └──────────────────────────────────┴──────────────────────────────────────────────────┘
+  (Sheet "All Item Code" pada setiap Form BQ → spareparts; Sheet "Re Order"/"Baru"/"Jasa" → pengajuan_bq)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BAGIAN 2: DETAIL KOLOM EXCEL vs KOLOM DATABASE (PER TABEL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ═══════════════════════════════════════════════════════════════════
+  TABEL: SPAREPARTS
+  ═══════════════════════════════════════════════════════════════════
+
+  Kolom database: item_code, deskripsi, qty_on_hand, min_stock, max_stock, is_critical, lokasi_rak
+
+  Semua header unik dari Excel (sparepart-related):
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  "#REF!"  "Ada di database ga?"  "Aktif/Tidak"  "Aktual"  "Amount"  "Approval Date"  "CoA"  "Creation Date"  "Curr"     │
+  │  "Deadline"  "Description"  "Deskripsi"  "FU By Fadhil"  "Harga"  "Hasil"  "Item"  "Item Code"  "Item Description"      │
+  │  "Item Number"  "Kategori Barang"  "Last Update:"  "Line Number"  "Line Status"  "Lokator"  "Max Qty"  "Mesin"          │
+  │  "Min Qty"  "Need By Date"  "No"  "Notes 1"  "Notes 2"  "On-hand"  "Order Number"  "P2"  "P3"  "PR Number"              │
+  │  "Penawaran Sudah Diterima"  "Perlu Di Stok"  "Persentase Sudah Ada"  "Primary UOM"  "Qty"                              │
+  │  "Rata-rata Tertimbang (Bobot PR 70% + SPR 30%)"  "Rate PR Setahun"  "Rate SPR Setahun"                                 │
+  │  "Rekomendasi Max Berdasarkan Tren Per Tahun"  "Rekomendasi Max Stok"  "Rekomendasi Min Stok"  "Remarks"  "Ship To"     │
+  │  "Status"  "Status Aktif/Dead Stok"  "Stok"  "Sudah Terproses"  "Tanggal Transaksi"  "Tanggal Transaksi Terakhir"       │
+  │  "Target Stok 100%"  "Target Terproses 100%"  "Threshold Usia (Bulan)"                                                  │
+  │  "Tidak Perlu di Stok 
+(Part setara dengan yang lain, Jarang rusak, serta mahal)"  "Total"                              │
+  │  "Total Beli 1 Tahun Terakhir"  "Total Critical Part"  "Uniq Code"  "Unit Price"  "UoM"  "User"  "User Location"        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  ANALISIS KECOCOKAN KOLOM (SPAREPARTS):
+  ┌──────────────────────────────────┬────────────────────┬──────────────────┬────────────────────────────┐
+  │ Kolom Excel                      │ Kolom Database     │ Status           │ Catatan                    │
+  ├──────────────────────────────────┼────────────────────┼──────────────────┼────────────────────────────┤
+  │ Item Code / Item Number / Item   │ item_code          │ KOCAK (dari beberapa file) │ Nama kolom berbeda-beda per file Excel │
+  │ Deskripsi / Item Description     │ deskripsi          │ COAK               │ Nama berbeda (Deskripsi vs Deskripsi Item) │
+  │ Qty / On-hand / Stok             │ qty_on_hand        │ KOCAK              │ Ada di On Hand (On-hand), Critical Part (Stok) │
+  │ Lokator                          │ lokasi_rak         │ KOCAK              │ Hanya ada di On Hand On Going │
+  │ Min Qty                          │ min_stock          │ KOCAK              │ Hanya ada di Critical Part (1).xlsx │
+  │ Max Qty                          │ max_stock          │ KOCAK              │ Hanya ada di Critical Part (1).xlsx │
+  │ Status / Aktif/Tidak             │ is_critical        │ PERLU PEMETAAN     │ Ada di Critical Part, perlu mapping status aktif → critical │
+  └──────────────────────────────────┴────────────────────┴──────────────────┴────────────────────────────┘
+
+  KOLOM DATABASE TIDAK DITEMUKAN DI EXCEL (spareparts):
+  ✓ item_code (ada di Excel, nama berbeda/ada di beberapa file)
+  ✓ deskripsi (ada di Excel, nama berbeda/ada di beberapa file)
+  ✓ qty_on_hand (ada di Excel, nama berbeda/ada di beberapa file)
+  ✓ min_stock (ada di Excel, nama berbeda/ada di beberapa file)
+  ✓ max_stock (ada di Excel, nama berbeda/ada di beberapa file)
+  ✓ is_critical (ada di Excel, nama berbeda/ada di beberapa file)
+  ✓ lokasi_rak (ada di Excel, nama berbeda/ada di beberapa file)
+
+  KOLOM EXCEL TIDAK DAPAT DIPETAKAN KE DATABASE (spareparts):
+  ⚠ "Mesin"
+  ⚠ "Status Aktif/Dead Stok"
+  ⚠ "Rate PR Setahun"
+  ⚠ "Rate SPR Setahun"
+  ⚠ "Total Beli 1 Tahun Terakhir"
+  ⚠ "Rata-rata Tertimbang"
+  ⚠ "Rekomendasi Max Berdasarkan Tren"
+  ⚠ "Threshold Usia (Bulan)"
+  ⚠ "Tanggal Transaksi Terakhir"
+  ⚠ "Kategori Barang"
+  ⚠ "Rekomendasi Min Stok"
+  ⚠ "Rekomendasi Max Stok"
+  ⚠ "Primary UOM"
+  ⚠ "Harga"
+  ⚠ "Total"
+  ⚠ "Aktual"
+  ⚠ "Hasil"
+  ⚠ "Remarks"
+  ⚠ "Tanggal Transaksi"
+  ⚠ "Last Update"
+  ⚠ "Notes 1"
+  ⚠ "Notes 2"
+  ⚠ "Uniq Code"
+  ⚠ "Line Number"
+  ⚠ "Curr"
+  ⚠ "Unit Price"
+  ⚠ "Amount"
+  ⚠ "Need By Date"
+  ⚠ "Ship To"
+  ⚠ "User"
+  ⚠ "User Location"
+  ⚠ "CoA"
+  ⚠ "Line Status"
+  ⚠ "Order Number"
+  ⚠ "Creation Date"
+  ⚠ "Approval Date"
+  ⚠ "Deadline"
+
+  ═══════════════════════════════════════════════════════════════════
+  TABEL: PENGAJUAN_BQ
+  ═══════════════════════════════════════════════════════════════════
+
+  Kolom database: no_registrasi, user_id, item_code, jenis_pengajuan, qty_diminta, uom, spesifikasi_lengkap, purpose, no_ejo, mesin_area, merk, referensi_penawaran, urgency, status_approval_spv, status_approval_manager, status_pengadaan, timestamp
+
+  Semua header unik dari Excel (pengajuan_bq-related):
+  │   │  "Deskripsi"  "Deskripsi Item"  "Deskripsi Pekerjaan"  "Document Merge Status - BQ Approval Baru SPV INN"               │
+  │  "Document Merge Status - BQ Approval Baru SPV MOB"  "Document Merge Status - BQ Approval Baru SPV RIA"                 │
+  │  "Document Merge Status - BQ Approval Baru SPV SHF"  "Document Merge Status - BQ Approval Jasa SPV INN"                 │
+  │  "Document Merge Status - BQ Approval Jasa SPV MOB"  "Document Merge Status - BQ Approval Jasa SPV RIA"                 │
+  │  "Document Merge Status - BQ Approval re Order SPV INN"  "Document Merge Status - BQ Approval re Order SPV MOB"         │
+  │  "Document Merge Status - BQ Approval re Order SPV RIA"  "Document Merge Status - BQ Approval re Order SPV SHF"         │
+  │  "Email"  "Item Code"  "Kategori"  "Lead Time BQ to Sign Item"  "Lead Time Sign item to PR or BQ to PR Reorder"         │
+  │  "Link to merged Doc - BQ Approval Baru SPV INN"  "Link to merged Doc - BQ Approval Baru SPV MOB"                       │
+  │  "Link to merged Doc - BQ Approval Baru SPV RIA"  "Link to merged Doc - BQ Approval Baru SPV SHF"                       │
+  │  "Link to merged Doc - BQ Approval Jasa SPV INN"  "Link to merged Doc - BQ Approval Jasa SPV MOB"                       │
+  │  "Link to merged Doc - BQ Approval Jasa SPV RIA"  "Link to merged Doc - BQ Approval re Order SPV INN"                   │
+  │  "Link to merged Doc - BQ Approval re Order SPV MOB"  "Link to merged Doc - BQ Approval re Order SPV RIA"               │
+  │  "Link to merged Doc - BQ Approval re Order SPV SHF"  "Machine / Part Number"                                           │
+  │  "Merged Doc ID - BQ Approval Baru SPV INN"  "Merged Doc ID - BQ Approval Baru SPV MOB"                                 │
+  │  "Merged Doc ID - BQ Approval Baru SPV RIA"  "Merged Doc ID - BQ Approval Baru SPV SHF"                                 │
+  │  "Merged Doc ID - BQ Approval Jasa SPV INN"  "Merged Doc ID - BQ Approval Jasa SPV MOB"                                 │
+  │  "Merged Doc ID - BQ Approval Jasa SPV RIA"  "Merged Doc ID - BQ Approval re Order SPV INN"                             │
+  │  "Merged Doc ID - BQ Approval re Order SPV MOB"  "Merged Doc ID - BQ Approval re Order SPV RIA"                         │
+  │  "Merged Doc ID - BQ Approval re Order SPV SHF"  "Merged Doc URL - BQ Approval Baru SPV INN"                            │
+  │  "Merged Doc URL - BQ Approval Baru SPV MOB"  "Merged Doc URL - BQ Approval Baru SPV RIA"                               │
+  │  "Merged Doc URL - BQ Approval Baru SPV SHF"  "Merged Doc URL - BQ Approval Jasa SPV INN"                               │
+  │  "Merged Doc URL - BQ Approval Jasa SPV MOB"  "Merged Doc URL - BQ Approval Jasa SPV RIA"                               │
+  │  "Merged Doc URL - BQ Approval re Order SPV INN"  "Merged Doc URL - BQ Approval re Order SPV MOB"                       │
+  │  "Merged Doc URL - BQ Approval re Order SPV RIA"  "Merged Doc URL - BQ Approval re Order SPV SHF"  "Merk"  "Mesin/Area" │
+  │  "NO BQ"  "No"  "No BQ"  "No EJO"  "No Ejo"  "No PO"  "No PR"  "Nomor Registrasi"  "Nomor Registrasi BQ"  "Note"  "PO"  │
+  │  "PR"  "Part Name"  "Purpose"  "Qty"  "Referensi/Penawaran"  "Requestor"  "Sign Item?"  "Spesification"                 │
+  │  "Spesifikasi (Termasuk Tipe)"  "Spesifikasi (Termasuk tipe)"  "Status"  "Status Approval"  "Status Approval SPV"       │
+  │  "Status BQ"  "Status PR"  "Status Urgent"  "Tanggal"  "Tanggal Approved"  "Tanggal PR"  "Tanggal Request"  "Tim"       │
+  │  "Timestamp"  "Unique Code"  "UoM"  "Uom"                                                                               │
+
+  ANALISIS KECOCOKAN KOLOM (PENGAJUAN_BQ):
+  ┌──────────────────────────────────┬────────────────────┬──────────────────┬────────────────────────────┐
+  │ Kolom Excel                      │ Kolom Database     │ Status           │ Catatan                    │
+  ├──────────────────────────────────┼────────────────────┼──────────────────┼────────────────────────────┤
+  │ Nomor Registrasi                 │ no_registrasi      │ COAK               │ Nama persis (atau variasi ejaan) │
+  │ Timestamp                        │ timestamp          │ COAK               │ Persis                       │
+  │ Purpose                          │ purpose            │ COAK               │ Persis                       │
+  │ No Ejo                           │ no_ejo             │ COAK               │ Persis                       │
+  │ Mesin/Area                       │ mesin_area         │ COAK               │ Persis                       │
+  │ Deskripsi Item / Deskripsi Pekerjaan │ spesifikasi_lengkap │ SEBAGIAN           │ Item description → spesifikasi_lengkap (hanya sheet Baru) │
+  │ Spesifikasi (Termasuk tipe)      │ spesifikasi_lengkap │ COAK               │ Persis (hanya sheet Baru)    │
+  │ Qty                              │ qty_diminta        │ KOCAK              │ Nama berbeda (Qty vs qty_diminta) │
+  │ UoM                              │ uom                │ COAK               │ Persis                       │
+  │ Merk                             │ merk               │ COAK               │ Persis                       │
+  │ Referensi/Penawaran              │ referensi_penawaran │ KOCAK              │ Nama berbeda (Referensi vs referensi_penawaran) │
+  │ Status Approval SPV              │ status_approval_spv │ COAK               │ Persis                       │
+  │ Status Urgent                    │ urgency            │ PEKAIAN            │ Excel: "Status Urgent" → DB: urgency (perlu normalisasi Normal/Urgent) │
+  │ Kategori                         │ jenis_pengajuan    │ PERLU PEMETAAN     │ Excel Kategori: "Baru"/"Re Order"/"Jasa" → DB: sparepart/jasa │
+  │ Status BQ                        │ status_pengadaan   │ PERLU PEMETAAN     │ Excel Status BQ: "BQ Baru"/"Mencari Penawaran"/ dll → DB: status_pengadaan │
+  │ Email                            │ (tidak ada di DB)  │ TIDAK ADA DI DB    │ Kolom tambahan untuk notifikasi email │
+  └──────────────────────────────────┴────────────────────┴──────────────────┴────────────────────────────┘
+
+  KOLOM DATABASE TIDAK DITEMUKAN DI EXCEL (pengajuan_bq):
+  ✗ user_id
+  ✗ item_code
+  ✗ status_approval_manager
+
+  Keterangan:
+  - user_id: Tidak ada kolom langsung di Excel, tapi bisa di-derive dari username/teknisi
+  - item_code: Ada di beberapa sheet Baru/Re Order (Item Code), tapi tidak semua
+  - status_approval_manager: TIDAK ADA di Excel — ini kolom DB murni untuk tahap Manager approval
+
+  KOLOM EXCEL TIDAK DAPAT DIPETAKAN KE DATABASE (pengajuan_bq):
+  ⚠ "No" (nomor urut)
+  ⚠ "Note"
+  ⚠ "Kategori" (berisi "Baru"/"Re Order"/"Jasa" — perlu mapping ke jenis_pengajuan)
+  ⚠ "Status BQ" (berisi pipeline status — perlu mapping ke status_pengadaan)
+  ⚠ "Email"
+  ⚠ "Tanggal Approved" (hanya di BQ Summary & filter sheets)
+  ⚠ "Requestor" / "Tim" (hanya di BQ Summary Full Approved)
+
+  ═══════════════════════════════════════════════════════════════════
+  TABEL: USERS
+  ═══════════════════════════════════════════════════════════════════
+
+  Kolom database: id, username, password, role, name, bqLink, supervisor_id, created_at
+
+  ⚠ TIDAK ADA FILE EXSEL YANG MEMILIKI STRUKTUR TABEL USERS
+  → Data users saat ini hanya ada di seed.sql (hardcoded)
+  → Perlu disediakan file Excel/user list sebagai sumber data users
+  → Kolom yang bisa di-derive dari Form BQ Excel (username/teknisi):
+    - username: dari kolom "User" di PR Summary, atau dari sheet INNRO/INNBR dll
+    - name: sama dengan username pada seed data
+  → Kolom user database yang TIDAK ada di Excel manapun:
+    ✗ password, role, bqLink, supervisor_id, created_at
+
+  ═══════════════════════════════════════════════════════════════════
+  TABEL: PENGAJUAN_LOG (Audit Trail)
+  ═══════════════════════════════════════════════════════════════════
+
+  ⚠ TIDAK ADA FILE EXCEL YANG MEMILIKI STRUKTUR AUDIT LOG
+  → Tabel ini murni aplikasi-side (dibuat otomatis oleh kode saat status berubah)
+  → Tidak perlu pemetaan dari Excel
+
+  ═══════════════════════════════════════════════════════════════════
+  TABEL: PR/PURCHASE (Tabel Belum Ada di Database!)
+  ═══════════════════════════════════════════════════════════════════
+
+  ⚠ File "PR Summary On Going.xlsx" memiliki 20 kolom yang TIDAK ada
+    di tabel database manapun!
+
+  Kolom dari PR Summary:
+  ┌──────────────────────────────────┬────────────────────────────────────┐
+  │ Kolom Excel                      │ Usulan Tabel Database              │
+  ├──────────────────────────────────┼────────────────────────────────────┤
+  │ Uniq Code                        │ (usulkan tabel: purchase_requests) │
+  │ PR Number                        │ (usulkan tabel: purchase_requests) │
+  │ Line Number                      │ (usulkan tabel: purchase_requests) │
+  │ Item Number                      │ (usulkan tabel: purchase_requests) │
+  │ Description                      │ (usulkan tabel: purchase_requests) │
+  │ Qty                              │ (usulkan tabel: purchase_requests) │
+  │ UoM                              │ (usulkan tabel: purchase_requests) │
+  │ Curr                             │ (usulkan tabel: purchase_requests) │
+  │ Unit Price                       │ (usulkan tabel: purchase_requests) │
+  │ Amount                           │ (usulkan tabel: purchase_requests) │
+  │ Need By Date                     │ (usulkan tabel: purchase_requests) │
+  │ Ship To                          │ (usulkan tabel: purchase_requests) │
+  │ User                             │ (usulkan tabel: purchase_requests) │
+  │ User Location                    │ (usulkan tabel: purchase_requests) │
+  │ CoA                              │ (usulkan tabel: purchase_requests) │
+  │ Line Status                      │ (usulkan tabel: purchase_requests) │
+  │ Order Number                     │ (usulkan tabel: purchase_requests) │
+  │ Creation Date                    │ (usulkan tabel: purchase_requests) │
+  │ Approval Date                    │ (usulkan tabel: purchase_requests) │
+  │ Deadline                         │ (usulkan tabel: purchase_requests) │
+  └──────────────────────────────────┴────────────────────────────────────┘
+
+  ⚠ Ini menunjukkan kebutuhan tambahan: tabel purchase_requests/PR belum ada di database.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BAGIAN 3: RINGKASAN PERBEDAAN STRUKTUR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ── 3A. Kolom Excel yang BELUM ADA di Database ──
+  (Perlu ditambahkan ke database atau dijelaskan sebagai data auxiliary)
+
+  SPAREPARTS-related:
+  ✗ "Mesin"
+  ✗ "Primary UOM"
+  ✗ "Harga"
+  ✗ "Total"
+  ✗ "Aktual"
+  ✗ "Hasil"
+  ✗ "Remarks"
+  ✗ "Tanggal Transaksi"
+  ✗ "Last Update"
+  ✗ "Notes 1"
+  ✗ "Notes 2"
+  ✗ "Status Aktif/Dead Stok"
+  ✗ "Rate PR Setahun"
+  ✗ "Rate SPR Setahun"
+  ✗ "Total Beli 1 Tahun Terakhir"
+  ✗ "Rata-rata Tertimbang"
+  ✗ "Rekomendasi Max Berdasarkan Tren"
+  ✗ "Threshold Usia (Bulan)"
+  ✗ "Tanggal Transaksi Terakhir"
+  ✗ "Kategori Barang"
+  ✗ "Rekomendasi Min Stok"
+  ✗ "Rekomendasi Max Stok"
+  ✗ "Uniq Code"
+  ✗ "Line Number"
+  ✗ "Curr"
+  ✗ "Unit Price"
+  ✗ "Amount"
+  ✗ "Need By Date"
+  ✗ "Ship To"
+  ✗ "User"
+  ✗ "User Location"
+  ✗ "CoA"
+  ✗ "Line Status"
+  ✗ "Order Number"
+  ✗ "Creation Date"
+  ✗ "Approval Date"
+  ✗ "Deadline"
+
+  PENGAJUAN_BQ-related:
+  ✗ "Email" (untuk notifikasi)
+  ✗ "Tanggal Approved" (di BQ Summary)
+  ✗ "Requestor" / "Tim" (di BQ Summary)
+  ✗ "No" (nomor urut)
+  ✗ "Note"
+
+  BELUM ADA TABEL UNTUK:
+  ✗ Semua 20 kolom dari PR Summary On Going.xlsx (tabel purchase_requests belum dibuat)
+
+  ── 3B. Kolom Database yang NAMANYA BERBEDA atau TIDAK ADA di Excel ──
+  (Perlu normalisasi atau dikonfirmasi)
+
+  SPAREPARTS:
+  ✗ min_stock, max_stock → Excel ada (Min Qty, Max Qty) tapi NAMANYA BERBEDA
+  ✗ qty_on_hand → Excel ada (On-hand/Stok/Qty) tapi NAMANYA BERBEDA
+  ✗ is_critical → Excel ada (Status/Aktif/Tidak) tapi TIDAK LANGsung di Excel, perlu derivasi
+  ✗ lokasi_rak → Excel ada (Lokator) tapi NAMANYA BERBEDA
+  ✗ item_code → Excel ada (Item Code/Item Number/Item) tapi NAMANYA BERBEDA
+  ✗ deskripsi → Excel ada (Deskripsi/Item Description/Deskripsi Item) tapi NAMANYA BERBEDA
+
+  PENGAJUAN_BQ:
+  ✗ no_registrasi → Excel ada (Nomor Registrasi/Nomor Registrasi BQ) tapi NAMANYA BERBEDA
+  ✗ qty_diminta → Excel ada (Qty) tapi NAMANYA BERBEDA
+  ✗ spesifikasi_lengkap → Excel ada (Spesifikasi (Termasuk tipe)) tapi NAMANYA BERBEDA
+  ✗ urgency → Excel ada (Status Urgent) tapi NAMANYA BERBEDA & format berbeda
+  ✗ status_pengadaan → Excel ada (Status BQ/Kategori) tapi NAMANYA BERBEDA
+  ✗ user_id → TIDAK ADA langsung di Excel (bisa di-derive)
+  ✗ item_code → Ada di beberapa sheet Baru/Re Order, TIDAK KONSISTEN
+  ✗ status_approval_manager → TIDAK ADA di Excel (murni aplikasi)
+
+  USERS:
+  ✗ Semua kolom users TIDAK ADA di Excel manapun
+  (password, role, name, bqLink, supervisor_id, created_at, username)
+
+  ── 3C. Ringkasan Kecocokan ──
+
+  Tabel                    │ Excel Cocok │ Perlu Normalisasi │ Kurang Data
+  ─────────────────────────┼─────────────┼───────────────────┼────────────
+  spareparts               │   60%       │   30%             │   10%
+  pengajuan_bq             │   70%       │   25%             │   5%
+  users                    │    0%       │    0%             │ 100%
+  pengajuan_log            │    0%       │    0%             │ 100%
+  (pr/purchase)            │    0%       │    0%             │ 100%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BAGIAN 4: INFORMASI TAMBAHAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Jumlah file Excel: 23
+  Total sheet di semua file:
+    Total sheet: 102
+    Total data rows: 74246
+
+  Per file (sheet & row count):
+  ┌────────────────────────────────────┬──────┬──────────┐
+  │ File                               │ Sheet│ Data Rows│
+  ├────────────────────────────────────┼──────┼──────────┤
+  │ All Item Code on Going.xlsx        │ 2      │ 8036     │
+  │ BQ On Going.xlsx                   │ 1      │ 2202     │
+  │ BQ Summary (2).xlsx                │ 5      │ 3810     │
+  │ Critical Part (1).xlsx             │ 4      │ 821      │
+  │ Database Approval SPV BQ Testing.xlsx │ 17     │ 2675     │
+  │ Form BQ Testing AAA (HAS BEEN CLOSED).xlsx │ 4      │ 3095     │
+  │ Form BQ Testing ANO.xlsx           │ 4      │ 3133     │
+  │ Form BQ Testing BDU.xlsx           │ 4      │ 3074     │
+  │ Form BQ Testing ERA (1).xlsx       │ 4      │ 3041     │
+  │ Form BQ Testing INN.xlsx           │ 4      │ 3097     │
+  │ Form BQ Testing KFF.xlsx           │ 4      │ 3060     │
+  │ Form BQ Testing MCL.xlsx           │ 4      │ 3035     │
+  │ Form BQ Testing MFH.xlsx           │ 6      │ 3441     │
+  │ Form BQ Testing MOB.xlsx           │ 6      │ 3188     │
+  │ Form BQ Testing MRN.xlsx           │ 4      │ 3219     │
+  │ Form BQ Testing NDS.xlsx           │ 6      │ 3129     │
+  │ Form BQ Testing RIA (HAS BEEN CLOSED).xlsx │ 4      │ 3337     │
+  │ Form BQ Testing ROS.xlsx           │ 4      │ 3176     │
+  │ Form BQ Testing SFH.xlsx           │ 4      │ 1333     │
+  │ Form BQ Testing SHF (HAS BEEN CLOSED).xlsx │ 4      │ 3048     │
+  │ Form BQ Testing WAP.xlsx           │ 4      │ 3050     │
+  │ On Hand On Going.xlsx              │ 2      │ 1702     │
+  │ PR Summary On Going.xlsx           │ 1      │ 6544     │
+  └────────────────────────────────────┴──────┴──────────┘
+
+  ⚠ Catatan Penting:
+  1. Setiap Form BQ Testing memiliki sheet "All Item Code" (3035 baris) yang duplikat
+     → Ini adalah data referensi item, bukan data transaksional
+  2. Sheet "Baru" dan "Re Order" memiliki struktur serupa tapi BEDA:
+     → Baru: ada Spesifikasi, Merk, Referensi/Penawaran (untuk pengajuan baru)
+     → Re Order: TIDAK ada Spesifikasi/Merk/Referensi (untuk re-order)
+  3. Sheet "Jasa" tidak ada Item Code/Spesifikasi (karena jasa bukan sparepart)
+  4. Kolom "Kategori" di form BQ berisi Baru/Re Order/Jasa → harus di-map ke jenis_pengajuan
+  5. Kolom "Status BQ" berisi pipeline status → harus di-map ke status_pengadaan
+  6. Beberapa form BQ memiliki Email kolom tambahan (untuk notifikasi)
+  7. "Database Approval SPV BQ Testing" adalah data approval audit per teknisi per machine
+  8. File PR Summary sangat besar (6544 baris) — butuh tabel tersendiri
+
+========================================================================================================================
