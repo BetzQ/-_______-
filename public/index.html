@@ -317,11 +317,14 @@
       <form id="form-bq" class="p-6 space-y-4">
         <div>
            <label for="f-itemcode" class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5 block">Item Code</label>
-           <select id="f-itemcode"
-             class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all">
-             <option value="">-- Pilih Item Code --</option>
-           </select>
-           <p class="text-[11px] text-slate-500 mt-1.5">Pilih dari daftar sparepart terpusat agar kode tidak salah ketik. Kosongkan jika Jasa.</p>
+           <div class="relative">
+             <input id="f-itemcode" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Ketik kode atau nama sparepart… (contoh: O-50834 atau Bearing)"
+               oninput="filterItemCodes()" onfocus="showItemcodeList()" onkeydown="itemcodeKeydown(event)" onblur="hideItemcodeListSoon()"
+               class="w-full px-4 py-3 rounded-xl bg-slate-800/60 border border-slate-700 text-white text-sm placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all" />
+             <div id="itemcode-list" class="hidden absolute z-20 left-0 right-0 mt-1.5 max-h-56 overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 shadow-2xl"></div>
+           </div>
+           <p class="text-[11px] text-slate-500 mt-1.5">Ketik untuk mencari (misal: "O-50834" atau "Bearing"), lalu klik hasilnya. Kosongkan jika Jasa.</p>
         </div>
         <div>
           <label for="f-qty" class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-1.5 block">Qty Diminta</label>
@@ -949,18 +952,91 @@
       panel.classList.remove('hidden');
     }
 
+    // =================== ITEM CODE: CARI CEPAT (COMBOBOX) ===================
+    let SPAREPARTS_ALL = [];
+    let itemcodeActive = -1;
+    let itemcodeHideTimer = null;
+
+    function itemcodeResults() {
+      const q = ($('f-itemcode').value || '').trim().toLowerCase();
+      const base = q
+        ? SPAREPARTS_ALL.filter(function (p) {
+            return String(p.item_code || '').toLowerCase().includes(q) ||
+                   String(p.deskripsi || '').toLowerCase().includes(q);
+          })
+        : SPAREPARTS_ALL.slice();
+      return base.slice(0, 80);
+    }
+
+    function renderItemcodeList() {
+      const list = $('itemcode-list');
+      const res = itemcodeResults();
+      if (!res.length) {
+        list.classList.add('hidden');
+        list.innerHTML = '<div class="px-3 py-3 text-xs text-slate-500">Tidak ditemukan. Boleh lanjut isi manual — wajib pakai kode yang benar.</div>';
+        return;
+      }
+      list.innerHTML = res.map(function (p, i) {
+        const on = i === itemcodeActive
+          ? 'bg-blue-600/40 ring-1 ring-blue-500/60'
+          : 'hover:bg-slate-800';
+        return '<div data-index="' + i + '" class="px-3 py-2 cursor-pointer flex flex-col gap-0.5 ' + on + '">' +
+          '<span class="font-mono text-xs text-sky-300">' + esc(p.item_code) + '</span>' +
+          '<span class="text-[11px] text-slate-400 truncate">' + esc(p.deskripsi || '') + '</span>' +
+        '</div>';
+      }).join('');
+      list.classList.remove('hidden');
+    }
+
+    function showItemcodeList() {
+      clearTimeout(itemcodeHideTimer);
+      itemcodeActive = -1;
+      renderItemcodeList();
+    }
+
+    function hideItemcodeListSoon() {
+      clearTimeout(itemcodeHideTimer);
+      itemcodeHideTimer = setTimeout(function () {
+        const list = $('itemcode-list');
+        list.classList.add('hidden');
+        list.innerHTML = '';
+      }, 150);
+    }
+
+    function filterItemCodes() {
+      itemcodeActive = -1;
+      renderItemcodeList();
+    }
+
+    function itemcodeSelect(i) {
+      const res = itemcodeResults();
+      const p = res[i];
+      if (!p) return;
+      $('f-itemcode').value = p.item_code;
+      $('itemcode-list').classList.add('hidden');
+    }
+
+    function itemcodeKeydown(e) {
+      const res = itemcodeResults();
+      if (e.key === 'ArrowDown') { e.preventDefault(); itemcodeActive = Math.min(itemcodeActive + 1, res.length - 1); renderItemcodeList(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); itemcodeActive = Math.max(itemcodeActive - 1, 0); renderItemcodeList(); }
+      else if (e.key === 'Enter') { if (itemcodeActive >= 0 && res[itemcodeActive]) { e.preventDefault(); itemcodeSelect(itemcodeActive); $('f-qty').focus(); } }
+      else if (e.key === 'Tab' || e.key === 'Escape') { $('itemcode-list').classList.add('hidden'); }
+    }
+
+    $('itemcode-list').addEventListener('mousedown', function (e) {
+      const row = e.target.closest('[data-index]');
+      if (row) { e.preventDefault(); itemcodeSelect(Number(row.dataset.index)); }
+    });
+
+    // =================== BQ MODAL ===================
     async function openBqModal() {
       try {
         const parts = await fetchSpareparts();
-        const sel = $('f-itemcode');
-        if (!parts.length) {
-          sel.innerHTML = '<option value="">-- Belum ada data sparepart --</option>';
-        } else {
-          sel.innerHTML = '<option value="">-- Pilih Item Code --</option>' +
-            parts.map((p) =>
-              '<option value="' + esc(p.item_code) + '">' + esc(p.item_code) + ' — ' + esc(p.deskripsi) + '</option>'
-            ).join('');
-        }
+        SPAREPARTS_ALL = parts;
+        itemcodeActive = -1;
+        $('f-itemcode').value = '';
+        hideItemcodeListSoon();
         $('modal-bq').classList.remove('hidden');
         setTimeout(function () { $('f-qty').focus(); }, 50);
       } catch (err) {

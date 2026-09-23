@@ -38,6 +38,8 @@
 | `BQ-2025-01-07-0007` | Menunggu | BQ Baru | RBAC-15 |
 
 > Contoh di atas diambil dari data master (seed). Jika salah satu tidak ada di DB Anda, ganti dengan no registrasi yang **statusnya sama** yang terlihat di menu Monitoring.
+>
+> **Fitur baru (form BQ Personal):** kolom Item Code kini **bisa diketik untuk mencari** — ketik kode ATAU nama sparepart (mis. "O-50834" atau "Bearing"), daftar tersaring otomatis, lalu klik hasilnya. Bisa juga pakai panah ↑/↓ + Enter; tidak perlu scroll ribuan baris lagi.
 
 ### 3) Contoh `itemCode` sparepart
 
@@ -107,119 +109,141 @@
 
 ## 🚪 SECTION 3: RBAC (Akses Berdasarkan Peran)
 
-**RBAC-08: Teknisi dilarang ubah status (403)**
-- Login: `AAA` / `04AAA10`
-- Langkah: Coba ubah status pengajuan `BQ-2026-09-01-0001`
-- Expected: Ditolak (403), pesan `Anda tidak memiliki akses untuk mengubah status pengajuan`
+> **Cara menuju tabelnya:** login role terkait → di dashboard klik tile **"Approval BQ"** → muncul modal **"Monitoring & Approval BQ"**.
+>
+> **Peta kolom tabel (kiri → kanan):**
+> 1. **No. Registrasi** — nomor unik (pakai kolom "Cari" di atas tabel untuk mencari baris)
+> 2. **Waktu** — tanggal & jam pengajuan
+> 3. **Teknisi** — nama + username + No. EJO/mesin
+> 4. **Barang** — `item_code` + deskripsi + purpose/pcs
+> 5. **Urgensi** — Normal / Urgent
+> 6. **Qty** — jumlah diminta
+> 7. **Status Approval** — badge **SPV** (atas) + **MGR** (bawah)
+> 8. **Status Pengadaan** — **dropdown** (hanya Officer & Manager) / **badge baca-saja** (Supervisor & Teknisi)
+> 9. **Aksi** (paling kanan) — tombol **Approve** (hijau) / **Reject** (merah) sesuai role + ikon **Riwayat** (abu, bergambar history)
+>
+> **Yang tampil di kolom Aksi per role:**
+> - Teknisi (`AAA`) → TIDAK ada tombol approve; hanya ikon **Riwayat**
+> - Supervisor (`INN`/`KAA`) → tombol hijau **Approve** + merah **Reject** (tahap SPV); kolom 8 baca-saja
+> - Officer (`ANS`) → dropdown Status Pengadaan (kolom 8); tanpa tombol approve
+> - Manager (`KSW`) → dropdown Status Pengadaan (kolom 8) + tombol hijau **Approve** + merah **Reject** (tahap MGR; redup kalau SPV belum Disetujui)
+> - Ikon **Riwayat** = buka kronologi audit (field, status lama → baru, aktor & waktu)
 
-**RBAC-09: Supervisor dilarang approve manager (403)**
-- Login: `INN` / `30INN11`
-- Langkah: Coba set `status_approval_manager='approved'` pada `BQ-2026-09-01-0001`
-- Expected: Ditolak (403), pesan `Supervisor tidak bisa approve/mengubah status Manager`
+**RBAC-08: Teknisi tidak punya akses ubah status**
+- Login: `AAA` / `04AAA10` → buka **Approval BQ**
+- Langkah: cari baris `BQ-2026-09-01-0001`, lihat kolom 8 dan 9
+- Expected: kolom Status Pengadaan hanya **badge teks** (tidak ada dropdown) dan kolom Aksi **tidak ada tombol Approve/Reject**, hanya ikon Riwayat. (Aturan backend 403: `Anda tidak memiliki akses untuk mengubah status pengajuan`)
 
-**RBAC-10: Manager dilarang approve SPV (403)**
-- Login: `KSW` / `01KSW10`
-- Langkah: Coba set `status_approval_spv='approved'` pada `BQ-2026-09-01-0001`
-- Expected: Ditolak (403), pesan `Manager tidak bisa approve/mengubah status SPV`
+**RBAC-09: Supervisor tidak bisa approve tahap Manager**
+- Login: `INN` / `30INN11` → buka **Approval BQ**
+- Langkah: baris `BQ-2026-09-01-0001`, lihat kolom 9
+- Expected: cuma tombol Approve/Reject tahap **SPV**; tidak ada tombol approval Manager. Kolom 8 baca-saja. (Backend 403: `Supervisor tidak bisa approve/mengubah status Manager`)
 
-**RBAC-11: Manager belum bisa approve karena SPV belum setuju (400)**
-- Login: `KSW` / `01KSW10`
-- Langkah: Set `status_approval_manager='approved'` pada `BQ-2025-01-01-0001` (SPV masih Menunggu)
-- Expected: Ditolak (400), pesan `Manager hanya bisa menyetujui setelah Supervisor menyetujui`
+**RBAC-10: Manager tidak bisa approve tahap SPV**
+- Login: `KSW` / `01KSW10` → buka **Approval BQ**
+- Langkah: baris `BQ-2026-09-01-0001`, lihat kolom 9
+- Expected: tombol Approve/Reject untuk tahap **MGR** saja (tahap akhir); tidak ada tombol approval SPV. (Backend 403: `Manager tidak bisa approve/mengubah status SPV`)
 
-**RBAC-12: Username tidak terdaftar ditolak (401)**
-- Input: Username `QA-TIDAK-ADA-XYZ`
-- Langkah: Coba ubah status pengajuan mana pun
-- Expected: Ditolak (401), pesan `User tidak ditemukan`
+**RBAC-11: Manager diblokir sampai SPV setuju**
+- Login: `KSW` / `01KSW10` → buka **Approval BQ**
+- Langkah: baris `BQ-2025-01-01-0001` (badge SPV = Menunggu), kolom 9
+- Expected: tombol Approve & Reject tampak **redup/disabled** (opacity rendah); kursor di atasnya muncul tooltip `Menunggu persetujuan Supervisor (SPV)`; klik tidak mengubah apa pun. (Backend 400: `Manager hanya bisa menyetujui setelah Supervisor menyetujui`)
 
-**RBAC-13: Aksi tanpa login ditolak (401)**
-- Langkah: Kirim ubah status tanpa username
-- Expected: Ditolak (401), pesan `Anda harus login terlebih dahulu`
+**RBAC-12: User tak terdaftar ditolak (Level API, opsional)**
+- Langkah: kirim ubah status dengan username `QA-TIDAK-ADA-XYZ`
+- Expected: `User tidak ditemukan` (401) — tidak bisa dilakukan lewat UI, cukup verifikasi endpoint
 
-**RBAC-14: Rekap pengajuan milik sendiri (Teknisi)**
-- Login: `AAA` / `04AAA10`
-- Langkah: Akses summary untuk username `AAA`
-- Expected: Berhasil (200), hanya data milik `AAA` yang tampil
+**RBAC-13: Aksi tanpa login ditolak (Level API, opsional)**
+- Langkah: kirim ubah status tanpa username
+- Expected: `Anda harus login terlebih dahulu` (401) — tidak bisa dilakukan lewat UI
 
-**RBAC-15: KAA (Supervisor 2) berhasil approve SPV (200)**
-- Login: `KAA` / `KAA1910`
-- Langkah: Set `status_approval_spv='approved'` pada `BQ-2025-01-07-0007` (SPV masih Menunggu)
-- Expected: Berhasil (200); status SPV menjadi `Disetujui`
+**RBAC-14: Teknisi hanya melihat data sendiri**
+- Login: `AAA` / `04AAA10` → buka **Approval BQ**
+- Expected: seluruh baris yang tampil milik `AAA` (kolom Teknisi menampilkan username `AAA`); tidak ada data user lain
+
+**RBAC-15: KAA (Supervisor 2) berhasil approve SPV**
+- Login: `KAA` / `KAA1910` → buka **Approval BQ**
+- Langkah: cari baris `BQ-2025-01-07-0007` (badge SPV = Menunggu) → kolom 9 → klik tombol hijau **Approve**
+- Expected: badge SPV (kolom 7, baris atas) berubah jadi hijau `Disetujui`; muncul toast `Pengajuan BQ-2025-01-07-0007 disetujui.`; klik ikon Riwayat → ada 1 entri Approval SPV oleh KAA
 
 ---
 
 ## 🧾 SECTION 4: FORM (Validasi Isian Pengajuan)
 
 **FORM-05: Pengajuan valid berhasil dibuat**
-- Login: `AAA` / `04AAA10`
-- Data: `itemCode: O-50834-00`, `qty: 2`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/05/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi test manual QA`, `jenis_pengajuan: sparepart`, `urgency: Normal`
-- Expected: Berhasil (201); `no_registrasi` tersedia (bentuk `BQ-2026-09-..-....`); qty_diminta harus sama dengan yang diinput
+- Login: `AAA` / `04AAA10` → klik tile **BQ Personal** (buka Form Pengajuan BQ)
+- Item Code: di kolom Item Code **ketik "O-50834"** → di daftar hasil yang muncul klik `O-50834-00` (Autoclave Fedegari…) → kode terisi otomatis
+- Data lain: `qty: 2`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/05/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi test manual QA`, `jenis: Sparepart`, `urgency: Normal`
+- Klik **KIRIM PENGAJUAN**
+- Expected: alert `Pengajuan Berhasil`; `no_registrasi` (bentuk `BQ-2026-09-..-....`) tampil di monitoring; qty_diminta = `2`
 
 **FORM-06: Penyimpanan timestamp**
 - Data: ikut hasil FORM-05
-- Langkah: Lihat data baru yang dibuat pada FORM-05
-- Expected: `timestamp` tersimpan (bukan kosong/null)
+- Langkah: lihat kolom Waktu baris hasil FORM-05 di **Approval BQ**
+- Expected: `timestamp` tersimpan (terlihat jam/tanggal, bukan kosong)
 
-**FORM-08: itemCode kosong ditolak (400)**
-- Data: `itemCode: ''` (kosong), qty `5`, uom `PCS`, dst. wajib diisi
-- Expected: Ditolak (400), pesan berisi `Item Code`, `UoM, Purpose, No. EJO, dan Mesin/Area`
+**FORM-08: Item Code kosong ditolak**
+- Login: `AAA` / `04AAA10` → **BQ Personal** → biarkan kolom Item Code kosong (jangan pilih apa pun), isi field lain lengkap
+- Expected: pengiriman **ditolak** — toast `Field yang ditandai wajib diisi`; bila di-bypass, server 400 dengan daftar field `Item Code, UoM, Purpose, No. EJO, dan Mesin/Area`
 
-**FORM-09: qty di bawah 1 ditolak (400)**
-- Data: `itemCode: O-50834-00`, `qty: 0`, uom `PCS`, purpose `CONSUMABLE`, `no_ejo: EJO/QA/09/2026`, `mesin_area: Capping`, `spesifikasi: Test qty nol`
-- Expected: Ditolak (400), pesan `Quantity minimal 1`
+**FORM-09: qty di bawah 1 ditolak**
+- Data: isi seperti FORM-05 tetapi `qty: 0`
+- Expected: browser menolak submit (input bertipe `min=1`), atau server menolak `Quantity minimal 1` (400)
 
-**FORM-12: itemCode tidak ditemukan ditolak (400)**
-- Data: `itemCode: QA-TIDAK-ADA-999`, qty `2`, uom `PCS`, dst. wajib diisi
-- Expected: Ditolak (400), pesan `Item Code 'QA-TIDAK-ADA-999' tidak ditemukan di database.`
+**FORM-12: Item Code tidak ditemukan ditolak**
+- Login: `AAA` / `04AAA10` → **BQ Personal**
+- Item Code: **ketik "QA-TIDAK-ADA-999"** → dropdown menampilkan `Tidak ditemukan…` → tetap ketik kode tersebut secara manual, isi field lain
+- Expected: server menolak → toast `Item Code 'QA-TIDAK-ADA-999' tidak ditemukan di database.`
 
 **FORM-13: Pengajuan jasa (tanpa itemCode) berhasil**
-- Data: `jenis_pengajuan: jasa`, qty `1`, uom `Job`, purpose `EJO`, `no_ejo: EJO/QA/13/2026`, `mesin_area: Mesin Capping VCM200`, `spesifikasi: Jasa kalibrasi test manual QA`, `urgency: Normal`
-- Expected: Berhasil (201), `no_registrasi` tersedia; itemCode tidak wajib
+- Login: `AAA` / `04AAA10` → **BQ Personal** → pilih `jenis: Jasa (JA/BR)` → muncul kotak **Keterangan Jasa**
+- Data: item code **dibiarkan kosong**, `qty: 1`, `uom: Job`, `purpose: EJO`, `no_ejo: EJO/QA/13/2026`, `mesin_area: Mesin Capping VCM200`, `spesifikasi: Jasa kalibrasi test manual QA`, `urgency: Normal`
+- Expected: Berhasil (201); `no_registrasi` tersedia; item code tidak wajib
 
 ---
 
 ## 🔄 SECTION 5: APP (Alur Status Pengajuan)
 
-**APP-09: Status pengadaan tidak valid ditolak (400)**
+**APP-09: Status pengadaan tidak valid ditolak (Level API, opsional)**
 - Login: `ANS` / `ANS1805`
-- Langkah: Set `status_pengadaan: SALAH-STATUS` pada `BQ-2026-09-01-0001`
-- Expected: Ditolak (400), pesan `status_pengadaan tidak valid`
+- Langkah: kirim `status_pengadaan: SALAH-STATUS` pada `BQ-2026-09-01-0001`
+- Expected: Ditolak (400), pesan `status_pengadaan tidak valid` — di UI dropdown hanya menyediakan opsi valid, jadi cukup verifikasi endpoint
 
-**APP-10: Status SPV tidak valid ditolak (400)**
+**APP-10: Status SPV tidak valid ditolak (Level API, opsional)**
 - Login: `INN` / `30INN11`
-- Langkah: Set `status_approval_spv: SALAH-STATUS` pada `BQ-2026-09-01-0001`
-- Expected: Ditolak (400), pesan `status_approval_spv tidak valid`
+- Langkah: kirim `status_approval_spv: SALAH-STATUS` pada `BQ-2026-09-01-0001`
+- Expected: Ditolak (400), pesan `status_approval_spv tidak valid` — di UI tombol hanya menyediakan Approve/Reject
 
-**APP-11: Ubah status tanpa kirim status ditolak (400)**
+**APP-11: Ubah status tanpa kirim status ditolak (Level API, opsional)**
 - Login: `KSW` / `01KSW10`
-- Langkah: Kirim update tanpa field `status_*` pada `BQ-2026-09-01-0001`
-- Expected: Ditolak (400), pesan `Tidak ada status yang dikirim untuk diubah`
+- Langkah: kirim update tanpa field `status_*` pada `BQ-2026-09-01-0001`
+- Expected: Ditolak (400), pesan `Tidak ada status yang dikirim untuk diubah` — tidak bisa dilakukan lewat UI
 
-**APP-12: Rekap pengajuan per user (Database)**
-- Login: `KSW` / `01KSW10` (untuk monitoring)
-- Langkah: Cek data summary untuk Dashboard Bulanan
-- Expected: Respons berisi array bulan + jumlah pengajuan (kurang-lebih sesuai total 1481)
+**APP-12: Rekap pengajuan (Dashboard Bulanan)**
+- Login: `KSW` / `01KSW10`
+- Langkah: lihat kartu di dashboard (Total Pengajuan)
+- Expected: kartu menampilkan total pengajuan **1481** (sesuai DB)
 
 **APP-13: Alur lengkap Teknisi -> SPV -> Officer -> Manager (BQS-01)**
-- Login: `AAA` / `04AAA10`
-- Data: `itemCode: O-50834-00`, `qty: 1`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi untuk test alur lengkap`, `jenis_pengajuan: sparepart`, `urgency: Normal`
-- Langkah: Buat pengajuan → catat `no_registrasi` hasilnya sebagai `[no]`
+- Login: `AAA` / `04AAA10` → klik tile **BQ Personal**
+- Data: Item Code cari/ketik `O-50834` → pilih `O-50834-00`; `qty: 1`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi untuk test alur lengkap`, `jenis: Sparepart`, `urgency: Normal`
+- Klik **KIRIM PENGAJUAN** → catat `no_registrasi` hasilnya sebagai `[no]`
 - Expected: Berhasil (201)
 
 **BQS-02: SPV approve (INN)**
-- Login: `INN` / `30INN11`
-- Langkah: Set `status_approval_spv='approved'` pada `[no]`
-- Expected: Berhasil (200)
+- Login: `INN` / `30INN11` → buka **Approval BQ**
+- Langkah: cari `[no]` di kolom Cari → kolom 9 → klik tombol hijau **Approve** (tahap SPV)
+- Expected: Berhasil; badge SPV berubah menjadi `Disetujui`
 
 **MON-RPT: Officer tandai 'Proses PO' (ANS)**
-- Login: `ANS` / `ANS1805`
-- Langkah: Set `status_pengadaan='Proses PO'` pada `[no]`
-- Expected: Berhasil (200), status berubah
+- Login: `ANS` / `ANS1805` → buka **Approval BQ**
+- Langkah: baris `[no]` → kolom 8 (Status Pengadaan) → pilih opsi **Proses PO** dari dropdown
+- Expected: Berhasil; status berubah menjadi `Proses PO` (tersimpan otomatis saat dipilih)
 
 **MON-RPT2: Manager setujui final (KSW)**
-- Login: `KSW` / `01KSW10`
-- Langkah: Set `status_approval_manager='approved'` pada `[no]`
-- Expected: Berhasil (200); status SPV & Manager `Disetujui`, Pengadaan `Proses PO`
+- Login: `KSW` / `01KSW10` → buka **Approval BQ**
+- Langkah: baris `[no]` (SPV sudah Disetujui → tombol aktif) → kolom 9 → klik tombol hijau **Approve** (tahap MGR)
+- Expected: Berhasil; badge SPV & MGR `Disetujui`, Pengadaan `Proses PO`
 
 ---
 
@@ -253,8 +277,9 @@
 - Expected: Rentang tanggal terisi otomatis, minimal `2025-01-01` s.d. tanggal terbaru (21 bulan: Jan 2025–Sep 2026)
 
 **MON-09: Log audit berukuran tetap (3)**
-- Langkah: Buka detail log pengajuan `BQ-2026-09-01-0001`
-- Expected: Log berisi **3 entri**: SPV approve, pengadaan ubah status, manager approve
+- Login: `KSW` / `01KSW10` → buka **Approval BQ**
+- Langkah: cari baris `BQ-2026-09-01-0001` → kolom 9 → klik ikon **Riwayat** (tombol abu-abu bergambar history)
+- Expected: modal Riwayat menampilkan **3 entri**: Approval SPV, pengadaan ubah status, Approval Manager
 
 ---
 
@@ -361,40 +386,42 @@
 > ⚠️ Jalankan **berurutan E2E-01 → E2E-08** (hasil langkah 1 dipakai di langkah berikutnya).
 
 **E2E-01: Teknisi membuat pengajuan**
-- Login: `AAA` / `04AAA10`
-- Data: `itemCode: O-50834-00`, `qty: 2`, `uom: PCS`, `purpose: EJO`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi QA alur E2E`, `jenis_pengajuan: sparepart`, `urgency: Normal`
+- Login: `AAA` / `04AAA10` → klik tile **BQ Personal**
+- Item Code: **ketik "O-50834"** → klik hasil `O-50834-00`; lalu `qty: 2`, `uom: PCS`, `purpose: EJO`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi QA alur E2E`, `jenis: Sparepart`, `urgency: Normal`
+- Klik **KIRIM PENGAJUAN**
 - Expected: Berhasil (201). **Catat `no_registrasi` hasilnya → pakai sebagai `[no]` di test berikutnya**
 
 **E2E-02: Status awal pengajuan baru**
-- Langkah: Buka monitoring, cari `[no]`
-- Expected: SPV `Menunggu`, Manager `Menunggu`, Pengadaan `BQ Baru`, Teknisi: `AAA`, Qty: `2`
+- Login: `AAA` / `04AAA10` → buka **Approval BQ**
+- Langkah: cari `[no]` di kolom Cari
+- Expected: kolom 7: SPV `Menunggu`, MGR `Menunggu`; kolom 8: `BQ Baru`; Teknisi: `AAA`; Qty: `2`
 
 **E2E-03: Supervisor menyetujui**
-- Login: `INN` / `30INN11`
-- Langkah: Set `status_approval_spv='approved'` pada `[no]`
-- Expected: Berhasil; SPV menjadi `Disetujui`
+- Login: `INN` / `30INN11` → buka **Approval BQ**
+- Langkah: baris `[no]` → kolom 9 → klik tombol hijau **Approve** (tahap SPV)
+- Expected: badge SPV menjadi `Disetujui`
 
 **E2E-04: Officer ubah status pengadaan**
-- Login: `ANS` / `ANS1805`
-- Langkah: Set `status_pengadaan='Proses PO'` pada `[no]`
-- Expected: Berhasil; Pengadaan menjadi `Proses PO`
+- Login: `ANS` / `ANS1805` → buka **Approval BQ**
+- Langkah: baris `[no]` → kolom 8 → pilih **Proses PO** dari dropdown
+- Expected: Status Pengadaan menjadi `Proses PO`
 
 **E2E-05: Audit trail dua aksi tercatat**
-- Langkah: Buka detail log pada `[no]`
-- Expected: Terdapat **2 entri**: aksi SPV (INN) dan aksi pengadaan (ANS)
+- Langkah: (bisa konsisten pakai satu role) buka **Approval BQ** → baris `[no]` → kolom 9 → klik ikon **Riwayat**
+- Expected: modal Riwayat menampilkan **2 entri**: Approval SPV (INN) dan Status Pengadaan (ANS)
 
 **E2E-06: Manager menyetujui final**
-- Login: `KSW` / `01KSW10`
-- Langkah: Set `status_approval_manager='approved'` pada `[no]`
-- Expected: Berhasil; Manager `Disetujui`
+- Login: `KSW` / `01KSW10` → buka **Approval BQ**
+- Langkah: baris `[no]` (SPV sudah Disetujui → tombol aktif) → kolom 9 → klik tombol hijau **Approve** (tahap MGR)
+- Expected: badge MGR menjadi `Disetujui`
 
 **E2E-07: Audit trail tiga aksi tercatat**
-- Langkah: Buka kembali detail log pada `[no]`
-- Expected: **3 entri** (aksi SPV, pengadaan, manager); muncul aktor `manager`
+- Langkah: baris `[no]` → kolom 9 → klik ikon **Riwayat**
+- Expected: **3 entri** (Approval SPV, Status Pengadaan, Approval Manager); muncul aktor dengan role `manager`
 
 **E2E-08: Status akhir konsisten**
-- Langkah: Cek status `[no]` di monitoring
-- Expected: SPV `Disetujui`, Manager `Disetujui`, Pengadaan `Proses PO`
+- Langkah: cek baris `[no]` di monitoring
+- Expected: SPV `Disetujui`, MGR `Disetujui`, Pengadaan `Proses PO`
 
 ---
 
