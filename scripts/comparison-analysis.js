@@ -2,7 +2,7 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
 
-const folder = 'C:\\0000-Universitas_Terbuka\\semester8\\capstoneproject\\App-list\\Micropage E-Sparepart - app - deployed\\CP Kelompok A 127\\Bahan Capstone Project\\Raw Data CP-20260922T080238Z-1-001\\Raw Data CP';
+const folder = 'C:\\0000-Universitas_Terbuka\\semester8\\capstoneproject\\App-list\\Micropage E-Sparepart - app - deployed\\CP Kelompok A 127\\Bahan Capstone Project\\Raw Data CP-20260924T053522Z-1-001_v2_baru\\Raw Data CP';
 
 const dbSchema = {
   users: {
@@ -389,7 +389,7 @@ report += '\n';
 report += '  Keterangan:\n';
 report += '  - user_id: Tidak ada kolom langsung di Excel, tapi bisa di-derive dari username/teknisi\n';
 report += '  - item_code: Ada di beberapa sheet Baru/Re Order (Item Code), tapi tidak semua\n';
-report += '  - status_approval_manager: TIDAK ADA di Excel — ini kolom DB murni untuk tahap Manager approval\n';
+report += '  - status_approval_manager: kini ADA di Excel (Database Approval MGR BQ Testing.xlsx) — tahap Manager approval\n';
 report += '\n';
 report += '  KOLOM EXCEL TIDAK DAPAT DIPETAKAN KE DATABASE (pengajuan_bq):\n';
 report += '  ⚠ "No" (nomor urut)\n';
@@ -487,7 +487,7 @@ report += '  ✗ urgency → Excel ada (Status Urgent) tapi NAMANYA BERBEDA & fo
 report += '  ✗ status_pengadaan → Excel ada (Status BQ/Kategori) tapi NAMANYA BERBEDA\n';
 report += '  ✗ user_id → TIDAK ADA langsung di Excel (bisa di-derive)\n';
 report += '  ✗ item_code → Ada di beberapa sheet Baru/Re Order, TIDAK KONSISTEN\n';
-report += '  ✗ status_approval_manager → TIDAK ADA di Excel (murni aplikasi)\n\n';
+report += '  ✗ status_approval_manager → kini ADA di Excel (Database Approval MGR BQ Testing.xlsx)\n\n';
 
 report += '  USERS:\n';
 report += '  ✗ Semua kolom users TIDAK ADA di Excel manapun\n';

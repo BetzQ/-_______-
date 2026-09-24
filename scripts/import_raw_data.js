@@ -14,6 +14,7 @@
  *     - BQ On Going.xlsx                 → data BQ ongoing
  *     - BQ Summary (2).xlsx              → ringkasan BQ + pipeline status
  *     - Database Approval SPV BQ Testing → status approval SPV audit
+ *     - Database Approval MGR BQ Testing → status approval Manager (tahap 2)
  *
  * KEBIJAKAN:
  *   - Menggunakan UPSERT (INSERT ... ON CONFLICT DO UPDATE) agar
@@ -44,7 +45,7 @@ const DATA_DIR = path.join(
   __dirname, '..',
   'CP Kelompok A 127',
   'Bahan Capstone Project',
-  'Raw Data CP-20260922T080238Z-1-001',
+  'Raw Data CP-20260924T053522Z-1-001_v2_baru',
   'Raw Data CP'
 );
 

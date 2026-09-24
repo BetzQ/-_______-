@@ -2,7 +2,7 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
 
-const folder = 'C:\\0000-Universitas_Terbuka\\semester8\\capstoneproject\\App-list\\Micropage E-Sparepart - app - deployed\\CP Kelompok A 127\\Bahan Capstone Project\\Raw Data CP-20260922T080238Z-1-001\\Raw Data CP';
+const folder = 'C:\\0000-Universitas_Terbuka\\semester8\\capstoneproject\\App-list\\Micropage E-Sparepart - app - deployed\\CP Kelompok A 127\\Bahan Capstone Project\\Raw Data CP-20260924T053522Z-1-001_v2_baru\\Raw Data CP';
 
 const files = fs.readdirSync(folder).filter(f => f.endsWith('.xlsx')).sort();
 
