@@ -391,3 +391,200 @@ muted, .muted { color: var(--muted); }
 
 /* divider */
 .hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
+
+/* ---------------- Nav avatars ---------------- */
+.nav button { gap: 10px; }
+.nav-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--ac, var(--ink));
+  color: #faf8f3;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+.nav-avatar.big {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  font-size: 17px;
+  box-shadow: var(--shadow);
+}
+
+/* ---------------- Member hero ---------------- */
+.mhero {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 28px 30px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+.mhero::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: var(--ac, var(--ink));
+  border-radius: 18px 0 0 18px;
+}
+.mhero-avatar {
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  background: var(--ac, var(--ink));
+  color: #faf8f3;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 700;
+  box-shadow: var(--shadow);
+}
+.mhero h1 { font-size: 26px; margin-bottom: 2px; }
+.mhero-role {
+  font-size: 14px; font-weight: 600;
+  color: var(--ac, var(--ink));
+  margin: 4px 0 0;
+}
+.mhero-status {
+  grid-column: 1 / -1;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  background: var(--surface-soft);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  line-height: 1.55;
+  margin-top: 2px;
+}
+.dot-pulse {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--ac, var(--ink));
+  flex: 0 0 auto;
+  margin-top: 6px;
+  position: relative;
+}
+.dot-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--ac, var(--ink));
+  opacity: 0;
+  animation: pulse 2s ease-out infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* ---------------- In-page jump nav ---------------- */
+.inpage-nav {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 22px 0 6px;
+  position: sticky; top: 12px; z-index: 5;
+  padding: 6px 0;
+}
+.inpage-nav button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 13px; font-weight: 600;
+  padding: 7px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.inpage-nav button:hover { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow); }
+
+/* ---------------- Member cards (index) ---------------- */
+.mcard-top {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 12px;
+}
+.mcard-top .nav-avatar.big { margin-right: 14px; }
+.mcard-top .member-role { margin-bottom: 2px; }
+.mcard-cta {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12.5px; font-weight: 600;
+  color: var(--ac, var(--ink));
+}
+
+/* ---------------- Fase (kerangka per tahap) ---------------- */
+.fase {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+  margin-top: 16px;
+}
+.fase-head { margin-bottom: 18px; }
+.fase-badge {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ac, var(--ink));
+  background: color-mix(in srgb, var(--ac, var(--ink)) 9%, transparent);
+  padding: 3px 9px; border-radius: 999px;
+  margin-bottom: 8px;
+}
+.fase-head h3 { font-size: 18px; }
+.fase-desc {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 72ch;
+}
+.fase .step-num {
+  border-radius: 12px;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+/* ---------------- Checklist (tambahan) ---------------- */
+.ck-main { flex: 1 1 0; min-width: 0; }
+.ck-reset {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px; font-weight: 600; font-family: var(--sans);
+  padding: 6px 12px; border-radius: 8px;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease;
+}
+.ck-reset:hover { color: var(--ink); border-color: var(--ink-soft); }
+.ck-now {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #9a5b1b;
+  background: color-mix(in srgb, #9a5b1b 10%, transparent);
+  padding: 2px 8px; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: 5px;
+  flex: 0 0 auto;
+}
+.ck-now::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ---------------- Small screens ---------------- */
+@media (max-width: 520px) {
+  .mhero { grid-template-columns: 1fr; }
+  .mhero-avatar { width: 56px; height: 56px; }
+  .fase { padding: 18px 16px; }
+  .hero, .mhero, .card { padding: 20px 18px; }
+  .step { grid-template-columns: 38px 1fr; gap: 12px; }
+  .step-num { width: 36px; height: 36px; font-size: 13px; }
+}
