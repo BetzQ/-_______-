@@ -1,9 +1,9 @@
 /* ============================================================
    Catatan Kerja Anggota — Capstone Kelompok A 127 (STSI4401)
    Analisa per anggota: kerangka kerja lengkap dari awal sampai
-   selesai. Disusun dari arsip chat grup (obrolan chat), dokumen
-   resmi (checklist & to-do list), dan dokumen hasil kerja tim.
+   selesai. Disusun dari arsip obrolan tim dan dokumen hasil kerja.
    Per tanggal 25 September 2026 (minggu ke-2 / M1–M2).
+   v3: setiap langkah dipecah jadi sub-langkah centang + hasil.
    ============================================================ */
 
 const PROJEK = {
@@ -44,12 +44,72 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah-langkah kecil seorang pemimpin proyek dari nol: membentuk grup sampai membagi tugas.",
         langkah: [
-          { k: "Membentuk grup WhatsApp Capstone", a: "Buat grup baru, undang seluruh calon anggota satu per satu, lalu kirim pesan pembuka: mengingatkan jadwal Tuweb sesi 1 dan mengajak semua menentukan topik paling lambat Kamis." },
-          { k: "Menggelar polling jadwal diskusi", a: "Buat polling pilihan waktu diskusi perdana (malam ini / besok / Kamis), beri batas waktu voting, lalu ingatkan anggota yang belum memilih sampai semua ikut." },
-          { k: "Menyelenggarakan Google Meet perdana", a: "Buat link Meet, bagikan ke grup, pastikan kehadiran semua anggota, dan tegaskan bahwa isi pertemuan dicatat untuk lampiran berita acara laporan CP." },
-          { k: "Menyiapkan Google Drive tim", a: "Buat folder Drive yang rapi: checklist & to-do list mingguan, folder referensi (contoh CP kating), dan folder bahan pendukung, lalu bagikan tautannya ke seluruh anggota." },
-          { k: "Menyiapkan kerangka dokumen awal", a: "Buat draf 'kasar' proposal capstone dan draf laporan capstone sebagai kerangka yang akan dikembangkan penulis; buat dokumen 'Aps Script CP' berisi tautan aplikasi dan source code untuk developer." },
-          { k: "Membagi tanggung jawab perdana", a: "Sebarkan tugas awal: penulis melengkapi jurnal, developer mempelajari bahan teknis, dan anggota lain meninjau bahan untuk PPT/poster — sambil mempertegas bahwa progres dicentang di checklist Drive." },
+          {
+            k: "Membentuk grup WhatsApp Capstone",
+            a: "Buat grup baru, undang seluruh calon anggota satu per satu, lalu kirim pesan pembuka: mengingatkan jadwal Tuweb sesi 1 dan mengajak semua menentukan topik paling lambat Kamis.",
+            cara: [
+              "Buka menu baru di WhatsApp lalu pilih New Group.",
+              "Undang kelima calon anggota satu per satu sampai lengkap.",
+              "Kirim pesan pembuka: ingatkan jadwal Tuweb sesi 1 (Jumat malam).",
+              "Tutup pesan dengan tenggat: topik harus ditentukan paling lambat Kamis.",
+            ],
+            hasil: "Grup resmi terbentuk berisi semua anggota + tenggat pemilihan topik tersampaikan.",
+          },
+          {
+            k: "Menggelar polling jadwal diskusi",
+            a: "Buat polling pilihan waktu diskusi perdana (malam ini / besok / Kamis), beri batas waktu voting, lalu ingatkan anggota yang belum memilih sampai semua ikut.",
+            cara: [
+              "Buka menu polling di dalam grup.",
+              "Isi opsi: Malam ini 15 Sep / Besok malam 16 Sep / Kamis malam 17 Sep.",
+              "Beri batas waktu voting (mis. sampai pukul 17.00).",
+              "Ingatkan satu-satu anggota yang belum memilih (contoh: tinggal Giren).",
+            ],
+            hasil: "Tanggal diskusi perdana terkunci dan semua anggota ikut voting.",
+          },
+          {
+            k: "Menyelenggarakan Google Meet perdana",
+            a: "Buat link Meet, bagikan ke grup, pastikan kehadiran semua anggota, dan tegaskan bahwa isi pertemuan dicatat untuk lampiran berita acara laporan CP.",
+            cara: [
+              "Buat agenda Google Meet (dari Google Calendar).",
+              "Salin link Meet lalu bagikan ke grup sebelum jam mulai.",
+              "Ingatkan satu sama lain agar semua hadir.",
+              "Catat poin kesepakatan singkat untuk bahan berita acara.",
+            ],
+            hasil: "Link Meet + notulensi singkat pertemuan (siap jadi lampiran laporan).",
+          },
+          {
+            k: "Menyiapkan Google Drive tim",
+            a: "Buat folder Drive yang rapi: checklist & to-do list mingguan, folder referensi (contoh CP kating), dan folder bahan pendukung, lalu bagikan tautannya ke seluruh anggota.",
+            cara: [
+              "Buat folder induk bernama yang jelas, misal 'CP Kelompok A 127'.",
+              "Buat subfolder: 'Checklist & To Do List', 'Referensi CP (kating)', 'Bahan Capstone Project'.",
+              "Atur izin akses (Editor) untuk semua anggota.",
+              "Salin tautan ke grup dan minta semua membukanya.",
+            ],
+            hasil: "Struktur Drive rapi yang dipakai bersama seluruh tim.",
+          },
+          {
+            k: "Menyiapkan kerangka dokumen awal",
+            a: "Buat draf 'kasar' proposal capstone dan draf laporan capstone sebagai kerangka yang akan dikembangkan penulis; buat dokumen 'Aps Script CP' berisi tautan aplikasi dan source code untuk developer.",
+            cara: [
+              "Buat gdoc 'Proposal Capstone' berisi kerangka bab kasar.",
+              "Buat gdoc 'Laporan Capstone' berisi kerangka laporan kasar.",
+              "Buat gdoc 'Aps Script CP' berisi tautan aplikasi + source code.",
+              "Letakkan ketiganya di folder Bahan dan tunjuk pemiliknya (Sarifah & Avwan).",
+            ],
+            hasil: "3 kerangka awal siap dikembangkan penulis dan developer.",
+          },
+          {
+            k: "Membagi tanggung jawab perdana",
+            a: "Sebarkan tugas awal: penulis melengkapi jurnal, developer mempelajari bahan teknis, dan anggota lain meninjau bahan untuk PPT/poster — sambil mempertegas bahwa progres dicentang di checklist Drive.",
+            cara: [
+              "Tetapkan peran awal tiap anggota (penulis / teknis / media).",
+              "Kirim instruksi tugas dan tenggatnya per orang.",
+              "Tegaskan: setiap selesai, centang di checklist mingguan Drive.",
+              "Minta konfirmasi 'siap' dari semua anggota.",
+            ],
+            hasil: "Daftar tugas awal jelas dan seluruh anggota menyetujui.",
+          },
         ],
       },
       {
@@ -57,15 +117,105 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah seorang business analyst yang memastikan setiap anggota melihat masalah dan sistem dari sudut yang sama.",
         langkah: [
-          { k: "Memaparkan problem statement resmi", a: "Jelaskan di grup: sparepart sering tidak tersedia saat dibutuhkan; uraikan dua akar masalah dari Why-Why Analysis (pengajuan tidak lengkap + monitoring lemah; belum ada critical sparepart list) beserta solusi dan target sistemnya." },
-          { k: "Menawarkan dukungan data", a: "Umumkan bahwa semua data pendukung (raw data, contoh report, log) bisa diminta kapan saja, terutama untuk kebutuhan developer aplikasi." },
-          { k: "Melengkapi tim dan menata ulang tugas", a: "Undang anggota yang belum masuk (Wida), kenalkan kelebihannya (UI/UX Designer), lalu ajukan penyesuaian pembagian tugas: Bab III yang sarat diagram dialihkan ke Giren, dan mintalah persetujuan anggota yang bersangkutan." },
-          { k: "Menjawab pertanyaan kebutuhan fungsional", a: "Jawab satu per satu pertanyaan developer: format Monthly Report (ada contoh + link Looker), pemakaian status Normal/Urgent, siapa saja yang boleh approval (SPV1, SPV2, Officer), pemakaian PR Summary, dan status Jenis Jasa." },
-          { k: "Mendokumentasikan flow & hak akses (RBAC)", a: "Tuliskan menu setiap peran pengguna (Teknisi, Officer, SPV1, SPV2, Manager, Administrator), alur pengajuan barang reguler/urgent, dan alur preventive replenishment critical part — sebagai kontrak bersama antara analis, penulis Bab III, dan developer." },
-          { k: "Memberi peta literatur ke penulis", a: "Susun daftar topik pencarian jurnal (bahasa Indonesia dan Inggris) dan serahkan ke penulis Bab I-II; kunci pembagian Bab agar tidak tumpang tindih." },
-          { k: "Menyerahkan kerangka Bab III + diagram awal", a: "Siapkan draf kerangka Bab III dan diagram awal, serahkan ke penyusun Bab III, lengkap dengan arahan: rapikan pakai Visio/DrawIO dan selaraskan dengan aplikasi yang tengah dikembangkan." },
-          { k: "Menyuplai data mentah & flow data", a: "Unggah seluruh raw data ke Drive (folder Raw Data CP) untuk developer; buat dokumen flow data pengajuan barang, dan janjikan flow modul stok/critical part yang lebih sederhana menyusul." },
-          { k: "Mereview hasil tulisan anggota", a: "Baca kiriman penulis (Bab I–II), beri penilaian singkat yang menumbuhkan semangat, lalu beri catatan koreksi yang spesifik (contoh: cantumkan ilustrasi Why-Why, buat jadwal 8 minggu, hapus sebutan IoT/Blockchain, samakan pertanyaan & tujuan penelitian)." },
+          {
+            k: "Memaparkan problem statement resmi",
+            a: "Jelaskan di grup: sparepart sering tidak tersedia saat dibutuhkan; uraikan dua akar masalah dari Why-Why Analysis (pengajuan tidak lengkap + monitoring lemah; belum ada critical sparepart list) beserta solusi dan target sistemnya.",
+            cara: [
+              "Tulis paparan latar belakang topik di grup.",
+              "Cantumkan 2 akar masalah utama dari Why-Why Analysis.",
+              "Sebutkan data pendukung: downtime Cartoning Marchesini 305 menit dari 6 dokumen EJO.",
+              "Sebutkan 4 modul sistem sasaran (BQ digital, approval, critical part, monthly report).",
+            ],
+            hasil: "Semua anggota memahami masalah, akar masalah, dan solusinya dengan sudut pandang yang sama.",
+          },
+          {
+            k: "Menawarkan dukungan data",
+            a: "Umumkan bahwa semua data pendukung (raw data, contoh report, log) bisa diminta kapan saja, terutama untuk kebutuhan developer aplikasi.",
+            cara: [
+              "Tulis ketersediaan data pendukung di grup.",
+              "Sebutkan lokasi data di Drive agar tahu tempatnya.",
+              "Persilakan developer menyebut kebutuhan data yang diinginkan.",
+            ],
+            hasil: "Developer tahu sumber data dan tidak ragu meminta.",
+          },
+          {
+            k: "Melengkapi tim dan menata ulang tugas",
+            a: "Undang anggota yang belum masuk (Wida), kenalkan kelebihannya (UI/UX Designer), lalu ajukan penyesuaian pembagian tugas: Bab III yang sarat diagram dialihkan ke Giren, dan mintalah persetujuan anggota yang bersangkutan.",
+            cara: [
+              "Undang Wida ke grup dan kenalkan profilnya (UI/UX Designer).",
+              "Jelaskan alasan penyesuaian: Bab III berisi banyak diagram (DFD, dll).",
+              "Ajukan tawaran ke Giren untuk mengambil alih Bab III.",
+              "Tunggu persetujuan Giren sebelum mengunci pembagian.",
+            ],
+            hasil: "Tim lengkap 5 orang + pembagian tugas baru disepakati.",
+          },
+          {
+            k: "Menjawab pertanyaan kebutuhan fungsional",
+            a: "Jawab satu per satu pertanyaan developer: format Monthly Report (ada contoh + link Looker), pemakaian status Normal/Urgent, siapa saja yang boleh approval (SPV1, SPV2, Officer), pemakaian PR Summary, dan status Jenis Jasa.",
+            cara: [
+              "Kumpulkan semua pertanyaan developer menjadi satu daftar.",
+              "Jawab tertulis di grup satu per satu.",
+              "Sertakan link Looker Studio untuk format Monthly Report.",
+              "Jelaskan aturan: Normal/Urgent per pengajuan, approval oleh SPV/Officer, PR Summary khusus Manager & SPV1, dan Jenis Jasa juga masuk pengajuan.",
+            ],
+            hasil: "Seluruh jawaban kebutuhan fungsional tercatat di grup sebagai acuan developer.",
+          },
+          {
+            k: "Mendokumentasikan flow & hak akses (RBAC)",
+            a: "Tuliskan menu setiap peran pengguna (Teknisi, Officer, SPV1, SPV2, Manager, Administrator), alur pengajuan barang reguler/urgent, dan alur preventive replenishment critical part — sebagai kontrak bersama antara analis, penulis Bab III, dan developer.",
+            cara: [
+              "Buat daftar menu & hak akses per role (Teknisi, Officer, SPV1, SPV2, Manager, Administrator).",
+              "Tulis alur pengajuan barang reguler dan urgent.",
+              "Tulis alur preventive replenishment critical sparepart.",
+              "Simpan di gdoc 'Flow & RBAC' dan bagikan ke analis, penulis Bab III, developer.",
+            ],
+            hasil: "Dokumen Flow & RBAC sebagai kontrak bersama seluruh tim.",
+          },
+          {
+            k: "Memberi peta literatur ke penulis",
+            a: "Susun daftar topik pencarian jurnal (bahasa Indonesia dan Inggris) dan serahkan ke penulis Bab I-II; kunci pembagian Bab agar tidak tumpang tindih.",
+            cara: [
+              "Susun 5 topik jurnal bahasa Indonesia (mis. sistem pengadaan berbasis web, RAD, min-max stok, workflow approval, analisis downtime).",
+              "Susun 4 topik jurnal bahasa Inggris (critical spareparts, inventory control, dll).",
+              "Kirim daftar topik ke Sarifah sebagai panduan pencarian.",
+              "Ingatkan syarat: jurnal 5 tahun terakhir.",
+              "Kunci pembagian bab agar tidak tumpang tindih.",
+            ],
+            hasil: "Peta literatur sampai ke penulis Bab I-II.",
+          },
+          {
+            k: "Menyerahkan kerangka Bab III + diagram awal",
+            a: "Siapkan draf kerangka Bab III dan diagram awal, serahkan ke penyusun Bab III, lengkap dengan arahan: rapikan pakai Visio/DrawIO dan selaraskan dengan aplikasi yang tengah dikembangkan.",
+            cara: [
+              "Buka dokumen 'Draft Bab 3 CP 127 A' di folder Bahan.",
+              "Periksa kerangka & diagram kasar yang sudah dibuat.",
+              "Serahkan ke Giren secara tertulis di grup.",
+              "Beri arahan: rapikan pakai Visio/DrawIO & selaraskan dengan aplikasi.",
+            ],
+            hasil: "Kerangka Bab III resmi berpindah tangan ke Giren.",
+          },
+          {
+            k: "Menyuplai data mentah & flow data",
+            a: "Unggah seluruh raw data ke Drive (folder Raw Data CP) untuk developer; buat dokumen flow data pengajuan barang, dan janjikan flow modul stok/critical part yang lebih sederhana menyusul.",
+            cara: [
+              "Unggah seluruh raw data ke folder 'Bahan Capstone Project > Raw Data CP'.",
+              "Buat dokumen flow data pengajuan barang.",
+              "Umumkan lokasi file ke developer di grup.",
+              "Jelaskan bahwa flow modul stok/critical part menyusul.",
+            ],
+            hasil: "Developer menerima raw data + flow data pengajuan barang.",
+          },
+          {
+            k: "Mereview hasil tulisan anggota",
+            a: "Baca kiriman penulis (Bab I–II), beri penilaian singkat yang menumbuhkan semangat, lalu beri catatan koreksi yang spesifik (contoh: cantumkan ilustrasi Why-Why, buat jadwal 8 minggu, hapus sebutan IoT/Blockchain, samakan pertanyaan & tujuan penelitian).",
+            cara: [
+              "Buka Bab I & II yang diunggah Sarifah di Drive.",
+              "Beri penilaian apresiasi dulu (mis. 'overall udah bagus banget').",
+              "Sampaikan catatan per poin: ilustrasi why-why, jadwal 8 minggu, hapus rentang waktu, hapus IoT/Blockchain, samakan pertanyaan-tujuan.",
+              "Minta hasil revisi dikembalikan sebelum tenggat submit M3.",
+            ],
+            hasil: "Daftar revisi yang jelas untuk pemilik bab.",
+          },
         ],
       },
       {
@@ -73,10 +223,49 @@ const MEMBERS = [
         rentang: "M3",
         desc: "Menjadi editor, penyusun format, dan submitter dokumen resmi pertama kelompok.",
         langkah: [
-          { k: "Menggabungkan seluruh bagian proposal", a: "Rangkai Bab I–II dari penulis, Bab III dari penyusun sistem, daftar pustaka, dan jadwal kegiatan menjadi satu dokumen utuh." },
-          { k: "Memvalidasi kesesuaian fitur & data pada Bab III", a: "Periksa bahwa perancangan dan diagram di Bab III benar-benar cocok dengan fitur serta data yang sudah ditetapkan (flow & RBAC), sebelum dikirim." },
-          { k: "Melakukan formatting resmi", a: "Rapikan sampul, halaman pengesahan, daftar isi, daftar tabel/gambar, dan penomoran sesuai pedoman UT." },
-          { k: "Submit Proposal sebagai Tugas 1", a: "Unggah proposal sesuai ketentuan tuton pada pekan M3 dan umumkan ke anggota." },
+          {
+            k: "Menggabungkan seluruh bagian proposal",
+            a: "Rangkai Bab I–II dari penulis, Bab III dari penyusun sistem, daftar pustaka, dan jadwal kegiatan menjadi satu dokumen utuh.",
+            cara: [
+              "Kumpulkan file Bab I-II (Sarifah) dan Bab III (Giren) dari Drive.",
+              "Gabungkan jadi satu dokumen proposal.",
+              "Masukkan daftar pustaka dan jadwal kegiatan 8 minggu.",
+              "Susun urut: sampul, Bab I, Bab II, Bab III, daftar pustaka.",
+            ],
+            hasil: "Satu file proposal utuh siap diedit.",
+          },
+          {
+            k: "Memvalidasi kesesuaian fitur & data pada Bab III",
+            a: "Periksa bahwa perancangan dan diagram di Bab III benar-benar cocok dengan fitur serta data yang sudah ditetapkan (flow & RBAC), sebelum dikirim.",
+            cara: [
+              "Bandingkan diagram Bab III dengan fitur aplikasi yang sedang dibuat.",
+              "Cek menu per role sesuai dokumen RBAC.",
+              "Catat bagian yang belum cocok lalu kirim ke Giren untuk diperbaiki.",
+            ],
+            hasil: "Bab III valid dan selaras dengan aplikasi.",
+          },
+          {
+            k: "Melakukan formatting resmi",
+            a: "Rapikan sampul, halaman pengesahan, daftar isi, daftar tabel/gambar, dan penomoran sesuai pedoman UT.",
+            cara: [
+              "Buat sampul dan halaman pengesahan sesuai pedoman.",
+              "Generate daftar isi, daftar tabel, daftar gambar otomatis.",
+              "Periksa penomoran halaman dan konsistensi font.",
+              "Baca ulang ejaan sebelum kirim.",
+            ],
+            hasil: "Proposal ter-format sesuai pedoman UT.",
+          },
+          {
+            k: "Submit Proposal sebagai Tugas 1",
+            a: "Unggah proposal sesuai ketentuan tuton pada pekan M3 dan umumkan ke anggota.",
+            cara: [
+              "Cek ketentuan tenggat pekan M3 di tuton.",
+              "Unggah proposal sesuai format yang diminta.",
+              "Simpan bukti submit (tangkapan layar / notifikasi).",
+              "Umumkan ke grup bahwa Tugas 1 sudah terkirim.",
+            ],
+            hasil: "Tugas 1 terkirim + bukti pengumpulan tersimpan.",
+          },
         ],
       },
       {
@@ -84,8 +273,27 @@ const MEMBERS = [
         rentang: "M4",
         desc: "Menjembatani produk aplikasi menjadi bab analisis.",
         langkah: [
-          { k: "Mengumpulkan data & foto hasil produk", a: "Minta developer menyediakan tangkapan layar dan data hasil pengujian aplikasi untuk dijadikan bahan tulisan." },
-          { k: "Menyusun Draf Bab IV", a: "Tulis Bab IV berisi hasil pengembangan, hasil uji (misal black box), dan analisis dampaknya terhadap downtime/efisiensi." },
+          {
+            k: "Mengumpulkan data & foto hasil produk",
+            a: "Minta developer menyediakan tangkapan layar dan data hasil pengujian aplikasi untuk dijadikan bahan tulisan.",
+            cara: [
+              "Minta developer menyiapkan tangkapan layar tiap modul utama.",
+              "Minta ringkasan hasil uji (black box / UAT).",
+              "Kelompokkan bahan menjadi: tampilan, alur, dan hasil pengujian.",
+            ],
+            hasil: "Paket bahan lengkap untuk Bab IV.",
+          },
+          {
+            k: "Menyusun Draf Bab IV",
+            a: "Tulis Bab IV berisi hasil pengembangan, hasil uji (misal black box), dan analisis dampaknya terhadap downtime/efisiensi.",
+            cara: [
+              "Tulis hasil pengembangan (fitur yang berhasil diterapkan).",
+              "Tulis ringkasan hasil uji black box.",
+              "Tulis analisis dampak terhadap downtime/efisiensi.",
+              "Sisipkan gambar dan tabel pendukung.",
+            ],
+            hasil: "Draf Bab IV pertama selesai.",
+          },
         ],
       },
       {
@@ -93,8 +301,26 @@ const MEMBERS = [
         rentang: "M5",
         desc: "Merangkai kemajuan proyek menjadi laporan resmi kedua.",
         langkah: [
-          { k: "Menulis Bab IV Laporan Kemajuan", a: "Perbarui hasil pengembangan dan uji sampai pekan M5 ke dalam Bab IV." },
-          { k: "Menyatukan dan formatting", a: "Rangkai Bab I–V dari semua anggota sesuai pembagian, rapikan format, lalu submit sebagai Tugas 2." },
+          {
+            k: "Menulis Bab IV Laporan Kemajuan",
+            a: "Perbarui hasil pengembangan dan uji sampai pekan M5 ke dalam Bab IV.",
+            cara: [
+              "Perbarui data hasil uji sampai pekan M5.",
+              "Sinkronkan dengan fitur aplikasi terbaru.",
+              "Rapikan tabel dan gambar.",
+            ],
+            hasil: "Bab IV versi laporan kemajuan.",
+          },
+          {
+            k: "Menyatukan dan formatting",
+            a: "Rangkai Bab I–V dari semua anggota sesuai pembagian, rapikan format, lalu submit sebagai Tugas 2.",
+            cara: [
+              "Gabungkan Bab I–V dari semua anggota.",
+              "Format ulang sesuai pedoman UT.",
+              "Submit sebagai Tugas 2 lalu umumkan ke grup.",
+            ],
+            hasil: "Laporan kemajuan ter-publish sebagai Tugas 2.",
+          },
         ],
       },
       {
@@ -102,7 +328,16 @@ const MEMBERS = [
         rentang: "M6",
         desc: "Menutup bagian teknis laporan utama.",
         langkah: [
-          { k: "Finalisasi Bab IV", a: "Sempurnakan Bab IV Laporan Akhir dengan data nilai yang sudah final." },
+          {
+            k: "Finalisasi Bab IV",
+            a: "Sempurnakan Bab IV Laporan Akhir dengan data nilai yang sudah final.",
+            cara: [
+              "Cek data hasil uji yang sudah final.",
+              "Perbaiki analisis dampak dengan angka final.",
+              "Lengkapi lampiran pendukung (surat pernyataan, berita acara, log kegiatan).",
+            ],
+            hasil: "Bab IV final siap dirakit di laporan akhir.",
+          },
         ],
       },
       {
@@ -110,7 +345,17 @@ const MEMBERS = [
         rentang: "M7",
         desc: "Mengubah bagian laporan menjadi artikel ilmiah.",
         langkah: [
-          { k: "Konversi Bab IV ke seksi Teknis Karya Ilmiah", a: "Sesuaikan isi Bab IV dengan format artikel ilmiah (bagian teknis), siap untuk digabung dengan seksi lainnya." },
+          {
+            k: "Konversi Bab IV ke seksi Teknis Karya Ilmiah",
+            a: "Sesuaikan isi Bab IV dengan format artikel ilmiah (bagian teknis), siap untuk digabung dengan seksi lainnya.",
+            cara: [
+              "Baca template karya ilmiah yang diminta.",
+              "Ringkas Bab IV menjadi bagian 'Teknis' sesuai format.",
+              "Selaraskan format sitasi dan struktur seksi.",
+              "Serahkan ke penggabung karya ilmiah.",
+            ],
+            hasil: "Seksi Teknis karya ilmiah siap digabung.",
+          },
         ],
       },
       {
@@ -118,7 +363,16 @@ const MEMBERS = [
         rentang: "M8",
         desc: "Memastikan seluruh laporan teknis sah dan lengkap.",
         langkah: [
-          { k: "Evaluasi laporan teknis", a: "Tinjau ulang kelengkapan Bab IV beserta lampiran (surat pernyataan, berita acara, log kegiatan) sebelum pengumpulan akhir." },
+          {
+            k: "Evaluasi laporan teknis",
+            a: "Tinjau ulang kelengkapan Bab IV beserta lampiran (surat pernyataan, berita acara, log kegiatan) sebelum pengumpulan akhir.",
+            cara: [
+              "Cek kelengkapan Bab IV beserta lampiran satu per satu.",
+              "Pastikan berita acara dan log kegiatan tersedia.",
+              "Siapkan file final sebelum tenggat pengumpulan.",
+            ],
+            hasil: "Laporan teknis lengkap dan siap dikumpulkan.",
+          },
         ],
       },
     ],
@@ -186,9 +440,38 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah kecil seorang peneliti pustaka, dimulai dari menerima peta literatur.",
         langkah: [
-          { k: "Menerima peta topik pencarian jurnal", a: "Catat daftar topik yang diberikan ketua kelompok (5 topik bahasa Indonesia dan 4 topik bahasa Inggris) sebagai panduan pencarian." },
-          { k: "Mencari jurnal 5 tahun terakhir", a: "Cari 5–10 jurnal yang relevan per pilar topik: sistem informasi pengadaan berbasis web, metode RAD, pengendalian stok min-max, otomasi workflow approval, dan analisis downtime." },
-          { k: "Menyeleksi dan mengunduh sumber", a: "Pilih jurnal yang benar-benar mendukung pembahasan, simpan referensinya, dan siapkan daftar pustaka yang bisa dilacak (penulis, tahun, judul, jurnal, tautan)." },
+          {
+            k: "Menerima peta topik pencarian jurnal",
+            a: "Catat daftar topik yang diberikan ketua kelompok (5 topik bahasa Indonesia dan 4 topik bahasa Inggris) sebagai panduan pencarian.",
+            cara: [
+              "Buka daftar topik yang dikirim Fadhil di grup.",
+              "Simpan daftarnya di catatan pribadi.",
+              "Kelompokkan 5 topik bahasa Indonesia dan 4 topik bahasa Inggris.",
+            ],
+            hasil: "Peta riset tercatat lengkap dan siap dipakai mencari.",
+          },
+          {
+            k: "Mencari jurnal 5 tahun terakhir",
+            a: "Cari 5–10 jurnal yang relevan per pilar topik: sistem informasi pengadaan berbasis web, metode RAD, pengendalian stok min-max, otomasi workflow approval, dan analisis downtime.",
+            cara: [
+              "Buka Google Scholar atau portal jurnal kampus/UT.",
+              "Gunakan kata kunci per pilar: sistem pengadaan berbasis web, RAD, min-max stock, workflow approval, analisis downtime.",
+              "Pilih jurnal 5 tahun terakhir.",
+              "Kumpulkan minimal 5–10 jurnal yang relevan.",
+            ],
+            hasil: "Kumpulan jurnal terpilih (target 5–10).",
+          },
+          {
+            k: "Menyeleksi dan mengunduh sumber",
+            a: "Pilih jurnal yang benar-benar mendukung pembahasan, simpan referensinya, dan siapkan daftar pustaka yang bisa dilacak (penulis, tahun, judul, jurnal, tautan).",
+            cara: [
+              "Baca abstrak tiap jurnal untuk memastikan dukungannya.",
+              "Catat metadata: penulis, tahun, judul, nama jurnal, tautan.",
+              "Simpan berkas PDF di folder riset.",
+              "Susun daftar pustaka sementara.",
+            ],
+            hasil: "Daftar pustaka terkelola dan bisa dilacak.",
+          },
         ],
       },
       {
@@ -196,10 +479,52 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah seorang penulis menyusun bab pembuka laporan.",
         langkah: [
-          { k: "Menyusun Bab I — Pendahuluan", a: "Tulis latar belakang masalah (pakai problem statement dan data downtime 305 menit dari ketua kelompok), rumusan masalah, tujuan (SMART), manfaat, ruang lingkup, dan jadwal kegiatan." },
-          { k: "Menyusun Bab II — Kajian Pustaka & Landasan Teori", a: "Sintesis literatur yang ditemukan menjadi kajian pustaka per pilar, susun landasan teori, lalu tutup dengan pertanyaan penelitian dan hipotesis (H1–H3)." },
-          { k: "Mengunggah hasil & meminta review", a: "Simpan Bab I dan II ke Google Drive (lengkap dengan jurnal pendukung), lalu beri tahu ketua kelompok dan minta dicek/dikoreksi." },
-          { k: "Menyempurnakan hasil revisi", a: "Kerjakan catatan revisi satu per satu: cantumkan ilustrasi Why-Why, ubah jadwal jadi 8 minggu, hapus rentang waktu yang tidak cocok, hilangkan sebutan IoT/Blockchain, dan samakan poin pertanyaan dengan tujuan penelitian." },
+          {
+            k: "Menyusun Bab I — Pendahuluan",
+            a: "Tulis latar belakang masalah (pakai problem statement dan data downtime 305 menit dari ketua kelompok), rumusan masalah, tujuan (SMART), manfaat, ruang lingkup, dan jadwal kegiatan.",
+            cara: [
+              "Tulis latar belakang berbasis problem statement + data downtime 305 menit.",
+              "Tulis rumusan masalah.",
+              "Tulis tujuan penelitian dengan format SMART.",
+              "Tulis manfaat dan ruang lingkup.",
+              "Buat jadwal kegiatan 8 minggu yang konsisten.",
+            ],
+            hasil: "Draf Bab I utuh (Pendahuluan).",
+          },
+          {
+            k: "Menyusun Bab II — Kajian Pustaka & Landasan Teori",
+            a: "Sintesis literatur yang ditemukan menjadi kajian pustaka per pilar, susun landasan teori, lalu tutup dengan pertanyaan penelitian dan hipotesis (H1–H3).",
+            cara: [
+              "Sintesis literatur per pilar menjadi kajian pustaka (hindari copas mentah).",
+              "Susun landasan teori (sistem informasi, RAD, min-max stock, RBAC).",
+              "Tulis pertanyaan penelitian.",
+              "Tulis hipotesis H1–H3.",
+              "Hindari istilah di luar lingkup proyek (mis. IoT/Blockchain).",
+            ],
+            hasil: "Draf Bab II utuh dengan sitasi.",
+          },
+          {
+            k: "Mengunggah hasil & meminta review",
+            a: "Simpan Bab I dan II ke Google Drive (lengkap dengan jurnal pendukung), lalu beri tahu ketua kelompok dan minta dicek/dikoreksi.",
+            cara: [
+              "Buat/isi gdoc Bab I dan Bab II di Drive.",
+              "Unggah jurnal pendukung (PDF) bersamanya.",
+              "Tandai/ping Fadhil minta dicek dan dikoreksi.",
+            ],
+            hasil: "Bab I-II terunggah + permintaan review tersampaikan.",
+          },
+          {
+            k: "Menyempurnakan hasil revisi",
+            a: "Kerjakan catatan revisi satu per satu: cantumkan ilustrasi Why-Why, ubah jadwal jadi 8 minggu, hapus rentang waktu yang tidak cocok, hilangkan sebutan IoT/Blockchain, dan samakan poin pertanyaan dengan tujuan penelitian.",
+            cara: [
+              "Tambahkan gambar/ilustrasi Why-Why Analysis.",
+              "Ubah jadwal kegiatan menjadi 8 minggu.",
+              "Hapus rentang waktu yang tidak cocok dengan jadwal CP.",
+              "Hapus sebutan IoT dan Blockchain.",
+              "Samakan poin pertanyaan penelitian dengan tujuan penelitian.",
+            ],
+            hasil: "5 catatan revisi selesai dikerjakan.",
+          },
         ],
       },
       {
@@ -207,8 +532,26 @@ const MEMBERS = [
         rentang: "M3",
         desc: "Menutup bab pendahuluan yang dijadikan syarat submit.",
         langkah: [
-          { k: "Finalisasi Bab I & II + jadwal kegiatan", a: "Pastikan isi Bab I–II sudah sesuai arahan dan jadwal kegiatan memakai rentang 8 minggu CP." },
-          { k: "Menyerahkan ke ketua untuk format & submit", a: "Berikan bab final ke ketua kelompok agar digabung, di-format, dan di-submit sebagai Tugas 1." },
+          {
+            k: "Finalisasi Bab I & II + jadwal kegiatan",
+            a: "Pastikan isi Bab I–II sudah sesuai arahan dan jadwal kegiatan memakai rentang 8 minggu CP.",
+            cara: [
+              "Cek semua catatan revisi sudah dikerjakan.",
+              "Pastikan jadwal kegiatan memakai rentang 8 minggu CP.",
+              "Periksa kelengkapan daftar pustaka.",
+            ],
+            hasil: "Bab I-II final siap digabungkan ke proposal.",
+          },
+          {
+            k: "Menyerahkan ke ketua untuk format & submit",
+            a: "Berikan bab final ke ketua kelompok agar digabung, di-format, dan di-submit sebagai Tugas 1.",
+            cara: [
+              "Kirim tautan file final ke Fadhil.",
+              "Tandai bagian yang masih diragukan (jika ada).",
+              "Tunggu konfirmasi setelah di-format dan di-submit.",
+            ],
+            hasil: "Tugas submit Proposal berpindah ke ketua.",
+          },
         ],
       },
       {
@@ -216,8 +559,26 @@ const MEMBERS = [
         rentang: "M4",
         desc: "Perawatan kualitas bab pendahuluan.",
         langkah: [
-          { k: "Revisi Bab I & II sesuai feedback tutor", a: "Terjemahkan komentar dosen/tutor menjadi perbaikan isi." },
-          { k: "Kelola daftar pustaka", a: "Rapikan referensi, tambahkan yang baru, dan pastikan semua sitasi tercantum lengkap." },
+          {
+            k: "Revisi Bab I & II sesuai feedback tutor",
+            a: "Terjemahkan komentar dosen/tutor menjadi perbaikan isi.",
+            cara: [
+              "Catat komentar tutor satu per satu.",
+              "Kelompokkan menjadi perubahan isi vs perubahan format.",
+              "Perbaiki lalu perbarui di Drive.",
+            ],
+            hasil: "Feedback tutor masuk ke Bab I-II.",
+          },
+          {
+            k: "Kelola daftar pustaka",
+            a: "Rapikan referensi, tambahkan yang baru, dan pastikan semua sitasi tercantum lengkap.",
+            cara: [
+              "Periksa semua sitasi tercantum dalam daftar pustaka.",
+              "Tambahkan referensi baru bila diperlukan.",
+              "Rapikan format bibliografi agar konsisten.",
+            ],
+            hasil: "Daftar pustaka rapi dan lengkap.",
+          },
         ],
       },
       {
@@ -225,8 +586,26 @@ const MEMBERS = [
         rentang: "M5",
         desc: "Menulis kembali bab pendahuluan dalam dokumen kemajuan.",
         langkah: [
-          { k: "Tulis Bab I, II, V Laporan Kemajuan", a: "Perbarui konten sesuai perkembangan proyek; tulis Bab V (penutup sementara)." },
-          { k: "Formatting & submit", a: "Rapikan sesuai pedoman, gabungkan dengan bab lain, lalu submit bersama ketua." },
+          {
+            k: "Tulis Bab I, II, V Laporan Kemajuan",
+            a: "Perbarui konten sesuai perkembangan proyek; tulis Bab V (penutup sementara).",
+            cara: [
+              "Perbarui isi Bab I-II sesuai perkembangan.",
+              "Tulis Bab V (penutup sementara).",
+              "Sisipkan data/progres terbaru.",
+            ],
+            hasil: "Bab baru versi laporan kemajuan.",
+          },
+          {
+            k: "Formatting & submit",
+            a: "Rapikan sesuai pedoman, gabungkan dengan bab lain, lalu submit bersama ketua.",
+            cara: [
+              "Rapikan format sesuai pedoman UT.",
+              "Gabungkan dengan bab dari anggota lain.",
+              "Submit bersama ketua.",
+            ],
+            hasil: "Tugas 2 terkumpul.",
+          },
         ],
       },
       {
@@ -234,7 +613,16 @@ const MEMBERS = [
         rentang: "M6",
         desc: "Mencerahkan versi final laporan.",
         langkah: [
-          { k: "Finalisasi Bab I, II, V, VI", a: "Sempurnakan seluruh bab pendahuluan dan penutup untuk Laporan Akhir." },
+          {
+            k: "Finalisasi Bab I, II, V, VI",
+            a: "Sempurnakan seluruh bab pendahuluan dan penutup untuk Laporan Akhir.",
+            cara: [
+              "Perbarui dengan data final.",
+              "Sempurnakan kesimpulan dan saran (Bab V/VI).",
+              "Cek konsistensi antar-bab.",
+            ],
+            hasil: "Versi final bab-bab Sarifah di laporan akhir.",
+          },
         ],
       },
       {
@@ -242,8 +630,26 @@ const MEMBERS = [
         rentang: "M7",
         desc: "Menyesuaikan tulisan dengan format artikel.",
         langkah: [
-          { k: "Konversi Bab I, II, V ke seksi Umum Karya Ilmiah", a: "Sesuaikan isi dengan format karya ilmiah yang diminta." },
-          { k: "Menyusun Berita Acara", a: "Siapkan berita acara kerja kelompok sebagai lampiran." },
+          {
+            k: "Konversi Bab I, II, V ke seksi Umum Karya Ilmiah",
+            a: "Sesuaikan isi dengan format karya ilmiah yang diminta.",
+            cara: [
+              "Ikuti template karya ilmiah yang diminta.",
+              "Ringkas bab menjadi seksi pendahuluan & kesimpulan.",
+              "Selaraskan format sitasi.",
+            ],
+            hasil: "Seksi Umum karya ilmiah siap digabung.",
+          },
+          {
+            k: "Menyusun Berita Acara",
+            a: "Siapkan berita acara kerja kelompok sebagai lampiran.",
+            cara: [
+              "Kumpulkan ringkasan kegiatan per pertemuan.",
+              "Susun format berita acara standar UT.",
+              "Minta konfirmasi/tanda tangan semua anggota.",
+            ],
+            hasil: "Berita acara siap menjadi lampiran.",
+          },
         ],
       },
       {
@@ -251,7 +657,16 @@ const MEMBERS = [
         rentang: "M8",
         desc: "Mengamankan seluruh dokumen resmi.",
         langkah: [
-          { k: "Arsipkan dokumen final", a: "Simpan semua versi final laporan dan karya ilmiah di tempat yang rapi dan dapat diaudit." },
+          {
+            k: "Arsipkan dokumen final",
+            a: "Simpan semua versi final laporan dan karya ilmiah di tempat yang rapi dan dapat diaudit.",
+            cara: [
+              "Kumpulkan versi final proposal, kemajuan, laporan akhir, karya ilmiah.",
+              "Simpan rapi di folder Drive sesuai subfolder.",
+              "Catat daftar tautan di satu tempat.",
+            ],
+            hasil: "Arsip final terdokumentasi rapi.",
+          },
         ],
       },
     ],
@@ -307,10 +722,47 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah awal anggota baru yang langsung mendapat peran visual.",
         langkah: [
-          { k: "Perkenalan di grup", a: "Sapa seluruh anggota, beri tahu nama dan profesi, serta minta maaf karena bergabung di tengah diskusi." },
-          { k: "Memahami pembagian tugas", a: "Pelajari posisi sebagai spesialis visual/media: PPT, poster A4, skrip & video demo, forum; pahami pula bahwa Bab III kini ditangani Giren." },
-          { k: "Menerima amanah PPT & poster", a: "Catat instruksi ketua kelompok untuk mulai menyusun PPT dan poster, dengan outline materi (latar belakang, dll.) yang tersedia di folder bahan." },
-          { k: "Menetapkan kebijakan visual", a: "Tanyakan hal-hal yang butuh persetujuan anggota—misalnya pemakaian foto di slide anggota kelompok—dan kumpulkan persetujuannya." },
+          {
+            k: "Perkenalan di grup",
+            a: "Sapa seluruh anggota, beri tahu nama dan profesi, serta minta maaf karena bergabung di tengah diskusi.",
+            cara: [
+              "Sapa semua anggota di grup.",
+              "Kenalkan nama dan profesi (UI/UX Designer).",
+              "Sampaikan maaf karena bergabung lebih lambat.",
+            ],
+            hasil: "Kehadiran anggota baru tercatat di grup.",
+          },
+          {
+            k: "Memahami pembagian tugas",
+            a: "Pelajari posisi sebagai spesialis visual/media: PPT, poster A4, skrip & video demo, forum; pahami pula bahwa Bab III kini ditangani Giren.",
+            cara: [
+              "Baca ulang posisi sebagai spesialis visual & media.",
+              "Kenali lingkup: PPT, poster A4, skrip & video demo, forum.",
+              "Pahami bahwa Bab III kini ditangani Giren.",
+              "Tanya bila ada bagian yang kurang jelas.",
+            ],
+            hasil: "Posisi dan lingkup kerja dipahami jelas.",
+          },
+          {
+            k: "Menerima amanah PPT & poster",
+            a: "Catat instruksi ketua kelompok untuk mulai menyusun PPT dan poster, dengan outline materi (latar belakang, dll.) yang tersedia di folder bahan.",
+            cara: [
+              "Catat instruksi ketua: mulai menyusun PPT dan poster.",
+              "Buka folder Bahan untuk outline materi.",
+              "Buat rencana mulai mengerjakan dua produk tersebut.",
+            ],
+            hasil: "Tugas PPT & poster diterima resmi.",
+          },
+          {
+            k: "Menetapkan kebijakan visual",
+            a: "Tanyakan hal-hal yang butuh persetujuan anggota—misalnya pemakaian foto di slide anggota kelompok—dan kumpulkan persetujuannya.",
+            cara: [
+              "Tanyakan ke grup: bolehkah menampilkan foto anggota di slide?",
+              "Kumpulkan jawaban tiap anggota.",
+              "Catat keputusan dan lanjutkan pengerjaan.",
+            ],
+            hasil: "Kebijakan visual (foto slide) terkunci oleh persetujuan anggota.",
+          },
         ],
       },
       {
@@ -318,9 +770,37 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah desainer menyiapkan wajah proyek dari awal.",
         langkah: [
-          { k: "Menyiapkan template PPT", a: "Tentukan skema warna, tipografi, dan tata letak slide yang konsisten dengan identitas proyek, siap untuk diisi konten kapan saja." },
-          { k: "Menyiapkan template poster A4", a: "Buat kerangka poster satu halaman: judul, latar belakang, solusi, alur, hasil, dan identitas penulis." },
-          { k: "Membuat visualisasi diagram alur/arsitektur", a: "Ubah hasil diskusi (misalnya alur pengajuan & RBAC dari ketua) menjadi visual yang enak dibaca untuk bahan slide dan poster." },
+          {
+            k: "Menyiapkan template PPT",
+            a: "Tentukan skema warna, tipografi, dan tata letak slide yang konsisten dengan identitas proyek, siap untuk diisi konten kapan saja.",
+            cara: [
+              "Tentukan palet warna yang senada identitas proyek.",
+              "Pilih tipografi untuk judul dan isi.",
+              "Buat master slide: judul, daftar isi, isi, penutup.",
+              "Simpan template di folder Bahan.",
+            ],
+            hasil: "Template PPT siap diisi konten.",
+          },
+          {
+            k: "Menyiapkan template poster A4",
+            a: "Buat kerangka poster satu halaman: judul, latar belakang, solusi, alur, hasil, dan identitas penulis.",
+            cara: [
+              "Buat kanvas berukuran A4.",
+              "Atur zona: judul, latar belakang, solusi, alur, hasil, identitas.",
+              "Sisipkan placeholder untuk gambar dan teks.",
+            ],
+            hasil: "Kerangka poster A4 siap diisi.",
+          },
+          {
+            k: "Membuat visualisasi diagram alur/arsitektur",
+            a: "Ubah hasil diskusi (misalnya alur pengajuan & RBAC dari ketua) menjadi visual yang enak dibaca untuk bahan slide dan poster.",
+            cara: [
+              "Kumpulkan hasil diskusi (flow pengajuan, RBAC, alur sistem).",
+              "Gambar alur dengan tool pilihan (Figma/Canva).",
+              "Pastikan label menunya konsisten dengan aplikasi.",
+            ],
+            hasil: "Visual alur siap dipakai di slide dan poster.",
+          },
         ],
       },
       {
@@ -328,8 +808,26 @@ const MEMBERS = [
         rentang: "M3",
         desc: "Kontribusi visual agar proposal tampil rapi.",
         langkah: [
-          { k: "Membantu tata letak visual Proposal", a: "Sumbang keahlian desain untuk kerapian dokumen proposal sebelum dikirim." },
-          { k: "Aktif di forum diskusi M3", a: "Ikut serta dalam diskusi resmi tuton sebagai bagian keaktifan kelompok." },
+          {
+            k: "Membantu tata letak visual Proposal",
+            a: "Sumbang keahlian desain untuk kerapian dokumen proposal sebelum dikirim.",
+            cara: [
+              "Minta file draft proposal yang sedang disusun.",
+              "Perbaiki kerapian tabel, gambar, dan spasi.",
+              "Beri saran tata letak halaman bila perlu.",
+            ],
+            hasil: "Proposal tampil lebih rapi sebelum submit.",
+          },
+          {
+            k: "Aktif di forum diskusi M3",
+            a: "Ikut serta dalam diskusi resmi tuton sebagai bagian keaktifan kelompok.",
+            cara: [
+              "Cek jadwal forum di minggu M3.",
+              "Pilih topik diskusi yang relevan dengan proyek.",
+              "Tulis tanggapan yang bermakna sesuai kapasitas media.",
+            ],
+            hasil: "Keaktifan forum tercatat atas nama kelompok.",
+          },
         ],
       },
       {
@@ -337,8 +835,26 @@ const MEMBERS = [
         rentang: "M4",
         desc: "Langkah awal dari dua produk utama: video dan poster.",
         langkah: [
-          { k: "Menulis skrip video demo", a: "Buat naskah penjelasan aplikasi dari alur sistem: login, cek stok, isi BQ, approval, monitoring." },
-          { k: "Membuat draf poster A4", a: "Isi kerangka poster dengan konten sementara yang sudah tersedia." },
+          {
+            k: "Menulis skrip video demo",
+            a: "Buat naskah penjelasan aplikasi dari alur sistem: login, cek stok, isi BQ, approval, monitoring.",
+            cara: [
+              "Susun alur cerita: login, cek stok, isi BQ, approval, monitoring.",
+              "Tulis narasi singkat per adegan.",
+              "Cocokkan dengan menu aplikasi yang sebenarnya.",
+            ],
+            hasil: "Naskah video demo siap direkam.",
+          },
+          {
+            k: "Membuat draf poster A4",
+            a: "Isi kerangka poster dengan konten sementara yang sudah tersedia.",
+            cara: [
+              "Isi template poster dengan konten sementara.",
+              "Atur keseimbangan visual teks dan gambar.",
+              "Kumpulkan masukan anggota.",
+            ],
+            hasil: "Draf poster pertama selesai.",
+          },
         ],
       },
       {
@@ -346,7 +862,16 @@ const MEMBERS = [
         rentang: "M5",
         desc: "Menurunkan laporan kemajuan menjadi presentasi.",
         langkah: [
-          { k: "Menyusun 8–12 slide PPT Laporan Kemajuan", a: "Rangkai slide: judul, anggota, latar belakang, tujuan, metode, hasil, kendala, dan rencana lanjut, sesuai jatah slide yang diminta." },
+          {
+            k: "Menyusun 8–12 slide PPT Laporan Kemajuan",
+            a: "Rangkai slide: judul, anggota, latar belakang, tujuan, metode, hasil, kendala, dan rencana lanjut, sesuai jatah slide yang diminta.",
+            cara: [
+              "Susun narasi: judul, anggota, latar belakang, tujuan, metode, hasil, kendala, rencana lanjut.",
+              "Isi dengan data dan grafik kemajuan terkini.",
+              "Pastikan jumlah slide sesuai jatah (8–12).",
+            ],
+            hasil: "PPT Laporan Kemajuan siap.",
+          },
         ],
       },
       {
@@ -354,7 +879,16 @@ const MEMBERS = [
         rentang: "M6",
         desc: "Mengumpulkan bahan suara/gambar untuk video demo.",
         langkah: [
-          { k: "Mengumpulkan rekaman video/suara anggota 1–5", a: "Atur jadwal perekaman, beri panduan singkat ke tiap anggota, lalu kumpulkan hasilnya rapi." },
+          {
+            k: "Mengumpulkan rekaman video/suara anggota 1–5",
+            a: "Atur jadwal perekaman, beri panduan singkat ke tiap anggota, lalu kumpulkan hasilnya rapi.",
+            cara: [
+              "Buat jadwal perekaman per anggota.",
+              "Kirim panduan singkat (durasi, konten, kondisi kamera).",
+              "Kumpulkan file dan beri nama rapi.",
+            ],
+            hasil: "Seluruh rekaman anggota terkumpul.",
+          },
         ],
       },
       {
@@ -362,9 +896,36 @@ const MEMBERS = [
         rentang: "M7",
         desc: "Merampungkan dan mengunggah semua media publikasi.",
         langkah: [
-          { k: "Menyunting video YouTube", a: "Gabungkan rekaman demo aplikasi + suara anggota menjadi video final yang jelas dan tak terlalu panjang." },
-          { k: "Menyelesaikan Poster A4 & PPT final", a: "Finalisasi poster dan slide presentasi untuk pengumpulan tugas 3." },
-          { k: "Upload semua media", a: "Unggah video ke YouTube, poster dan PPT ke Drive/link resmi, lalu bagikan tautannya." },
+          {
+            k: "Menyunting video YouTube",
+            a: "Gabungkan rekaman demo aplikasi + suara anggota menjadi video final yang jelas dan tak terlalu panjang.",
+            cara: [
+              "Gabungkan rekaman demo aplikasi dan suara anggota.",
+              "Tambahkan teks dan gambar pembuka.",
+              "Jaga durasi ringkas, lalu render versi final.",
+            ],
+            hasil: "Video final siap diunggah.",
+          },
+          {
+            k: "Menyelesaikan Poster A4 & PPT final",
+            a: "Finalisasi poster dan slide presentasi untuk pengumpulan tugas 3.",
+            cara: [
+              "Perbarui poster dan PPT dengan data final.",
+              "Cek konsistensi warna dan keterbacaan.",
+              "Export versi final.",
+            ],
+            hasil: "Poster A4 & PPT final.",
+          },
+          {
+            k: "Upload semua media",
+            a: "Unggah video ke YouTube, poster dan PPT ke Drive/link resmi, lalu bagikan tautannya.",
+            cara: [
+              "Unggah video ke YouTube.",
+              "Unggah poster dan PPT ke Drive/link resmi.",
+              "Bagikan tautan ke grup dan simpan bukti.",
+            ],
+            hasil: "Semua media publikasi ter-upload.",
+          },
         ],
       },
       {
@@ -372,7 +933,16 @@ const MEMBERS = [
         rentang: "M8",
         desc: "Memastikan media tetap bisa diakses saat evaluasi.",
         langkah: [
-          { k: "Cek link YouTube tetap aktif", a: "Uji tautan video sebelum dan saat sesi evaluasi agar tidak rusak." },
+          {
+            k: "Cek link YouTube tetap aktif",
+            a: "Uji tautan video sebelum dan saat sesi evaluasi agar tidak rusak.",
+            cara: [
+              "Buka dan uji tautan video.",
+              "Cek ulang menjelang dan saat sesi evaluasi.",
+              "Siapkan tautan cadangan bila perlu.",
+            ],
+            hasil: "Media tetap bisa diakses saat evaluasi.",
+          },
         ],
       },
     ],
@@ -427,11 +997,55 @@ const MEMBERS = [
         rentang: "M1–M2",
         desc: "Langkah awal: masuk, menawarkan ide, dan menerima posisi baru.",
         langkah: [
-          { k: "Bergabung & membuka ruang ide", a: "Sapa grup dan nyatakan kesiapan; ajak anggota berbagi ide untuk didiskusikan bersama." },
-          { k: "Mengikuti mekanisme pemilihan jadwal", a: "Ikut serta dalam polling jadwal diskusi bersama anggota lain." },
-          { k: "Menyetujui pengalihan tugas Bab III", a: "Ketika ketua mengusulkan agar penyusunan Bab III (dengan banyak diagram) berpindah ke Giren, respons dengan persetujuan yang jelas agar tim lanjut bergerak." },
-          { k: "Menerima kerangka & diagram awal", a: "Terima draf kerangka Bab III dan diagram awal dari ketua; catat arahan: rapikan dengan Visio/DrawIO dan selaraskan tentatif dengan aplikasi yang dikembangkan." },
-          { k: "Mempelajari alur sistem & RBAC", a: "Kuasai flow dan hak akses setiap peran pengguna sebagai dasar akurat untuk menggambar diagram." },
+          {
+            k: "Bergabung & membuka ruang ide",
+            a: "Sapa grup dan nyatakan kesiapan; ajak anggota berbagi ide untuk didiskusikan bersama.",
+            cara: [
+              "Sapa grup dan nyatakan kesiapan.",
+              "Ajak anggota membagikan ide di grup.",
+              "Siap menerima hasil diskusi.",
+            ],
+            hasil: "Partisipasi aktif tercatat di hari pertama.",
+          },
+          {
+            k: "Mengikuti mekanisme pemilihan jadwal",
+            a: "Ikut serta dalam polling jadwal diskusi bersama anggota lain.",
+            cara: [
+              "Buka polling jadwal yang dibuat ketua.",
+              "Pilih salah satu opsi waktu.",
+              "Konfirmasi selesai voting.",
+            ],
+            hasil: "Jadwal diskusi disetujui oleh semua anggota.",
+          },
+          {
+            k: "Menyetujui pengalihan tugas Bab III",
+            a: "Ketika ketua mengusulkan agar penyusunan Bab III (dengan banyak diagram) berpindah ke Giren, respons dengan persetujuan yang jelas agar tim lanjut bergerak.",
+            cara: [
+              "Baca usulan ketua mengenai pengalihan Bab III.",
+              "Beri persetujuan yang jelas di grup.",
+            ],
+            hasil: "Pembagian tugas terkunci dan tim melanjutkan.",
+          },
+          {
+            k: "Menerima kerangka & diagram awal",
+            a: "Terima draf kerangka Bab III dan diagram awal dari ketua; catat arahan: rapikan dengan Visio/DrawIO dan selaraskan tentatif dengan aplikasi yang dikembangkan.",
+            cara: [
+              "Akses dokumen 'Draft Bab 3 CP 127 A' di Drive.",
+              "Pelajari kerangka dan diagram kasar.",
+              "Catat arahan: rapikan Visio/DrawIO, selaraskan dengan aplikasi.",
+            ],
+            hasil: "Kerangka Bab III dipahami sepenuhnya.",
+          },
+          {
+            k: "Mempelajari alur sistem & RBAC",
+            a: "Kuasai flow dan hak akses setiap peran pengguna sebagai dasar akurat untuk menggambar diagram.",
+            cara: [
+              "Baca dokumen flow & RBAC dari ketua.",
+              "Catat menu setiap peran.",
+              "Tanyakan bagian yang belum jelas.",
+            ],
+            hasil: "Dasar pemodelan diagram akurat.",
+          },
         ],
       },
       {
@@ -439,10 +1053,49 @@ const MEMBERS = [
         rentang: "M1–M2 / M3",
         desc: "Langkah analis menuliskan cara penelitian dan perekayasaan.",
         langkah: [
-          { k: "Menetapkan pendekatan penelitian", a: "Gunakan Mixed Methods (kualitatif + kuantitatif) dalam kerangka RAD dan Continual Improvement—jelaskan alasan pemilihan paradigma pragmatisme." },
-          { k: "Menentukan lokasi, waktu, dan subjek", a: "Tulis lokasi (Lini Steril Dept. Engineering PT Fonko), rentang waktu, dan teknik Purposive Sampling pada 6 peranan: Manager, SPV1, SPV2, Engineering Officer, 10 Teknisi, Administrator." },
-          { k: "Menyusun teknik pengumpulan data", a: "Uraikan 4 teknik: observasi lapangan, wawancara terstruktur & FGD, studi dokumentasi (log EJO 305 menit, PR/PO, min-max), dan kuesioner dikotomis/Likert." },
-          { k: "Menyusun teknik analisis data", a: "Jelaskan Why-Why & Fishbone, audit parameter stok min-max, analisis isi (content analysis), dan statistika deskriptif & komparatif." },
+          {
+            k: "Menetapkan pendekatan penelitian",
+            a: "Gunakan Mixed Methods (kualitatif + kuantitatif) dalam kerangka RAD dan Continual Improvement—jelaskan alasan pemilihan paradigma pragmatisme.",
+            cara: [
+              "Tulis pemilihan Mixed Methods (kualitatif + kuantitatif).",
+              "Kaitkan dengan kerangka RAD dan Continual Improvement.",
+              "Jelaskan alasan paradigma pragmatisme.",
+            ],
+            hasil: "Pendekatan & paradigma penelitian tertulis lengkap.",
+          },
+          {
+            k: "Menentukan lokasi, waktu, dan subjek",
+            a: "Tulis lokasi (Lini Steril Dept. Engineering PT Fonko), rentang waktu, dan teknik Purposive Sampling pada 6 peranan: Manager, SPV1, SPV2, Engineering Officer, 10 Teknisi, Administrator.",
+            cara: [
+              "Tulis lokasi: Lini Steril Dept. Engineering PT Fonko.",
+              "Tulis rentang waktu penelitian.",
+              "Tulis teknik Purposive Sampling.",
+              "Rinci subjek: Manager, SPV1, SPV2, Engineering Officer, 10 Teknisi, Administrator.",
+            ],
+            hasil: "Lokasi, waktu, dan subjek terdokumentasi.",
+          },
+          {
+            k: "Menyusun teknik pengumpulan data",
+            a: "Uraikan 4 teknik: observasi lapangan, wawancara terstruktur & FGD, studi dokumentasi (log EJO 305 menit, PR/PO, min-max), dan kuesioner dikotomis/Likert.",
+            cara: [
+              "Uraikan observasi lapangan.",
+              "Uraikan wawancara terstruktur dan FGD.",
+              "Uraikan studi dokumentasi (EJO 305 menit, PR/PO, min-max).",
+              "Uraikan kuesioner dikotomis/Likert.",
+            ],
+            hasil: "Empat teknik pengumpulan data ditulis lengkap.",
+          },
+          {
+            k: "Menyusun teknik analisis data",
+            a: "Jelaskan Why-Why & Fishbone, audit parameter stok min-max, analisis isi (content analysis), dan statistika deskriptif & komparatif.",
+            cara: [
+              "Jelaskan teknik Why-Why dan Fishbone.",
+              "Jelaskan audit parameter stok min-max.",
+              "Jelaskan analisis isi (content analysis).",
+              "Jelaskan statistika deskriptif & komparatif.",
+            ],
+            hasil: "Metode analisis data tertulis lengkap.",
+          },
         ],
       },
       {
@@ -450,14 +1103,88 @@ const MEMBERS = [
         rentang: "M1–M2 / M3",
         desc: "Langkah inti pembuatan seluruh diagram perancangan.",
         langkah: [
-          { k: "Membuat context diagram / DFD level 0", a: "Gambarkan interaksi sistem dengan entitas eksternal secara global." },
-          { k: "Membuat DFD level 1", a: "Pecah 4 proses utama: Kelola Master Stok & Critical Part, Pengajuan Form BQ, Verifikasi & Approval Multi-Tier, dan Monitoring & Reporting." },
-          { k: "Membuat flowchart system", a: "Gambar alur pengajuan BQ & verification loop, serta alur preventive replenishment critical sparepart." },
-          { k: "Membuat use case diagram & activity diagram", a: "Petakan aktor-label-aksi (login, cek stok, isi BQ, approval, monitoring) dan aktivitas-aktivitas sistem berurutan." },
-          { k: "Merancang ERD & spesifikasi tabel", a: "Susun diagram relasi dan rinci tabel: USERS, FORM_BQ, DETAIL_BQ, STOCK_GUDANG_CRITICAL, APPROVAL_LOG beserta kolom-kunci." },
-          { k: "Merancang antarmuka (UI)", a: "Gambarkan halaman login, dashboard RBAC, BQ personal/summary, pencarian on-hand, critical part list, form approval, dan embed Monthly Report—sesuai aplikasi nyata." },
-          { k: "Menuliskan pengujian, implementasi, pemeliharaan", a: "Rincikan Black Box & UAT, lalu tahap migrasi data, penerbitan kredensial, sosialisasi SOP, go-live, serta FGD dan pemeliharaan berkala." },
-          { k: "Merapikan seluruh diagram", a: "Rapikan setiap diagram dengan Visio/DrawIO agar jelas, konsisten, dan diselaraskan dengan fitur aplikasi." },
+          {
+            k: "Membuat context diagram / DFD level 0",
+            a: "Gambarkan interaksi sistem dengan entitas eksternal secara global.",
+            cara: [
+              "Identifikasi entitas eksternal (teknisi, officer, SPV, manager, admin).",
+              "Gambar sistem sebagai satu proses global di DrawIO.",
+              "Beri label alur data masuk dan keluar.",
+            ],
+            hasil: "Context diagram / DFD level 0.",
+          },
+          {
+            k: "Membuat DFD level 1",
+            a: "Pecah 4 proses utama: Kelola Master Stok & Critical Part, Pengajuan Form BQ, Verifikasi & Approval Multi-Tier, dan Monitoring & Reporting.",
+            cara: [
+              "Pecah proses jadi 4 modul (master stok & critical part, pengajuan BQ, verifikasi & approval, monitoring & reporting).",
+              "Hubungkan tiap proses dengan data store.",
+              "Cek konsistensi label antar level.",
+            ],
+            hasil: "DFD level 1 lengkap.",
+          },
+          {
+            k: "Membuat flowchart system",
+            a: "Gambar alur pengajuan BQ & verification loop, serta alur preventive replenishment critical sparepart.",
+            cara: [
+              "Gambar alur pengajuan BQ dan loop verifikasinya.",
+              "Gambar alur preventive replenishment critical sparepart.",
+              "Pastikan ada decision point (Normal/Urgent, approve/reject).",
+            ],
+            hasil: "Flowchart sistem untuk dua alur utama.",
+          },
+          {
+            k: "Membuat use case diagram & activity diagram",
+            a: "Petakan aktor-label-aksi (login, cek stok, isi BQ, approval, monitoring) dan aktivitas-aktivitas sistem berurutan.",
+            cara: [
+              "Petakan aktor dan use case utama.",
+              "Beri label aksi: login, cek stok, isi BQ, approval, monitoring.",
+              "Buat activity diagram untuk alur utama.",
+            ],
+            hasil: "Use case diagram & activity diagram.",
+          },
+          {
+            k: "Merancang ERD & spesifikasi tabel",
+            a: "Susun diagram relasi dan rinci tabel: USERS, FORM_BQ, DETAIL_BQ, STOCK_GUDANG_CRITICAL, APPROVAL_LOG beserta kolom-kunci.",
+            cara: [
+              "Gambar relasi antar tabel utama (USERS, FORM_BQ, DETAIL_BQ, STOCK_GUDANG_CRITICAL, APPROVAL_LOG).",
+              "Tulis kolom kunci setiap tabel.",
+              "Validasi ke developer agar cocok dengan database aplikasi.",
+            ],
+            hasil: "ERD + spesifikasi tabel.",
+          },
+          {
+            k: "Merancang antarmuka (UI)",
+            a: "Gambarkan halaman login, dashboard RBAC, BQ personal/summary, pencarian on-hand, critical part list, form approval, dan embed Monthly Report—sesuai aplikasi nyata.",
+            cara: [
+              "Gambar halaman login dan dashboard per role.",
+              "Gambar BQ personal & summary, pencarian on-hand, critical part list.",
+              "Gambar form approval.",
+              "Sisipkan tampilan embed Monthly Report.",
+              "Samakan menu dengan aplikasi yang sedang dibuat.",
+            ],
+            hasil: "Rancangan UI selaras aplikasi nyata.",
+          },
+          {
+            k: "Menuliskan pengujian, implementasi, pemeliharaan",
+            a: "Rincikan Black Box & UAT, lalu tahap migrasi data, penerbitan kredensial, sosialisasi SOP, go-live, serta FGD dan pemeliharaan berkala.",
+            cara: [
+              "Tulis rencana pengujian Black Box dan UAT.",
+              "Tulis tahap implementasi: migrasi data, kredensial, sosialisasi SOP, go-live.",
+              "Tulis jadwal FGD dan pemeliharaan berkala.",
+            ],
+            hasil: "Rincian pengujian & implementasi.",
+          },
+          {
+            k: "Merapikan seluruh diagram",
+            a: "Rapikan setiap diagram dengan Visio/DrawIO agar jelas, konsisten, dan diselaraskan dengan fitur aplikasi.",
+            cara: [
+              "Cek tiap diagram dari segi label, konsistensi, dan ukuran.",
+              "Rapikan dengan Visio/DrawIO menjadi satu file rapi.",
+              "Selaraskan dengan fitur aplikasi yang sudah berjalan.",
+            ],
+            hasil: "Seluruh diagram final dan konsisten.",
+          },
         ],
       },
       {
@@ -465,7 +1192,16 @@ const MEMBERS = [
         rentang: "M3",
         desc: "Menyerahkan bagian metodologi yang siap digabung.",
         langkah: [
-          { k: "Finalisasi Bab III Proposal", a: "Pastikan metodologi, perancangan, dan seluruh diagram lengkap lalu serahkan ke ketua untuk digabung & di-submit." },
+          {
+            k: "Finalisasi Bab III Proposal",
+            a: "Pastikan metodologi, perancangan, dan seluruh diagram lengkap lalu serahkan ke ketua untuk digabung & di-submit.",
+            cara: [
+              "Cek kelengkapan metodologi dan seluruh diagram.",
+              "Perbaiki bagian yang belum jelas.",
+              "Serahkan file final ke Fadhil untuk digabung & di-submit.",
+            ],
+            hasil: "Bab III final siap digabung ke proposal.",
+          },
         ],
       },
       {
@@ -473,7 +1209,16 @@ const MEMBERS = [
         rentang: "M4",
         desc: "Perawatan kualitas metode & diagram.",
         langkah: [
-          { k: "Revisi Bab III & diagram sesuai feedback tutor", a: "Perbaiki isi dan gambar sesuai komentar dosen." },
+          {
+            k: "Revisi Bab III & diagram sesuai feedback tutor",
+            a: "Perbaiki isi dan gambar sesuai komentar dosen.",
+            cara: [
+              "Catat komentar tutor.",
+              "Perbaiki isi dan gambar diagram.",
+              "Perbarui versi di Drive.",
+            ],
+            hasil: "Revisi tutor masuk ke Bab III.",
+          },
         ],
       },
       {
@@ -481,8 +1226,24 @@ const MEMBERS = [
         rentang: "M5–M6",
         desc: "Menulis ulang dan memantapkan bagian metodologi.",
         langkah: [
-          { k: "Tulis Bab III Laporan Kemajuan", a: "Perbarui metode dan perancangan sesuai perkembangan aplikasi." },
-          { k: "Finalisasi Bab III + penyempurnaan diagram", a: "Sempurnakan semua diagram untuk Laporan Akhir." },
+          {
+            k: "Tulis Bab III Laporan Kemajuan",
+            a: "Perbarui metode dan perancangan sesuai perkembangan aplikasi.",
+            cara: [
+              "Perbarui metode sesuai perkembangan aplikasi.",
+              "Sinkronkan diagram dengan fitur terbaru.",
+            ],
+            hasil: "Bab III versi laporan kemajuan.",
+          },
+          {
+            k: "Finalisasi Bab III + penyempurnaan diagram",
+            a: "Sempurnakan semua diagram untuk Laporan Akhir.",
+            cara: [
+              "Perbaiki seluruh diagram untuk laporan akhir.",
+              "Pastikan konsisten dengan hasil aplikasi di Bab IV.",
+            ],
+            hasil: "Bab III final laporan akhir.",
+          },
         ],
       },
       {
@@ -490,8 +1251,25 @@ const MEMBERS = [
         rentang: "M7–M8",
         desc: "Menyesuaikan ke format artikel dan evaluasi akhir.",
         langkah: [
-          { k: "Konversi Bab III ke seksi Metodologi Karya Ilmiah", a: "Sesuaikan isi dengan format karya ilmiah dan integrasikan diagram." },
-          { k: "Evaluasi kesesuaian dokumen final", a: "Periksa konsistensi metodologi dan pemodelan sebelum pengumpulan akhir." },
+          {
+            k: "Konversi Bab III ke seksi Metodologi Karya Ilmiah",
+            a: "Sesuaikan isi dengan format karya ilmiah dan integrasikan diagram.",
+            cara: [
+              "Ikuti template karya ilmiah.",
+              "Ringkas metode dan integrasikan diagram.",
+              "Selaraskan format sitasi.",
+            ],
+            hasil: "Seksi Metodologi karya ilmiah.",
+          },
+          {
+            k: "Evaluasi kesesuaian dokumen final",
+            a: "Periksa konsistensi metodologi dan pemodelan sebelum pengumpulan akhir.",
+            cara: [
+              "Cek konsistensi metodologi dan pemodelan.",
+              "Validasi dengan hasil yang ada di Bab IV.",
+            ],
+            hasil: "Dokumen metodologi final konsisten.",
+          },
         ],
       },
     ],
@@ -530,7 +1308,9 @@ const MEMBERS = [
 const $app = document.getElementById("app");
 const $nav = document.getElementById("nav");
 let current = "home";
-const CK_KEY = "ck_a127_v2";
+const CK_KEY = "ck_a127_v3";
+const WHO_KEY = "ck_a127_who";
+const TOUR_DONE = "ck_a127_tour_done_";
 const savedChecks = JSON.parse(localStorage.getItem(CK_KEY) || "{}");
 
 function esc(s) {
@@ -610,7 +1390,7 @@ function renderHome() {
       <ul class="crosslist">
         ${PROJEK.lingkupTitik.map((t) => `<li>${esc(t)}</li>`).join("")}
       </ul>
-      <p class="small muted" style="margin-top:16px;">Halaman ini berisi analisa per anggota: <strong>kerangka kerja lengkap dari awal sampai selesai</strong> (langkahnya kecil-kecil, namun disusun dengan bahasa orang dewasa), <strong>bukti di grup</strong>, <strong>checklist pengerjaan</strong>, serta <strong>keterkaitan antar pemegang peran</strong>. Pilih nama di menu sebelah kiri.</p>
+      <p class="small muted" style="margin-top:16px;">Halaman ini berisi analisa per anggota: <strong>kerangka kerja lengkap dari awal sampai selesai</strong> (langkahnya kecil-kecil, disusun dengan bahasa orang dewasa), <strong>catatan singkat kontribusi</strong>, <strong>checklist pengerjaan</strong>, serta <strong>keterkaitan antar pemegang peran</strong>. Setiap langkah juga sudah dipecah jadi <strong>sub-langkah</strong> yang bisa dicentang (ada penghitung kecil di samping judul langkah). Pilih nama di menu sebelah kiri.</p>
     </div>
 
     <div class="section">
@@ -639,24 +1419,37 @@ function bindHome() {
 /* ------------------------- member ------------------------- */
 
 function renderMember(m) {
-  const fase = m.fase.map((f, fi) => `
-    <div class="fase">
-      <div class="fase-head">
-        <div>
-          <span class="fase-badge">${esc(f.rentang)}</span>
-          <h3>${fi + 1}. ${esc(f.judul)}</h3>
-        </div>
-        <p class="fase-desc">${esc(f.desc)}</p>
-      </div>
-      <div class="steps">${f.langkah.map((s, si) => `
+  const fase = m.fase.map((f, fi) => {
+    const steps = f.langkah.map((s, si) => {
+      const fkey = m.id + "." + fi + "." + si;
+      const cara = (s.cara || []).map((c, ci) => {
+        const sk = fkey + "." + ci;
+        const on = savedChecks[sk] === true;
+        return `<li><label class="sub-check ${on ? "on" : ""}"><input type="checkbox" data-sub="${fkey}" data-sk="${sk}" ${on ? "checked" : ""}/><span>${esc(c)}</span></label></li>`;
+      }).join("");
+      return `
         <div class="step">
           <div class="step-num">${fi + 1}.${si + 1}</div>
           <div>
-            <h4>${esc(s.k)}</h4>
-            <p>${esc(s.a)}</p>
+            <h4>${esc(s.k)} ${cara ? `<span class="sub-prog" data-sp="${fkey}"></span>` : ""}</h4>
+            <p class="step-a">${esc(s.a)}</p>
+            ${cara ? `<ul class="substeps">${cara}</ul>` : ""}
+            ${s.hasil ? `<div class="hasil">${esc(s.hasil)}</div>` : ""}
           </div>
-        </div>`).join("")}</div>
-    </div>`).join("");
+        </div>`;
+    }).join("");
+    return `
+      <div class="fase">
+        <div class="fase-head">
+          <div>
+            <span class="fase-badge">${esc(f.rentang)}</span>
+            <h3>${fi + 1}. ${esc(f.judul)}</h3>
+          </div>
+          <p class="fase-desc">${esc(f.desc)}</p>
+        </div>
+        <div class="steps">${steps}</div>
+      </div>`;
+  }).join("");
 
   const bukti = m.bukti.map((b) => `
     <div class="t-item">
@@ -687,7 +1480,7 @@ function renderMember(m) {
   const kLinks = [
     ["ringkasan", "Ringkasan", "#bd4b4b"],
     ["fase", "Kerangka kerja lengkap", "var(--ink)"],
-    ["bukti", "Bukti di grup", "var(--ink)"],
+    ["bukti", "Jejak kontribusi", "var(--ink)"],
     ["checklist", "Checklist", "var(--ink)"],
     ["kaitan", "Keterkaitan", "var(--ink)"],
   ];
@@ -716,13 +1509,13 @@ function renderMember(m) {
 
     <section id="fase" class="section">
       <h2>Kerangka kerja lengkap — dari awal sampai selesai</h2>
-      <p class="muted">Langkah-langkah kecil urut dari paling awal hingga penutup proyek. Kata-katanya dewasa, tapi langkahnya diperinci supaya mudah diikuti satu per satu.</p>
+      <p class="muted">Langkah-langkah kecil urut dari paling awal hingga penutup proyek. Di samping judul langkah ada penghitung sub-langkah (mis. 2/4) — centang tiap sub-langkah yang sudah dikerjakan.</p>
       ${fase}
     </section>
 
     <section id="bukti" class="section">
-      <h2>Bukti di grup (berurutan)</h2>
-      <p class="muted">Jejak partisipasi yang tercatat di arsip chat grup per tanggal.</p>
+      <h2>Jejak kontribusi (berurutan)</h2>
+      <p class="muted">Rangkaian kegiatan yang sudah dijalankan anggota beserta waktunya.</p>
       <div class="timeline" style="--ac:${m.warna};">${bukti}</div>
     </section>
 
@@ -738,7 +1531,7 @@ function renderMember(m) {
         </div>
         ${checklist}
       </div>
-      <p class="small muted" style="margin-top:10px;">Centang bisa diubah bebas dan tersimpan di browser ini. Tanda <strong>terverifikasi</strong> berarti sudah terlihat pengerjaannya di chat/dokumen tim per 25 Sep 2026; tanda <strong>sedang dikerjakan</strong> berarti berjalan namun belum tuntas versi finalnya.</p>
+      <p class="small muted" style="margin-top:10px;">Centang bisa diubah bebas dan tersimpan di browser ini. Tanda <strong>terverifikasi</strong> berarti pengerjaannya sudah tampak per 25 Sep 2026; tanda <strong>sedang dikerjakan</strong> berarti berjalan namun belum tuntas versi finalnya.</p>
     </section>
 
     <section id="kaitan" class="section">
@@ -773,7 +1566,17 @@ function bindMember(m) {
     })
   );
 
+  $app.querySelectorAll("[data-sub]").forEach((cb) =>
+    cb.addEventListener("change", () => {
+      savedChecks[cb.dataset.sk] = cb.checked;
+      localStorage.setItem(CK_KEY, JSON.stringify(savedChecks));
+      cb.closest(".sub-check").classList.toggle("on", cb.checked);
+      updateSubProgress(cb.dataset.sub);
+    })
+  );
+
   updateProgress(m.id);
+  document.querySelectorAll("[data-sp]").forEach((el) => updateSubProgress(el.dataset.sp));
 }
 
 function updateProgress(group) {
@@ -785,5 +1588,174 @@ function updateProgress(group) {
   if (l) l.textContent = n + " dari " + boxes.length + " langkah ditandai selesai · " + (boxes.length ? Math.round((n / boxes.length) * 100) : 0) + "%";
 }
 
+function updateSubProgress(fkey) {
+  const boxes = Array.from(document.querySelectorAll('[data-sub="' + fkey + '"]'));
+  const n = boxes.filter((b) => b.checked).length;
+  const el = document.querySelector('[data-sp="' + fkey + '"]');
+  if (el) el.textContent = n + "/" + boxes.length;
+}
+
+/* ------------------------- tour (panduan menunjuk ke bagian) ------------------------- */
+
+const TOURS = {
+  home: [
+    { sel: ".hero", judul: "Judul halaman ini", isi: "Ini halaman khusus kelompok kita. Judul di sini berisi topik proyek yang sedang dikerjakan, lengkap dengan mata kuliah, universitas, pembimbing, dan jadwalnya." },
+    { sel: ".member-cards", judul: "Empat kartu anggota", isi: "Setiap kartu adalah satu anggota. Tinggal diklik untuk membuka halaman yang berisi tugas-tugasnya. Di kartu ini juga tertera peran dan NIM-nya." },
+    { sel: ".timeline", judul: "Garis waktu kelompok", isi: "Ini rangkuman perjalanan kelompok dari awal sampai sekarang, jadi semua tahu kapan apa yang terjadi." },
+    { sel: ".nav", judul: "Menu pindah halaman", isi: "Menu di kiri ini tempat berpindah antara beranda dan halaman masing-masing anggota." },
+  ],
+};
+
+function memberTour() {
+  return [
+    { sel: ".mhero", judul: "Kartu identitas Anda", isi: "Kartu paling atas ini berisi nama lengkap, NIM, peran Anda di kelompok, dan satu kalimat status pekerjaan yang sedang berjalan. Huruf di kotak sebelah kiri adalah avatar untuk memudahkan menemukan Anda di menu." },
+    { sel: "#ringkasan", judul: "Ringkasan peran", isi: "Sebelum masuk ke langkah-langkah, bagian ini menjelaskan gambaran besar: apa yang Anda kerjakan dan bagaimana itu membantu kelompok." },
+    { sel: "#fase", judul: "Kerangka kerja lengkap", isi: "Ini bagian terpenting. Tugas diurutkan dari yang paling awal sampai selesai, lalu dibagi-bagi menjadi beberapa tahap. Mulailah dari tahap bernomor 1 dan berjalan ke bawah pelan-pelan." },
+    { sel: "#fase .fase", judul: "Satu tahap kerja", isi: "Setiap kotak besar adalah satu tahap. Bagian atasnya menampilkan penanda minggu (misalnya M1–M2) dan judul tahap. Di bawahnya berisi langkah-langkah kerja." },
+    { sel: "#fase .step", judul: "Langkah kerja bernomor", isi: "Ini satu langkah kerja, contohnya 1.1. Angka pertama menunjuk tahap ke berapa, angka kedua menunjuk langkah ke berapa. Baca judul dan keterangannya, lalu kerjakan urut dari atas." },
+    { sel: "#fase .substeps", judul: "Sub-langkah yang bisa dicentang", isi: "Satu langkah besar dipecah lagi menjadi sub-langkah kecil. Selesai satu, centang satu. Di samping judul langkah ada penghitung seperti 2/4, jadi langsung terlihat berapa yang sudah beres." },
+    { sel: "#fase .hasil", judul: "Kotak hasil", isi: "Kotak garis putus-putus ini mengingatkan apa yang seharusnya menjadi keluaran setelah langkah selesai. Kalau keluarnya belum ada, berarti langkah itu belum kelar." },
+    { sel: "#bukti", judul: "Jejak kontribusi", isi: "Ini rangkuman waktu: kapan suatu kegiatan pernah dikerjakan. Berguna untuk menceritakan kemajuan saat diskusi atau mengecek progres." },
+    { sel: "#checklist .card", judul: "Checklist pengerjaan", isi: "Ini rangkuman semua tugas dalam bentuk daftar centang, lengkap dengan tanda sudah selesai (terverifikasi) atau sedang dikerjakan. Ada tombol 'Reset centang' untuk mengulang dari nol." },
+    { sel: "#kaitan", judul: "Keterkaitan dengan anggota lain", isi: "Bagian terakhir menunjukkan bahwa pekerjaan masing-masing orang saling berhubungan. Ini membantu melihat siapa yang perlu diajak bicara supaya tugas berjalan lancar." },
+  ];
+}
+
+let tour = null;
+
+function bindTour() {
+  const start = document.getElementById("tour-start");
+  const whoBox = document.getElementById("tour-who");
+  const reopen = document.getElementById("guide-reopen");
+  if (start && whoBox) {
+    whoBox.querySelectorAll("[data-gotour]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const who = b.dataset.gotour;
+        localStorage.setItem(WHO_KEY, who);
+        start.classList.remove("show");
+        startTour(who);
+      })
+    );
+  }
+  if (reopen) reopen.addEventListener("click", () => { if (start) start.classList.add("show"); });
+  const nextB = document.getElementById("tour-next");
+  if (nextB) nextB.addEventListener("click", tourNext);
+  const prevB = document.getElementById("tour-prev");
+  if (prevB) prevB.addEventListener("click", tourPrev);
+  const who = localStorage.getItem(WHO_KEY);
+  if (who) {
+    if (localStorage.getItem(TOUR_DONE + who) !== "1") startTour(who);
+  } else if (start) {
+    start.classList.add("show");
+  }
+}
+
+function startTour(who) {
+  const steps = who === "home" ? TOURS.home : memberTour();
+  if (!steps || !steps.length) return;
+  navigate(who);
+  tour = { who, steps, idx: -1, el: null };
+  tourNext();
+}
+
+function tourNext() {
+  if (!tour) return;
+  if (tour.idx + 1 >= tour.steps.length) { tourFinish(); return; }
+  tour.idx += 1;
+  renderTourStep();
+}
+
+function tourPrev() {
+  if (!tour) return;
+  if (tour.idx <= 0) return;
+  tour.idx -= 1;
+  renderTourStep();
+}
+
+let tourRaf = null;
+function addTourListeners() {
+  window.addEventListener("scroll", onTourReposition, true);
+  window.addEventListener("resize", onTourReposition);
+}
+function removeTourListeners() {
+  window.removeEventListener("scroll", onTourReposition, true);
+  window.removeEventListener("resize", onTourReposition);
+  if (tourRaf) { cancelAnimationFrame(tourRaf); tourRaf = null; }
+}
+function onTourReposition() {
+  if (!tour || !tour.el) return;
+  if (tourRaf) return;
+  tourRaf = requestAnimationFrame(function () {
+    tourRaf = null;
+    if (tour && tour.el) positionTour(tour.el);
+  });
+}
+
+function positionTour(el) {
+  const sEl = document.getElementById("tour-spotlight");
+  const card = document.getElementById("tour-bubble");
+  if (!sEl || !card) return;
+  const r = el.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const cardW = Math.min(420, vw - 24);
+  card.style.width = cardW + "px";
+  card.style.maxWidth = cardW + "px";
+  const cardH = card.offsetHeight;
+  const gap = 14;
+  let top;
+  if (r.top - cardH - gap > 12) {
+    top = r.top - cardH - gap;
+  } else {
+    top = r.bottom + gap;
+    if (top + cardH > vh - 12) top = Math.max(12, vh - cardH - 12);
+  }
+  const left = Math.min(Math.max(r.left + r.width / 2 - cardW / 2, 12), vw - cardW - 12);
+  card.style.left = left + "px";
+  card.style.top = top + "px";
+  sEl.style.left = (r.left - 6) + "px";
+  sEl.style.top = (r.top - 6) + "px";
+  sEl.style.width = (r.width + 12) + "px";
+  sEl.style.height = (r.height + 12) + "px";
+}
+
+function renderTourStep() {
+  const overlay = document.getElementById("tour-overlay");
+  const titleEl = document.getElementById("tour-title2");
+  const descEl = document.getElementById("tour-desc");
+  const stepEl = document.getElementById("tour-step");
+  const dotsEl = document.getElementById("tour-dots");
+  const prevEl = document.getElementById("tour-prev");
+  const nextEl = document.getElementById("tour-next");
+  if (!overlay || !titleEl) { tourFinish(); return; }
+  const s = tour.steps[tour.idx];
+  const el = document.querySelector(s.sel);
+  if (!el) { tourNext(); return; }
+  tour.el = el;
+  titleEl.textContent = s.judul;
+  descEl.textContent = s.isi;
+  stepEl.textContent = (tour.idx + 1) + " / " + tour.steps.length;
+  dotsEl.innerHTML = tour.steps.map((_, d) =>
+    `<span class="t-dot ${d <= tour.idx ? "on" : ""}"></span>`).join("");
+  const last = tour.idx === tour.steps.length - 1;
+  nextEl.textContent = last ? "Selesai" : "Lanjut";
+  prevEl.style.visibility = tour.idx > 0 ? "visible" : "hidden";
+  overlay.classList.add("active");
+  addTourListeners();
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { positionTour(el); });
+  });
+}
+
+function tourFinish() {
+  const overlay = document.getElementById("tour-overlay");
+  if (overlay) overlay.classList.remove("active");
+  removeTourListeners();
+  if (tour) localStorage.setItem(TOUR_DONE + tour.who, "1");
+  tour = null;
+}
+
 /* ------------------------- boot ------------------------- */
 navigate("home");
+bindTour();

@@ -20,12 +20,47 @@
       <nav class="nav" id="nav"></nav>
 
       <div class="sidebar-foot">
-        <p>Catatan kontribusi per anggota berdasarkan arsip chat grup &amp; dokumen tim.</p>
+        <p>Catatan kontribusi per anggota untuk membantu teman-teman memahami tugas masing-masing.</p>
+        <button class="guide-reopen" id="guide-reopen" type="button">Lihat panduan ulang</button>
         <p class="foot-meta">Disusun Sept 2026</p>
       </div>
     </aside>
 
     <main class="content" id="app"></main>
+  </div>
+
+  <div class="tour-backdrop" id="tour-start">
+    <div class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+      <div class="guide-mark">A</div>
+      <p class="page-kicker">Panduan singkat</p>
+      <h1 id="tour-title">Halo, nama anggota yang mana yang ingin dipandu?</h1>
+      <p class="tour-intro">Pilih nama di bawah. Panduannya nanti langsung membawa Anda ke halaman yang berisi tugas nama tersebut, lalu menjelaskan setiap bagiannya satu per satu.</p>
+      <div class="tour-who" id="tour-who">
+        <button type="button" data-gotour="fadhil">Fadhil</button>
+        <button type="button" data-gotour="sarifah">Sarifah</button>
+        <button type="button" data-gotour="wida">Wida</button>
+        <button type="button" data-gotour="giren">Giren</button>
+        <button type="button" data-gotour="home" class="wide">Hanya melihat-lihat</button>
+      </div>
+      <p class="tour-note">Panduan ini muncul sekali saja. Kalau mau dibuka lagi, pakai tombol "Lihat panduan ulang" di bagian bawah menu kiri.</p>
+    </div>
+  </div>
+
+  <!-- TOUR SPOTLIGHT OVERLAY -->
+  <div id="tour-overlay" class="tour-overlay">
+    <div id="tour-spotlight" class="tour-spotlight"></div>
+    <div class="tour-bubble" id="tour-bubble">
+      <div class="tour-card-top">
+        <span class="tour-count" id="tour-step">1 / 10</span>
+        <div class="tour-dots" id="tour-dots"></div>
+      </div>
+      <h4 id="tour-title2"></h4>
+      <p class="tour-desc" id="tour-desc"></p>
+      <div class="tour-btns">
+        <button type="button" class="tour-btn ghost" id="tour-prev">Kembali</button>
+        <button type="button" class="tour-btn primary" id="tour-next">Lanjut</button>
+      </div>
+    </div>
   </div>
 
   <script src="analisis-kelompok/app.js"></script>
