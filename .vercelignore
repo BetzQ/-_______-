@@ -3,3 +3,9 @@ run-qa-test.js
 tests/
 node_modules/puppeteer/
 node_modules/.cache/puppeteer/
+
+# Dokumen bukti & skrip otomatisasi lokal (tidak dipakai server saat runtime)
+docs/
+scripts/
+CP Kelompok A 127/
+*.md

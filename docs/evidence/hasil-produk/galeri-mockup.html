@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galeri Mock-up &amp; Hasil Produk — Micropage E-Sparepart</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0b1220; color: #e2e8f0;
+    font-family: "Segoe UI", Inter, Arial, sans-serif; line-height: 1.6;
+  }
+  header {
+    padding: 38px 32px; border-bottom: 1px solid #1e293b;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+  }
+  header .kicker { color: #38bdf8; letter-spacing: 5px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+  header h1 { margin: 10px 0 8px; font-size: 34px; }
+  header p { color: #94a3b8; max-width: 900px; margin: 0; }
+  main { padding: 28px 32px 60px; max-width: 1600px; margin: 0 auto; }
+  section { margin-bottom: 44px; }
+  h2 {
+    font-size: 20px; margin: 0 0 4px; padding-bottom: 8px; border-bottom: 2px solid #1e293b;
+  }
+  h2 .badge {
+    display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 1px;
+    background: #0ea5e9; color: #04263a; border-radius: 999px; padding: 3px 10px; margin-left: 8px;
+    vertical-align: middle;
+  }
+  .desc { color: #94a3b8; font-size: 14px; margin: 8px 0 18px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 20px; }
+  figure {
+    margin: 0; background: #111a2b; border: 1px solid #1e293b; border-radius: 14px; overflow: hidden;
+    transition: transform .18s, border-color .18s;
+  }
+  figure:hover { transform: translateY(-3px); border-color: #38bdf8; }
+  figure img { width: 100%; display: block; border-bottom: 1px solid #1e293b; cursor: zoom-in; }
+  figcaption { padding: 12px 14px; font-size: 13px; }
+  figcaption b { color: #f1f5f9; display: block; margin-bottom: 2px; }
+  figcaption span { color: #64748b; font-size: 12px; font-family: Consolas, monospace; }
+  footer { padding: 26px 32px; border-top: 1px solid #1e293b; color: #64748b; font-size: 13px; }
+  nav { margin: 18px 0 0; }
+  nav a {
+    display: inline-block; margin: 4px 8px 4px 0; padding: 6px 12px; border-radius: 999px;
+    background: #16233a; color: #93c5fd; text-decoration: none; font-size: 13px; border: 1px solid #1e293b;
+  }
+  nav a:hover { background: #1e3a5f; color: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Capstone Kelompok A 127 · STSI4401 · Universitas Terbuka</div>
+  <h1>Galeri Mock-up &amp; Hasil Produk — Micropage E-Sparepart</h1>
+  <p>
+    Kumpulan tangkapan layar seluruh menu aplikasi untuk <b>setiap peran pengguna</b>, disusun otomatis
+    sebagai bukti visual <b>M3 (finalisasi arsitektur &amp; wireframe)</b> dan
+    <b>M5 (foto/data hasil produk)</b>. Setiap gambar diambil langsung dari aplikasi yang berjalan,
+    bukan desain konsep — sehingga sekaligus menjadi <i>mock-up</i> yang sudah terimplementasi.
+  </p>
+  <nav>
+    <a href="#login">1. Login</a>
+    <a href="#teknisi">2. Teknisi</a>
+    <a href="#spv1">3. Supervisor 1</a>
+    <a href="#spv2">4. Supervisor 2</a>
+    <a href="#officer">5. Officer</a>
+    <a href="#manager">6. Manager</a>
+    <a href="#alur">7. Alur End-to-End</a>
+  </nav>
+</header>
+
+<main>
+
+<section id="login">
+  <h2>1. Halaman Masuk <span class="badge">RBAC</span></h2>
+  <p class="desc">Gerbang aplikasi. Setiap pengguna masuk sesuai perannya; menu dan hak akses menyesuaikan posisi/jabatan.</p>
+  <div class="grid">
+    <figure><img src="00-login.png" loading="lazy"><figcaption><b>Halaman login</b><span>00-login.png</span></figcaption></figure>
+    <figure><img src="00-login-terisi.png" loading="lazy"><figcaption><b>Login terisi kredensial</b><span>00-login-terisi.png</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="teknisi">
+  <h2>2. Teknisi — 3 menu <span class="badge">FORM BQ · STOK · BQ SUMMARY</span></h2>
+  <p class="desc">
+    Teknisi mengajukan pembelian barang/jasa lewat formulir digital, mengecek ketersediaan stok fisik
+    beserta lokasi rak (<i>on-hand stock</i>), dan memantau status pengajuannya sendiri.
+  </p>
+  <div class="grid">
+    <figure><img src="01-teknisi-dashboard.png" loading="lazy"><figcaption><b>Dashboard teknisi + KPI stok</b><span>01-teknisi-dashboard.png</span></figcaption></figure>
+    <figure><img src="01-teknisi-bq.png" loading="lazy"><figcaption><b>Formulir Pengajuan Barang Digital (BQ)</b><span>01-teknisi-bq.png</span></figcaption></figure>
+    <figure><img src="01-teknisi-stok.png" loading="lazy"><figcaption><b>On Hand Stock (real-time + lokator rak)</b><span>01-teknisi-stok.png</span></figcaption></figure>
+    <figure><img src="01-teknisi-bqsummary.png" loading="lazy"><figcaption><b>BQ Summary pribadi</b><span>01-teknisi-bqsummary.png</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="spv1">
+  <h2>3. Supervisor 1 — 6 menu <span class="badge">APPROVAL · PR SUMMARY · REPORT</span></h2>
+  <p class="desc">
+    Supervisor 1 melakukan <i>review</i> dan persetujuan tahap pertama, menentukan kategori
+    Normal/Urgent, serta mengakses ringkasan Purchase Request dan laporan bulanan.
+  </p>
+  <div class="grid">
+    <figure><img src="02-spv1-dashboard.png" loading="lazy"><figcaption><b>Dashboard Supervisor 1</b><span>02-spv1-dashboard.png</span></figcaption></figure>
+    <figure><img src="02-spv1-monitoring.png" loading="lazy"><figcaption><b>Monitoring &amp; Approval BQ</b><span>02-spv1-monitoring.png</span></figcaption></figure>
+    <figure><img src="02-spv1-prsummary.png" loading="lazy"><figcaption><b>PR Summary (khusus SPV1 &amp; Manager)</b><span>02-spv1-prsummary.png</span></figcaption></figure>
+    <figure><img src="02-spv1-report.png" loading="lazy"><figcaption><b>Monthly Report (grafik)</b><span>02-spv1-report.png</span></figcaption></figure>
+    <figure><img src="02-spv1-bqsummary.png" loading="lazy"><figcaption><b>BQ Summary seluruh tim</b><span>02-spv1-bqsummary.png</span></figcaption></figure>
+    <figure><img src="02-spv1-critical.png" loading="lazy"><figcaption><b>Critical Sparepart List</b><span>02-spv1-critical.png</span></figcaption></figure>
+    <figure><img src="02-spv1-stok.png" loading="lazy"><figcaption><b>On Hand Stock</b><span>02-spv1-stok.png</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="spv2">
+  <h2>4. Supervisor 2 — 4 menu <span class="badge">APPROVAL TIM</span></h2>
+  <p class="desc">Supervisor 2 memantau dan menyetujui pengajuan dari timnya masing-masing — sesuai pembagian tim di Departemen Engineering.</p>
+  <div class="grid">
+    <figure><img src="03-spv2-dashboard.png" loading="lazy"><figcaption><b>Dashboard Supervisor 2</b><span>03-spv2-dashboard.png</span></figcaption></figure>
+    <figure><img src="03-spv2-monitoring.png" loading="lazy"><figcaption><b>Approval BQ</b><span>03-spv2-monitoring.png</span></figcaption></figure>
+    <figure><img src="03-spv2-bqsummary.png" loading="lazy"><figcaption><b>BQ Summary</b><span>03-spv2-bqsummary.png</span></figcaption></figure>
+    <figure><img src="03-spv2-critical.png" loading="lazy"><figcaption><b>Critical Part</b><span>03-spv2-critical.png</span></figcaption></figure>
+    <figure><img src="03-spv2-stok.png" loading="lazy"><figcaption><b>On Hand Stock</b><span>03-spv2-stok.png</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="officer">
+  <h2>5. Officer Penagihan — 4 menu <span class="badge">PENAGIHAN</span></h2>
+  <p class="desc">Officer mengikuti timnya, menyetujui pengajuan, dan memantau daftar suku cadang kritis.</p>
+  <div class="grid">
+    <figure><img src="04-officer-dashboard.png" loading="lazy"><figcaption><b>Dashboard Officer</b><span>04-officer-dashboard.png</span></figcaption></figure>
+    <figure><img src="04-officer-monitoring.png" loading="lazy"><figcaption><b>Approval BQ</b><span>04-officer-monitoring.png</span></figcaption></figure>
+    <figure><img src="04-officer-bqsummary.png" loading="lazy"><figcaption><b>BQ Summary</b><span>04-officer-bqsummary.png</span></figcaption></figure>
+    <figure><img src="04-officer-critical.png" loading="lazy"><figcaption><b>Critical Part</b><span>04-officer-critical.png</span></figcaption></figure>
+    <figure><img src="04-officer-stok.png" loading="lazy"><figcaption><b>On Hand Stock</b><span>04-officer-stok.png</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="manager">
+  <h2>6. Manager — 5 menu <span class="badge">APPROVAL URGENT · EXECUTIVE VIEW</span></h2>
+  <p class="desc">
+    Manager memberikan persetujuan akhir khusus pengajuan kategori Urgent, memantau stok kritis,
+    serta melihat laporan bulanan sebagai dasar keputusan manajerial.
+  </p>
+  <div class="grid">
+    <figure><img src="05-manager-dashboard.png" loading="lazy"><figcaption><b>Dashboard Manager</b><span>05-manager-dashboard.png</span></figcaption></figure>
+    <figure><img src="05-manager-monitoring.png" loading="lazy"><figcaption><b>Approval BQ Urgent (keputusan akhir)</b><span>05-manager-monitoring.png</span></figcaption></figure>
+    <figure><img src="05-manager-report.png" loading="lazy"><figcaption><b>Monthly Report &amp; executive dashboard</b><span>05-manager-report.png</span></figcaption></figure>
+    <figure><img src="05-manager-critical.png" loading="lazy"><figcaption><b>Critical Sparepart List</b><span>05-manager-critical.png</span></figcaption></figure>
+    <figure><img src="05-manager-bqsummary.png" loading="lazy"><figcaption><b>BQ Summary</b><span>05-manager-bqsummary.png</span></figcaption></figure>
+    <figure><img src="05-manager-stok.png" loading="lazy"><figcaption><b>On Hand Stock</b><span>05-manager-stok.png</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="alur">
+  <h2>7. Bukti Alur Berjalan End-to-End <span class="badge">TEKNISI → SPV → MANAGER</span></h2>
+  <p class="desc">
+    Bukti satu pengajuan nyata berjalan melewati seluruh tahapan sistem: dicek stoknya oleh Teknisi,
+    diajukan lewat formulir digital, disetujui Supervisor, disetujui Manager (karena kategori Urgent),
+    hingga tercatat dalam <i>audit trail</i> dan masuk ke laporan bulanan.
+  </p>
+  <div class="grid">
+    <figure><img src="06-alur-cek-stok.png" loading="lazy"><figcaption><b>1. Teknisi mengecek stok &amp; lokasi rak</b><span>06-alur-cek-stok.png</span></figcaption></figure>
+    <figure><img src="06-alur-form-bq-terisi.png" loading="lazy"><figcaption><b>2. Formulir pengajuan digital terisi</b><span>06-alur-form-bq-terisi.png</span></figcaption></figure>
+    <figure><img src="06-alur-bqsummary-teknisi.png" loading="lazy"><figcaption><b>3. Pengajuan tampil di BQ Summary (Menunggu SPV)</b><span>06-alur-bqsummary-teknisi.png</span></figcaption></figure>
+    <figure><img src="06-alur-approval-spv-sebelum.png" loading="lazy"><figcaption><b>4. Supervisor: pengajuan masuk antrean persetujuan</b><span>06-alur-approval-spv-sebelum.png</span></figcaption></figure>
+    <figure><img src="06-alur-approval-spv-sesudah.png" loading="lazy"><figcaption><b>5. Supervisor menyetujui (Approve SPV)</b><span>06-alur-approval-spv-sesudah.png</span></figcaption></figure>
+    <figure><img src="06-alur-approval-manager-sebelum.png" loading="lazy"><figcaption><b>6. Manager: pengajuan Urgent menunggu keputusan akhir</b><span>06-alur-approval-manager-sebelum.png</span></figcaption></figure>
+    <figure><img src="06-alur-approval-manager-sesudah.png" loading="lazy"><figcaption><b>7. Manager menyetujui (Approve MGR)</b><span>06-alur-approval-manager-sesudah.png</span></figcaption></figure>
+    <figure><img src="06-alur-riwayat-approval.png" loading="lazy"><figcaption><b>8. Riwayat approval / audit trail</b><span>06-alur-riwayat-approval.png</span></figcaption></figure>
+    <figure><img src="06-alur-monthly-report.png" loading="lazy"><figcaption><b>9. Terdata di Monthly Report</b><span>06-alur-monthly-report.png</span></figcaption></figure>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Dihasilkan otomatis dari aplikasi Micropage E-Sparepart — Kelompok A 127, Capstone STSI4401, Universitas Terbuka.
+  <br>Bukti visual ini dipakai untuk keperluan Tugas 1 (M3), Tugas 2 (M5), dan Tugas 3 (M7).
+</footer>
+</body>
+</html>

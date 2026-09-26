@@ -1,0 +1,146 @@
+{
+  "dibuat": "2026-09-26T12:36:15.163Z",
+  "base_url": "http://localhost:3000",
+  "peran": [
+    {
+      "key": "01-teknisi",
+      "label": "Teknisi",
+      "user": "AAA",
+      "nama": "AAA",
+      "roleBadge": "teknisi",
+      "menus": [
+        {
+          "act": "bq",
+          "judul": "BQ PersonalInput pengajuan barang baru"
+        },
+        {
+          "act": "stok",
+          "judul": "On Hand StockCek ketersediaan stok sparepart"
+        },
+        {
+          "act": "bqsummary",
+          "judul": "BQ SummaryStatus pengajuan & ringkasan BQ"
+        }
+      ]
+    },
+    {
+      "key": "02-spv1",
+      "label": "Supervisor 1",
+      "user": "INN",
+      "nama": "INN",
+      "roleBadge": "Supervisor 1",
+      "menus": [
+        {
+          "act": "prsummary",
+          "judul": "PR SummaryRingkasan Purchase Request"
+        },
+        {
+          "act": "report",
+          "judul": "Monthly ReportLaporan bulanan pengajuan BQ"
+        },
+        {
+          "act": "bqsummary",
+          "judul": "BQ SummaryRingkasan seluruh pengajuan BQ"
+        },
+        {
+          "act": "monitoring",
+          "judul": "Approval BQ Tahap SupervisorPersetujuan & monitoring pengaju"
+        },
+        {
+          "act": "critical",
+          "judul": "Critical Part ListDaftar sparepart kritis"
+        },
+        {
+          "act": "stok",
+          "judul": "On Hand StockCek ketersediaan stok gudang"
+        }
+      ]
+    },
+    {
+      "key": "03-spv2",
+      "label": "Supervisor 2",
+      "user": "KAA",
+      "nama": "KAA",
+      "roleBadge": "Supervisor 2",
+      "menus": [
+        {
+          "act": "bqsummary",
+          "judul": "BQ SummaryRingkasan seluruh pengajuan BQ"
+        },
+        {
+          "act": "monitoring",
+          "judul": "Approval BQ Tahap SupervisorPersetujuan & monitoring pengaju"
+        },
+        {
+          "act": "critical",
+          "judul": "Critical Part ListDaftar sparepart kritis"
+        },
+        {
+          "act": "stok",
+          "judul": "On Hand StockCek ketersediaan stok gudang"
+        }
+      ]
+    },
+    {
+      "key": "04-officer",
+      "label": "Officer Penagihan",
+      "user": "ANS",
+      "nama": "ANS",
+      "roleBadge": "Officer",
+      "menus": [
+        {
+          "act": "bqsummary",
+          "judul": "BQ SummaryRingkasan seluruh pengajuan BQ"
+        },
+        {
+          "act": "monitoring",
+          "judul": "Approval BQ Tahap SupervisorPersetujuan & monitoring pengaju"
+        },
+        {
+          "act": "critical",
+          "judul": "Critical Part ListDaftar sparepart kritis"
+        },
+        {
+          "act": "stok",
+          "judul": "On Hand StockCek ketersediaan stok gudang"
+        }
+      ]
+    },
+    {
+      "key": "05-manager",
+      "label": "Manager",
+      "user": "KSW",
+      "nama": "KSW",
+      "roleBadge": "manager",
+      "menus": [
+        {
+          "act": "stok",
+          "judul": "On Hand StockMonitoring stok sparepart fisik"
+        },
+        {
+          "act": "report",
+          "judul": "Monthly ReportLaporan bulanan & executive dashboard"
+        },
+        {
+          "act": "bqsummary",
+          "judul": "BQ SummaryRingkasan pengajuan BQ"
+        },
+        {
+          "act": "monitoring",
+          "judul": "Approval BQ UrgentPersetujuan akhir & approval urgent"
+        },
+        {
+          "act": "critical",
+          "judul": "Critical Part ListDaftar sparepart kritis"
+        }
+      ]
+    }
+  ],
+  "alur": {
+    "EJO": "EJO-DEMO-402106",
+    "noReg": "BQ-20260926-2814",
+    "itemCode": "P-50717-00",
+    "deskripsi": "General - Kabel UTP 4 Pairs Cat 6; Belden; -; 305m/roll"
+  },
+  "dialog": []
+}

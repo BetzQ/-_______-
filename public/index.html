@@ -2265,6 +2265,8 @@
 
     function startTour() {
       if (!user) return;
+      // Mode demo/perekaman: link dengan ?tour=off agar guide tidak muncul.
+      try { if (new URLSearchParams(location.search).get('tour') === 'off') return; } catch (e) {}
       var key = tourKey(user.role);
       if (localStorage.getItem(key)) return;
       var steps = TOUR_STEPS[user.role];

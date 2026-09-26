@@ -1,0 +1,1001 @@
+{
+  "generated_at": "2026-09-26T12:44:35.060Z",
+  "sumber": {
+    "aplikasi": "Micropage E-Sparepart (Kelompok A 127 - Capstone UT)",
+    "api_base": "http://localhost:3000",
+    "endpoint": [
+      "/api/spareparts",
+      "/api/spareparts/summary",
+      "/api/spareparts/alert",
+      "/api/pengajuan/all",
+      "/api/pengajuan/bq-summary",
+      "/api/reports/monthly",
+      "/api/login",
+      "/api/pengajuan/summary"
+    ]
+  },
+  "master_sparepart": {
+    "total_item": 3022,
+    "total_unit_on_hand": 11932,
+    "item_critical": 210,
+    "persen_critical": 6.95,
+    "item_di_bawah_min_stock": 213,
+    "item_stok_kosong": 1887,
+    "ringkasan_dari_api": {
+      "status": "ok",
+      "data": {
+        "total_item": 3022,
+        "total_critical": 210,
+        "stok_rendah": 356,
+        "stok_habis": 1887,
+        "low_stock": [
+          {
+            "item_code": "P-50717-00",
+            "deskripsi": "General - Kabel UTP 4 Pairs Cat 6; Belden; -; 305m/roll",
+            "qty_on_hand": 0,
+            "min_stock": 100,
+            "max_stock": 2440,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "T-80109-00",
+            "deskripsi": "Cellotape / Lakban Kertas 1 inch warna Putih ; No Brand ; pack size per pcs",
+            "qty_on_hand": 0,
+            "min_stock": 30,
+            "max_stock": 200,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "P-51559-00",
+            "deskripsi": "General - Lampu TL T5 14 W White; Philips; -; 1 unt",
+            "qty_on_hand": 0,
+            "min_stock": 30,
+            "max_stock": 100,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "O-21720-00",
+            "deskripsi": "General - Sleeves CSM 001642 M200/90 Y 550 E4 Bt5/5 Thikness 4/10; Piercan; SP010822; 1 Pc",
+            "qty_on_hand": 0,
+            "min_stock": 24,
+            "max_stock": 72,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "O-20950-00",
+            "deskripsi": "Capping VCM200 - Silicone Sucker 01.10.10; Steriline; 201119; 1 Pc",
+            "qty_on_hand": 0,
+            "min_stock": 20,
+            "max_stock": 40,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "P-14877-00",
+            "deskripsi": "General - Kabel NYYHY 3 x 2.5mm; SUPREME; -; 1 meter",
+            "qty_on_hand": 0,
+            "min_stock": 20,
+            "max_stock": 200,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "S-11400-00",
+            "deskripsi": "Majun AA, No Brand, Budhi Supplies, pack size per kg",
+            "qty_on_hand": 0,
+            "min_stock": 20,
+            "max_stock": 120,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "O-16007-00",
+            "deskripsi": "Silicone Sucker 01.10.10; P/N : 201119; ; ;",
+            "qty_on_hand": 0,
+            "min_stock": 20,
+            "max_stock": 40,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "P-53102-00",
+            "deskripsi": "Lampu PLC 13watt/E27 Putih; Phillips; ;",
+            "qty_on_hand": 0,
+            "min_stock": 10,
+            "max_stock": 50,
+            "is_critical": true,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "P-13714-00",
+            "deskripsi": "Autoclave Fedegari FVA2/A1 NB2963AT - Oring Viton 29 x 22 x 3.5 mm",
+            "qty_on_hand": 0,
+            "min_stock": 10,
+            "max_stock": 20,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "O-21091-00",
+            "deskripsi": "Capping VCM200 - SILICONE SUCKER 01.11.16;",
+            "qty_on_hand": 0,
+            "min_stock": 10,
+            "max_stock": 40,
+            "is_critical": false,
+            "lokasi_rak": null
+          },
+          {
+            "item_code": "P-51560-00",
+            "deskripsi": "General - Lampu TL T5 28W White; Philips; -; 1 unt",
+            "qty_on_hand": 10,
+            "min_stock": 20,
+            "max_stock": 70,
+            "is_critical": false,
+            "lokasi_rak": "O3"
+          }
+        ]
+      }
+    }
+  },
+  "transaksi_pengajuan": {
+    "total_baris": 1503,
+    "komposisi_status_pengadaan": {
+      "BQ Baru": 462,
+      "Proses PO": 98,
+      "Pending": 130,
+      "Selesai": 24,
+      "Tiba di Gudang": 24,
+      "Barang Dikirim": 765
+    },
+    "komposisi_approval_spv": {
+      "Disetujui": 1115,
+      "Menunggu": 123,
+      "Ditolak": 265
+    },
+    "komposisi_approval_manager": {
+      "Disetujui": 24,
+      "Menunggu": 1465,
+      "Ditolak": 14
+    },
+    "komposisi_urgensi": {
+      "Urgent": 293,
+      "Normal": 1210
+    },
+    "pengaju_per_role": {
+      "teknisi": 1442,
+      "Supervisor 1": 61
+    },
+    "jumlah_per_bulan": {
+      "2026-09": 61,
+      "2026-08": 50,
+      "2026-07": 51,
+      "2026-06": 99,
+      "2026-05": 42,
+      "2026-04": 71,
+      "2026-03": 52,
+      "2026-02": 75,
+      "2026-01": 100,
+      "2025-12": 41,
+      "2025-11": 61,
+      "2025-10": 70,
+      "2025-09": 75,
+      "2025-08": 129,
+      "2025-07": 70,
+      "2025-06": 56,
+      "2025-05": 75,
+      "2025-04": 66,
+      "2025-03": 64,
+      "2025-02": 132,
+      "2025-01": 63
+    },
+    "agregat": {
+      "keputusan_disetujui": 1139,
+      "keputusan_menunggu": 1588,
+      "keputusan_ditolak": 279
+    }
+  },
+  "bq_summary": {
+    "total_baris": 1503
+  },
+  "monthly_report": {
+    "status": "ok",
+    "period": {
+      "year": 2026,
+      "month": 9
+    },
+    "count": 61,
+    "data": [
+      {
+        "no_registrasi": "BQ-2026-09-01-0001",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-01T01:00:00.000Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "MRNBR0120",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 10,
+        "timestamp": "2026-09-01T22:34:26.000Z",
+        "nama_teknisi": "MRN",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "MRNRO0054",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-01T22:48:19.000Z",
+        "nama_teknisi": "MRN",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-02-0002",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Urgent",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "Pending",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-02T02:13:00.000Z",
+        "nama_teknisi": "ANO",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "WAPBR0010",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Ditolak",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-02T08:10:50.000Z",
+        "nama_teknisi": "WAP",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "KFFBR0024",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 4,
+        "timestamp": "2026-09-03T00:00:00.000Z",
+        "nama_teknisi": "KFF",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-03-0003",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Ditolak",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "Proses PO",
+        "qty_diminta": 3,
+        "timestamp": "2026-09-03T03:26:00.000Z",
+        "nama_teknisi": "BDU",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "NDSBR0063",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-03T16:01:12.000Z",
+        "nama_teknisi": "NDS",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-04-0004",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "Barang Dikirim",
+        "qty_diminta": 4,
+        "timestamp": "2026-09-04T04:39:00.000Z",
+        "nama_teknisi": "MOB",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-05-0005",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "Tiba di Gudang",
+        "qty_diminta": 5,
+        "timestamp": "2026-09-05T05:52:00.000Z",
+        "nama_teknisi": "MRN",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-06-0006",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Urgent",
+        "status_approval_spv": "Ditolak",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "Selesai",
+        "qty_diminta": 6,
+        "timestamp": "2026-09-06T06:05:00.000Z",
+        "nama_teknisi": "NDS",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "SFHRO0059",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 4,
+        "timestamp": "2026-09-07T07:01:33.000Z",
+        "nama_teknisi": "SFH",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "SFHRO0058",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 4,
+        "timestamp": "2026-09-07T07:01:37.000Z",
+        "nama_teknisi": "SFH",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-07-0007",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 7,
+        "timestamp": "2026-09-07T07:18:00.000Z",
+        "nama_teknisi": "RIA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-2026-09-08-0008",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Urgent",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "Pending",
+        "qty_diminta": 8,
+        "timestamp": "2026-09-08T08:31:00.000Z",
+        "nama_teknisi": "ROS",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "NDSBR0064",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 20,
+        "timestamp": "2026-09-08T12:27:03.000Z",
+        "nama_teknisi": "NDS",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "ANORO0010",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 10,
+        "timestamp": "2026-09-09T10:16:56.000Z",
+        "nama_teknisi": "ANO",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "WAPBR0011",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-09T13:32:38.000Z",
+        "nama_teknisi": "WAP",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "SFHRO0060",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Ditolak",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 3,
+        "timestamp": "2026-09-10T07:04:11.000Z",
+        "nama_teknisi": "SFH",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "NDSRO0024",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-10T11:16:20.000Z",
+        "nama_teknisi": "NDS",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "SFHRO0061",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 4,
+        "timestamp": "2026-09-11T06:57:52.000Z",
+        "nama_teknisi": "SFH",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "SFHRO0062",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 4,
+        "timestamp": "2026-09-11T06:59:44.000Z",
+        "nama_teknisi": "SFH",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "WAPBR0012",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-16T09:13:55.000Z",
+        "nama_teknisi": "WAP",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260918-0104",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-18T13:48:00.216Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260918-5218",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-18T13:48:15.330Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260918-5305",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-18T13:49:15.414Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260918-7617",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-18T14:30:57.728Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260918-4371",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-18T14:31:04.481Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260918-7720",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-18T14:31:17.831Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260919-3244",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-19T07:41:03.351Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260919-9281",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-19T07:41:09.388Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260919-2156",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-19T07:41:22.263Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260919-8105",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-19T12:54:38.205Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260919-4504",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-19T12:54:44.604Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260919-7542",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-19T12:54:57.642Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260920-6942",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-20T08:05:47.041Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260920-7063",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-20T08:06:07.162Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260920-0962",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-20T08:07:11.061Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260920-5067",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "Proses PO",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-20T08:07:15.166Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-0023",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T13:43:40.127Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-7723",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T13:43:47.826Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-2767",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T13:44:02.870Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-5147",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "Proses PO",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-22T13:44:05.251Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-0730",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T14:51:40.819Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-8366",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T14:51:48.455Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-3611",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T14:52:03.699Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-5948",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "Proses PO",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-22T14:52:06.038Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-8945",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T15:35:19.042Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-4509",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T15:35:34.606Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-2931",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-22T15:36:23.029Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260922-6496",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "Proses PO",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-22T15:36:26.594Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260923-3739",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-23T14:38:33.845Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260923-1491",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-23T14:38:41.598Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260923-5486",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-23T14:38:55.592Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260924-9178",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-24T09:22:29.290Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260924-7312",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-24T09:22:37.424Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260924-3125",
+        "jenis_pengajuan": "jasa",
+        "urgency": "Normal",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 1,
+        "timestamp": "2026-09-24T09:22:53.237Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260924-5609",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Normal",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "Proses PO",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-24T09:22:55.721Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260926-9339",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Menunggu",
+        "status_approval_manager": "Menunggu",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-26T10:28:49.605Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260926-2814",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-26T12:40:03.135Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      },
+      {
+        "no_registrasi": "BQ-20260926-8026",
+        "jenis_pengajuan": "sparepart",
+        "urgency": "Urgent",
+        "status_approval_spv": "Disetujui",
+        "status_approval_manager": "Disetujui",
+        "status_pengadaan": "BQ Baru",
+        "qty_diminta": 2,
+        "timestamp": "2026-09-26T12:42:38.346Z",
+        "nama_teknisi": "AAA",
+        "role_pengaju": "teknisi"
+      }
+    ],
+    "summary": {
+      "total": 61,
+      "urgent": 22,
+      "normal": 39,
+      "sparepart": 37,
+      "jasa": 24,
+      "approved": 7,
+      "rejected": 4,
+      "waiting": 31,
+      "pipeline": {
+        "BQ Baru": 50,
+        "Pending": 2,
+        "Proses PO": 6,
+        "Barang Dikirim": 1,
+        "Tiba di Gudang": 1,
+        "Selesai": 1
+      }
+    }
+  },
+  "uji_peran_login": [
+    {
+      "username": "AAA",
+      "role": "Teknisi",
+      "role_dari_server": "teknisi",
+      "login_berhasil": "teknisi",
+      "akses_pr_summary": "ditolak (403) - sesuai RBAC"
+    },
+    {
+      "username": "INN",
+      "role": "Supervisor 1",
+      "role_dari_server": "Supervisor 1",
+      "login_berhasil": "Supervisor 1",
+      "akses_pr_summary": "ok"
+    },
+    {
+      "username": "KAA",
+      "role": "Supervisor 2",
+      "role_dari_server": "Supervisor 2",
+      "login_berhasil": "Supervisor 2",
+      "akses_pr_summary": "ditolak (403) - sesuai RBAC"
+    },
+    {
+      "username": "ANS",
+      "role": "Officer Penagihan",
+      "role_dari_server": "Officer",
+      "login_berhasil": "Officer",
+      "akses_pr_summary": "ditolak (403) - sesuai RBAC"
+    },
+    {
+      "username": "KSW",
+      "role": "Manager",
+      "role_dari_server": "manager",
+      "login_berhasil": "manager",
+      "akses_pr_summary": "ok"
+    }
+  ]
+}
