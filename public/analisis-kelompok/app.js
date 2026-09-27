@@ -3,7 +3,9 @@
    Analisa per anggota: kerangka kerja lengkap dari awal sampai
    selesai. Disusun dari arsip obrolan tim dan dokumen hasil kerja.
    Per tanggal 25 September 2026 (minggu ke-2 / M1–M2).
-   v3: setiap langkah dipecah jadi sub-langkah centang + hasil.
+    v3: setiap langkah dipecah jadi sub-langkah centang + hasil.
+    v4: tambah analisa Avwan (Anggota 1 / developer) + centang
+        tersimpan ke database Supabase beserta log riwayat.
    ============================================================ */
 
 const PROJEK = {
@@ -22,6 +24,365 @@ const PROJEK = {
 };
 
 const MEMBERS = [
+  {
+    id: "avwan",
+    nama: "Avwan",
+    namaLengkap: "Muhamad Avwan",
+    nim: "048907343",
+    anggota: "Anggota 1",
+    peran: "Lead Developer / Architect",
+    warna: "#8a6d2f",
+    avatar: "AV",
+    kondisi: "Sangat aktif; per 26 Sep checklist mingguan M1–M6 tuntas berbukti (aplikasi ter-deploy dan teruji). Tinggal latihan presentasi (M7) dan evaluasi produk di Sesi 8 (M8).",
+    tagline: "Lead developer sekaligus arsitek — membangun ulang Fonko Gemini menjadi aplikasi web hosting mandiri (Node.js, Express, Supabase, Vercel) mulai dari kode, pengujian, sampai bukti hasil produk.",
+    ringkasan: [
+      "Avwan memegang tanggung jawab teknis penuh: memimpin perancangan arsitektur dan mengembangkan ulang aplikasi dari versi terdahulu (Apps Script & Spreadsheet Fonko Gemini) menjadi website hosting mandiri, berdasarkan sesi penjelasan fitur dan data dari Fadhil.",
+      "Arsitekturnya tiga lapis: SPA (Tailwind CSS + Chart.js) di lapis tampilan, REST API Node.js + Express di lapis aplikasi, dan PostgreSQL Supabase di lapis data (dengan salinan lokal MySQL/XAMPP untuk pengembangan). Katanya sandinya di-hash dengan scrypt, percobaan login dibatasi, dan menu tampil otomatis sesuai lima peran (RBAC).",
+      "Produknya hidup publik di Vercel dengan data riil departemen: 3.022 item sparepart, 1.503 pengajuan bersejarah, 210 critical part, persetujuan berjenjang dengan jejak audit, Monthly Report, sampai ekspor Excel. Di luar kode, ia menyiapkan dokumen M3/M5/M6/M7/M8 sebagai bukti tuntasnya checklist mingguannya.",
+    ],
+    fase: [
+      {
+        judul: "Menyelaraskan pemahaman sistem",
+        rentang: "M1–M2",
+        desc: "Langkah awal seorang developer sebelum menyentuh kode: hadir, bertanya, lalu memahami data.",
+        langkah: [
+          {
+            k: "Bergabung & hadir sejak hari pertama",
+            a: "Tanggapi pengingat ketua dengan cepat, hadiri Google Meet perdana (hasilnya masuk berita acara), lalu sepakati pola komunikasi terbuka di grup.",
+            cara: [
+              "Balas pengingat Tuweb sesi 1 di grup.",
+              "Ikuti Google Meet perdana malam 15 Sep.",
+              "Sepakati: bila bingung, langsung bertanya di grup.",
+            ],
+            hasil: "Kehadiran dan komitmen awal tercatat.",
+          },
+          {
+            k: "Menerima bahan 'Aps Script CP'",
+            a: "Terima gdocs dari ketua berisi tautan aplikasi Apps Script lama (Fonko Gemini) dan source code-nya sebagai titik awal pengembangan ulang.",
+            cara: [
+              "Buka gdocs 'Aps Script CP' di folder Bahan.",
+              "Pelajari tautan aplikasi sistem lama.",
+              "Bedah source code spreadsheet yang dipakai selama ini.",
+            ],
+            hasil: "Sistem lama dipahami sebagai garis dasar pengembangan.",
+          },
+          {
+            k: "Mengajukan 5 pertanyaan kebutuhan aplikasi",
+            a: "Sebelum coding, pastikan lingkupnya jelas: contoh format monthly report, perlunya status Normal/Urgent, siapa saja yang berhak approval SPV, apakah menu PR Summary dipakai, dan apakah pengajuan jasa ikut masuk web.",
+            cara: [
+              "Tanyakan contoh file dan tautan Looker untuk monthly report.",
+              "Konfirmasi status Normal/Urgent masuk ke form & dashboard.",
+              "Konfirmasi pihak yang berhak approval setingkat SPV.",
+              "Konfirmasi apakah menu PR Summary dipakai.",
+              "Konfirmasi pengajuan jasa ikut masuk aplikasi.",
+            ],
+            hasil: "Lingkup fitur final terjawab lengkap sebelum kode ditulis.",
+          },
+          {
+            k: "Menguasai alur sistem & hak akses",
+            a: "Serap pemaparan flow kerja dan RBAC lima peran (teknisi, SPV 1, SPV 2, officer, manager) sebagai dasar perancangan menu berjenjang.",
+            cara: [
+              "Baca pemaparan flow dan RBAC dari ketua.",
+              "Catat menu yang tampil untuk setiap peran.",
+              "Tanyakan bagian yang belum jelas.",
+            ],
+            hasil: "Peta menu dan hak akses siap diterjemahkan ke kode.",
+          },
+          {
+            k: "Mempelajari raw data & flow data",
+            a: "Bedah raw data serta flow data pengajuan barang yang diunggah ketua ke Drive sebagai bahan migrasi database.",
+            cara: [
+              "Unduh dan pelajari raw data di folder Bahan Capstone Project.",
+              "Terima flow data pengajuan barang dari ketua.",
+              "Petakan struktur data lama ke tabel baru.",
+            ],
+            hasil: "Struktur data riil siap dimigrasikan.",
+          },
+        ],
+      },
+      {
+        judul: "Merancang arsitektur & keamanan",
+        rentang: "M2",
+        desc: "Keputusan teknis yang menentukan bentuk seluruh aplikasi.",
+        langkah: [
+          {
+            k: "Menetapkan arsitektur tiga lapis",
+            a: "Pilih satu bahasa (JavaScript/Node.js) untuk tampilan dan server, Express untuk REST API ringan, Supabase PostgreSQL sebagai database produksi, lalu host aplikasi di Vercel supaya publik bisa mengakses tanpa instalasi.",
+            cara: [
+              "Tetapkan JavaScript/Node.js untuk dua sisi aplikasi.",
+              "Pilih Express karena pola REST API-nya jelas.",
+              "Pilih Supabase PostgreSQL dengan salinan lokal MySQL.",
+              "Siapkan konfigurasi deployment ke Vercel.",
+            ],
+            hasil: "Keputusan arsitektur final siap dikutip di Bab III.",
+          },
+          {
+            k: "Merancang skema database empat tabel",
+            a: "Rancang users (peran & relasi supervisor), spareparts (stok min-maks, penanda kritis, lokasi rak), pengajuan_bq (alur persetujuan lengkap), dan pengajuan_log (jejak audit tiap perubahan status).",
+            cara: [
+              "Rancang tabel users lengkap dengan role dan supervisor_id.",
+              "Rancang tabel spareparts beserta parameter stok.",
+              "Rancang tabel pengajuan_bq dengan status persetujuan berjenjang.",
+              "Rancang tabel pengajuan_log sebagai jejak audit.",
+            ],
+            hasil: "Skema SQL yang identik untuk PostgreSQL dan MySQL.",
+          },
+          {
+            k: "Memasang keamanan sejak awal",
+            a: "Hash seluruh sandi dengan scrypt (termasuk pembaruan otomatis dari sandi lama), batasi percobaan login, dan pakai query berparameter di setiap endpoint.",
+            cara: [
+              "Ubah seluruh sandi ke hash scrypt.",
+              "Pasang pembatas percobaan login (rate limit).",
+              "Gunakan parameterized query di seluruh endpoint.",
+            ],
+            hasil: "Dasar keamanan berdiri sebelum aplikasi dibuka publik.",
+          },
+          {
+            k: "Menyiapkan jalur pengembangan lokal",
+            a: "Siapkan salinan MySQL lewat XAMPP dengan skema identik, supaya pengembangan bisa berjalan tanpa koneksi internet lalu sinkron ke Supabase saat rilis.",
+            cara: [
+              "Pasang skema MySQL yang identik di XAMPP.",
+              "Jalankan server lokal sebagai tempat mencoba perubahan.",
+              "Samakan perilaku skrip agar kompatibel dua database.",
+            ],
+            hasil: "Pengembangan aman berjalan paralel: lokal untuk uji coba, Supabase untuk rilis.",
+          },
+        ],
+      },
+      {
+        judul: "Membangun & meluncurkan aplikasi",
+        rentang: "M2–M3",
+        desc: "Menulis kode fitur demi fitur sampai ter-deploy publik.",
+        langkah: [
+          {
+            k: "Membangun login & dashboard RBAC",
+            a: "Buat halaman masuk dengan sesi dan pembatas percobaan, lalu satu aplikasi yang menampilkan menu otomatis sesuai lima peran.",
+            cara: [
+              "Bangun form masuk dan verifikasi kredensial.",
+              "Bangun dashboard dengan menu dinamis per peran.",
+              "Uji tampilan menu untuk setiap peran.",
+            ],
+            hasil: "Satu aplikasi, tampilan berbeda untuk tiap jabatan.",
+          },
+          {
+            k: "Membangun modul pengajuan & persetujuan",
+            a: "Implementasikan Form BQ digital untuk sparepart dan jasa dengan field wajib, persetujuan dua tahap (SPV lalu Manager untuk Urgent), dan pencatatan jejak audit pada setiap perubahan.",
+            cara: [
+              "Bangun form BQ dengan validasi kelengkapan isian.",
+              "Bangun alur persetujuan SPV dan Manager.",
+              "Catat setiap perubahan status ke pengajuan_log.",
+              "Tambahkan kotak pencarian item code di dalam form.",
+            ],
+            hasil: "Pengajuan tidak lengkap tertutup oleh sistem.",
+          },
+          {
+            k: "Membangun modul stok & pelaporan",
+            a: "Bangun On Hand Stock, Critical Sparepart List beserta peringatan stok di bawah minimum, ringkasan BQ/PR, Monthly Report bergrafik, dan ekspor Excel.",
+            cara: [
+              "Bangun halaman stok dengan pencarian dan lokator rak.",
+              "Bangun daftar critical part dengan peringatan defisit stok.",
+              "Bangun ringkasan BQ, PR, dan Monthly Report.",
+              "Tambahkan fitur ekspor .xlsx untuk kebutuhan laporan.",
+            ],
+            hasil: "Empat modul sasaran sistem hidup dalam satu dasbor.",
+          },
+          {
+            k: "Migrasi data riil departemen",
+            a: "Impor data nyata: 3.022 item sparepart (total 11.932 unit stok), 210 item critical part, dan 1.503 pengajuan bersejarah beserta statusnya.",
+            cara: [
+              "Impor master sparepart dari arsip perusahaan.",
+              "Impor riwayat pengajuan beserta statusnya.",
+              "Tandai item yang masuk daftar critical part.",
+            ],
+            hasil: "Aplikasi berjalan dengan data nyata, bukan data contoh.",
+          },
+          {
+            k: "Meluncurkan ke hosting mandiri",
+            a: "Terbitkan aplikasi publik di Vercel dengan database Supabase agar penguji dapat mengakses tanpa instalasi, sembari menyediakan jalur lokal XAMPP.",
+            cara: [
+              "Siapkan konfigurasi serverless untuk Vercel.",
+              "Atur variabel lingkungan di Vercel.",
+              "Uji akses publik dari luar jaringan.",
+            ],
+            hasil: "https://e-sparepart-system-tau.vercel.app dapat diakses publik.",
+          },
+        ],
+      },
+      {
+        judul: "Tugas 1 & pengujian menyeluruh",
+        rentang: "M3–M4",
+        desc: "Menyerahkan arsitektur final, rancangan awal, dan bukti pengujian.",
+        langkah: [
+          {
+            k: "Mendokumentasikan arsitektur final",
+            a: "Tulis dokumen M3 berisi keputusan arsitektur, struktur direktori, perancangan data empat tabel, dan pemetaan diagram Bab III agar selaras dengan produk nyata.",
+            cara: [
+              "Tulis keputusan arsitektur beserta alasannya.",
+              "Dokumentasikan struktur direktori dan skema tabel.",
+              "Petakan DFD, use case, dan ERD ke aplikasi nyata.",
+            ],
+            hasil: "Penyusun Bab III bisa langsung menyelaraskan diagramnya.",
+          },
+          {
+            k: "Menyediakan galeri rancangan awal",
+            a: "Hasilkan 38 tangkapan layar seluruh menu dikali lima peran dalam galeri interaktif, dengan panduan dimatikan agar tangkapan bersih.",
+            cara: [
+              "Rekam setiap menu untuk setiap peran.",
+              "Rakit galeri HTML yang bisa diklik.",
+              "Matikan overlay panduan (?tour=off) sebelum merekam.",
+            ],
+            hasil: "Rancangan nyata 38 layar siap dipakai tim.",
+          },
+          {
+            k: "Menjalankan QA dua tahap",
+            a: "Lakukan inspeksi statis lalu pengujian fungsional; setiap temuan (termasuk bug perangkai tautan) diperbaiki dan diuji ulang sampai verdict layak.",
+            cara: [
+              "Inspeksi statis seluruh komponen (tahap 1).",
+              "Uji fungsional seluruh endpoint (tahap 2).",
+              "Perbaiki temuan lalu uji regresi.",
+            ],
+            hasil: "Kesimpulan QA: aplikasi layak diujikan.",
+          },
+          {
+            k: "Membangun UAT otomatis & manual",
+            a: "Siapkan perangkat uji otomatis beserta panduan QA manual berisi data siap tempel, lalu rekam 16 tangkapan layar sebagai bukti UAT.",
+            cara: [
+              "Bangun test runner dengan langkah beranimasi.",
+              "Tulis panduan QA manual dengan data uji siap pakai.",
+              "Rekam 16 tangkapan layar bukti UAT.",
+            ],
+            hasil: "Checklist M4 (pengujian & pengembangan) tuntas.",
+          },
+        ],
+      },
+      {
+        judul: "Tugas 2 — bukti hasil produk & demo",
+        rentang: "M5–M6",
+        desc: "Menyediakan foto, angka, dan rekaman sebagai bukti sistem berjalan.",
+        langkah: [
+          {
+            k: "Menyiapkan paket bukti hasil produk",
+            a: "Produksi ulang tangkapan layar 1440×900 tanpa overlay panduan, ekspor statistik ke CSV/JSON, lalu susun ringkasan siap tempel untuk Bab IV.",
+            cara: [
+              "Reproduksi tangkapan layar dengan panduan dimatikan.",
+              "Ekspor statistik ke CSV dan JSON.",
+              "Susun ringkasan Bab IV untuk ditulis ketua.",
+            ],
+            hasil: "Bab IV memperoleh angka nyata: 3.022 item, 1.503 pengajuan, 74,18% disetujui SPV.",
+          },
+          {
+            k: "Membuktikan alur dari ujung ke ujung",
+            a: "Rekam satu pengajuan nyata menempuh seluruh tahap: cek stok, isi form kategori Urgent, persetujuan SPV, persetujuan Manager, hingga tercatat di laporan.",
+            cara: [
+              "Jalankan transaksi demo dari akun teknisi.",
+              "Setujui berjenjang lewat akun SPV dan Manager.",
+              "Pastikan jejaknya tercatat di laporan bulanan.",
+            ],
+            hasil: "Bukti transaksi lengkap dari awal sampai akhir.",
+          },
+          {
+            k: "Menguji hak akses lima peran",
+            a: "Uji masuk dan batas akses tiap peran: teknisi ditolak membuka menu eksklusif (403) sementara Supervisor 1 diizinkan — persis seperti rancangan.",
+            cara: [
+              "Masuk bergantian sebagai lima peran.",
+              "Uji menu yang dibatasi untuk peran tertentu.",
+              "Catat hasil uji per peran.",
+            ],
+            hasil: "Pembatasan hak akses terbukti bekerja.",
+          },
+          {
+            k: "Merekam video demo",
+            a: "Rekam screen record demo aplikasi selama 1 menit 57 detik berformat H.264 agar siap diunggah ke YouTube oleh pengelola media.",
+            cara: [
+              "Rekam alur demo mengikuti skrip.",
+              "Enkode ke H.264 agar kompatibel luas.",
+              "Serahkan berkas ke pengelola media.",
+            ],
+            hasil: "Checklist M6 (rekam demo) tuntas.",
+          },
+        ],
+      },
+      {
+        judul: "Tugas 3 & evaluasi akhir",
+        rentang: "M7–M8",
+        desc: "Menyiapkan presentasi, evaluasi mandiri, dan menghadiri sesi evaluasi.",
+        langkah: [
+          {
+            k: "Menyusun skrip & panduan demo",
+            a: "Tulis narasi video, skrip demo langsung untuk sesi evaluasi, dan rubrik latihan mandiri agar pembawaan demo terlatih.",
+            cara: [
+              "Susun narasi per menit untuk video.",
+              "Susun alur demo langsung untuk Sesi 8.",
+              "Buat rubrik latihan minimal tiga putaran.",
+            ],
+            hasil: "Bahan latihan lengkap.",
+          },
+          {
+            k: "Melatih pembawaan demo",
+            a: "Ikuti rubrik latihan minimal tiga putaran: bawakan demo sesuai skrip, ukur durasi, lalu siapkan jawaban untuk pertanyaan yang mungkin muncul dari penguji.",
+            cara: [
+              "Latih demo mengikuti skrip minimal tiga putaran.",
+              "Catat durasi dan perbaiki transisi antar bagian.",
+              "Siapkan jawaban untuk pertanyaan umum penguji.",
+            ],
+            hasil: "Checklist M7 (latihan presentasi) bisa dicentang.",
+          },
+          {
+            k: "Menyusun evaluasi mandiri produk",
+            a: "Tulis laporan evaluasi berisi tujuh dimensi penilaian, tabel perbandingan sebelum–sesudah, serta batasan dan rencana perbaikan bila ditanya penguji.",
+            cara: [
+              "Evaluasi fungsional, keamanan, performa, data, dan aksesibilitas.",
+              "Susun perbandingan sebelum dan sesudah digitalisasi.",
+              "Catat batasan produk dan rencana tindak lanjut.",
+            ],
+            hasil: "Bahan evaluasi siap dibawa ke Sesi 8.",
+          },
+          {
+            k: "Mengikuti Sesi 8 & evaluasi akhir",
+            a: "Bawakan demo produk dan laporan evaluasi pada sesi bersama dosen pembimbing.",
+            cara: [
+              "Latih pembawaan demo minimal tiga kali.",
+              "Siapkan tautan aplikasi dan dokumen evaluasi.",
+              "Jawab pertanyaan penguji dengan bukti yang tersimpan.",
+            ],
+            hasil: "Produk siap dinilai pada Sesi 8.",
+          },
+        ],
+      },
+    ],
+    bukti: [
+      { tgl: "15 Sep · 09:15", judul: "Merespons arahan pertama", isi: "'Haloo ka, oke siap ka 👍' — menyambut pengingat Tuweb sesi 1 di grup." },
+      { tgl: "15 Sep · 19:39", judul: "Hadir di Google Meet perdana", isi: "Ikut pertemuan yang kemudian masuk berita acara lampiran laporan CP." },
+      { tgl: "15 Sep · 20:46", judul: "Menerima bahan 'Aps Script CP'", isi: "Gdocs berisi tautan Apps Script Fonko Gemini dan source code sistem lama." },
+      { tgl: "17 Sep · 14:07", judul: "Mengajukan 5 pertanyaan kebutuhan", isi: "Monthly report, status Urgent, pihak approval, PR Summary, dan jasa — terjawab di hari yang sama." },
+      { tgl: "18 Sep · 09:46", judul: "Menyatakan flow & RBAC terserap", isi: "'Okee kak fadhil makasihh 👍' seusai pemaparan alur dan hak akses lima peran." },
+      { tgl: "22 Sep · 15:14", judul: "Mulai membedah raw data", isi: "'oke siap ka fadhil, aku pelajarin dulu ya raw datanya'." },
+      { tgl: "24 Sep · 09:46", judul: "Menerima flow data pengajuan", isi: "Digunakan untuk memetakan struktur tabel pengajuan barang." },
+      { tgl: "24 Sep · 21:52", judul: "Menyetujui foto anggota di PPT", isi: "'Gapapa aku ka' — ikut mengambil keputusan visual bersama." },
+      { tgl: "26 Sep", judul: "Checklist M3–M6 tuntas berbukti", isi: "Dokumen arsitektur, galeri 38 layar, data Bab IV (CSV/JSON), video demo 1'57\", dan QA dua tahap." },
+    ],
+    checklist: [
+      { minggu: "M1–M2", teks: "Pelajari sistem lama (Apps Script & Spreadsheet Fonko Gemini) lewat gdocs 'Aps Script CP'.", done: true, bukti: "15 Sep" },
+      { minggu: "M1–M2", teks: "Tuntaskan pemahaman fitur: 5 pertanyaan kebutuhan (monthly report, Urgent, approval, PR Summary, jasa).", done: true, bukti: "17 Sep · terjawab hari itu" },
+      { minggu: "M1–M2", teks: "Bedah raw data dan flow data pengajuan barang dari Drive.", done: true, bukti: "22 & 24 Sep" },
+      { minggu: "M3", teks: "Finalisasi arsitektur website hosting mandiri & deploy ke Vercel.", done: true, bukti: "Dokumen M3 + app live" },
+      { minggu: "M3", teks: "Sediakan mock-up/wireframe awal: galeri 38 layar seluruh menu × 5 peran.", done: true, bukti: "galeri-mockup.html" },
+      { minggu: "M4", teks: "Pengujian & pengembangan produk: QA dua tahap + perbaikan temuan.", done: true, bukti: "Laporan QA 1 & 2" },
+      { minggu: "M4", teks: "Bangun UAT otomatis + panduan QA manual siap pakai.", done: true, bukti: "test-runner + 16 screenshot" },
+      { minggu: "M5", teks: "Sediakan foto hasil produk: 38 tangkapan layar 1440×900 tanpa overlay.", done: true, bukti: "docs/evidence/hasil-produk" },
+      { minggu: "M5", teks: "Sediakan data hasil produk: CSV/JSON statistik + ringkasan Bab IV.", done: true, bukti: "docs/evidence/data" },
+      { minggu: "M6", teks: "Rekam screen record demo aplikasi website.", done: true, bukti: "demo-aplikasi.mp4 · 1'57\"" },
+      { minggu: "M7", teks: "Latihan presentasi demo produk website (skrip siap, tinggal latihan).", done: false, sedang: true, bukti: "Skrip & rubrik M7" },
+      { minggu: "M8", teks: "Susun laporan evaluasi mandiri produk untuk Sesi 8.", done: false, sedang: true, bukti: "Dokumen M8" },
+      { minggu: "M8", teks: "Ikuti Sesi 8: evaluasi produk & bawakan demo.", done: false },
+    ],
+    keterkaitan: [
+      { fokus: "ke Fadhil", isi: "Menerima 'Aps Script CP', raw data, dan flow data; menuntaskan kebutuhan fungsional lewat 5 pertanyaan lalu menyerahkan data hasil produk untuk Bab IV." },
+      { fokus: "ke Giren", isi: "Menyerahkan pemetaan menu dan fitur aplikasi nyata agar DFD, use case, dan ERD di Bab III selaras dengan produk." },
+      { fokus: "ke Sarifah", isi: "Rumusan masalah dan tujuan di Bab I menjadi arah fitur aplikasi; angka hasil produk menjadi isi Bab IV dan V." },
+      { fokus: "ke Wida", isi: "Menyerahkan video demo dan galeri tangkapan layar sebagai bahan PPT, poster A4, dan unggahan YouTube." },
+    ],
+  },
   {
     id: "fadhil",
     nama: "Fadhil",
@@ -1468,8 +1829,8 @@ function renderHome() {
     </div>
 
     <div class="section">
-      <h2>Empat anggota yang dianalisis</h2>
-      <p class="muted">Analisa dikhususkan di luar developer aplikasi, untuk membantu teman-teman memahami tugasnya masing-masing.</p>
+      <h2>Lima anggota kelompok</h2>
+      <p class="muted">Analisa lengkap seluruh anggota — termasuk developer aplikasinya — untuk membantu teman-teman memahami tugasnya masing-masing.</p>
       <div class="member-cards">${cards}</div>
     </div>
 
@@ -1740,7 +2101,7 @@ async function bindLog() {
 const TOURS = {
   home: [
     { sel: ".hero", judul: "Judul halaman ini", isi: "Ini halaman khusus kelompok kita. Judul di sini berisi topik proyek yang sedang dikerjakan, lengkap dengan mata kuliah, universitas, pembimbing, dan jadwalnya." },
-    { sel: ".member-cards", judul: "Empat kartu anggota", isi: "Setiap kartu adalah satu anggota. Tinggal diklik untuk membuka halaman yang berisi tugas-tugasnya. Di kartu ini juga tertera peran dan NIM-nya." },
+    { sel: ".member-cards", judul: "Lima kartu anggota", isi: "Setiap kartu adalah satu anggota. Tinggal diklik untuk membuka halaman yang berisi tugas-tugasnya. Di kartu ini juga tertera peran dan NIM-nya." },
     { sel: ".timeline", judul: "Garis waktu kelompok", isi: "Ini rangkuman perjalanan kelompok dari awal sampai sekarang, jadi semua tahu kapan apa yang terjadi." },
     { sel: ".nav", judul: "Menu pindah halaman", isi: "Menu di kiri ini tempat berpindah antara beranda dan halaman masing-masing anggota." },
   ],
