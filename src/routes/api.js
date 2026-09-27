@@ -11,6 +11,12 @@
     getMonthlyReport,
   } = require('../controllers/bqController');
   const { exportXlsx } = require('../controllers/exportController');
+  const {
+    getCatatanChecks,
+    saveCatatanCheck,
+    resetCatatanChecks,
+    getCatatanLog,
+  } = require('../controllers/catatanController');
 
   const router = express.Router();
 
@@ -32,5 +38,11 @@
 
 // ---- Export Excel (.xlsx) ----
 router.post('/export/xlsx', exportXlsx);
+
+// ---- Modul Catatan Anggota (halaman catatan-anggota.html) ----
+router.get('/catatan/checks', getCatatanChecks);   // status centang
+router.post('/catatan/check', saveCatatanCheck);   // simpan 1 centang + log
+router.post('/catatan/reset', resetCatatanChecks); // reset centang anggota + log
+router.get('/catatan/log', getCatatanLog);         // riwayat log checklist
 
 module.exports = router;

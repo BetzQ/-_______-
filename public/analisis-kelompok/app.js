@@ -1310,8 +1310,16 @@ const $nav = document.getElementById("nav");
 let current = "home";
 const CK_KEY = "ck_a127_v3";
 const WHO_KEY = "ck_a127_who";
+const GUIDE_KEY = "ck_a127_guide_name";
 const TOUR_DONE = "ck_a127_tour_done_";
 const savedChecks = JSON.parse(localStorage.getItem(CK_KEY) || "{}");
+
+const API = {
+  CHECKS: "/api/catatan/checks",
+  CHECK: "/api/catatan/check",
+  RESET: "/api/catatan/reset",
+  LOG: "/api/catatan/log",
+};
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
@@ -1323,6 +1331,68 @@ function itemKey(m, c) { return m.id + "·" + c.teks.slice(0, 42); }
 function checked(m, c) {
   if (savedChecks[itemKey(m, c)] === true) return true;
   return c.done === true;
+}
+
+/* ------------------------- sinkron database (Supabase) ------------------------- */
+
+function guideName() { return localStorage.getItem(GUIDE_KEY) || "Tanpa nama"; }
+
+function saveCheckState(key, val) {
+  savedChecks[key] = val;
+  localStorage.setItem(CK_KEY, JSON.stringify(savedChecks));
+}
+
+function confirmForeignCheck(m) {
+  const guide = localStorage.getItem(GUIDE_KEY);
+  if (!guide) return true;
+  if (guide === m.nama || guide === m.namaLengkap || guide === m.id) return true;
+  return window.confirm(
+    "Checklist ini milik " + m.namaLengkap + ", bukan anggota yang Anda pilih (" + guide + "). Apa benar mau mengubah?"
+  );
+}
+
+async function pushCheckToDb(m, key, label, checked) {
+  try {
+    await fetch(API.CHECK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        member_id: m.id,
+        member_name: m.namaLengkap,
+        check_key: key,
+        label: label,
+        checked: checked,
+        actor_name: guideName(),
+      }),
+    });
+  } catch (e) {
+    console.warn("Gagal sinkron ke database. Perubahan tetap tersimpan di browser ini.", e);
+  }
+}
+
+async function pushResetToDb(m) {
+  try {
+    await fetch(API.RESET, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ member_id: m.id, member_name: m.namaLengkap, actor_name: guideName() }),
+    });
+  } catch (e) {
+    console.warn("Gagal sinkron reset ke database.", e);
+  }
+}
+
+async function syncChecksFromDb() {
+  try {
+    const res = await fetch(API.CHECKS);
+    if (!res.ok) return;
+    const json = await res.json();
+    (json.data || []).forEach((r) => { savedChecks[r.check_key] = r.checked === true; });
+    localStorage.setItem(CK_KEY, JSON.stringify(savedChecks));
+    if (current !== "home" && current !== "log") navigate(current);
+  } catch (e) {
+    /* Database tidak terjangkau: lanjut dengan penyimpanan browser. */
+  }
 }
 
 /* ------------------------- navigation ------------------------- */
@@ -1346,6 +1416,10 @@ function navigate(slug) {
     $app.innerHTML = renderHome();
     bindHome();
     document.title = "Catatan Kerja Anggota · Capstone Kelompok A 127";
+  } else if (slug === "log") {
+    $app.innerHTML = renderLog();
+    bindLog();
+    document.title = "Log Checklist · Catatan Kerja Anggota · Kelompok A 127";
   } else {
     const m = MEMBERS.find((x) => x.id === slug);
     $app.innerHTML = renderMember(m);
@@ -1531,7 +1605,7 @@ function renderMember(m) {
         </div>
         ${checklist}
       </div>
-      <p class="small muted" style="margin-top:10px;">Centang bisa diubah bebas dan tersimpan di browser ini. Tanda <strong>terverifikasi</strong> berarti pengerjaannya sudah tampak per 25 Sep 2026; tanda <strong>sedang dikerjakan</strong> berarti berjalan namun belum tuntas versi finalnya.</p>
+      <p class="small muted" style="margin-top:10px;">Status centang tersimpan ke database Supabase dan setiap perubahan tercatat di log lengkap dengan nama, tanggal, dan jam (buka lewat tautan "Lihat log checklist" di pojok kiri bawah). Tanda <strong>terverifikasi</strong> berarti pengerjaannya sudah tampak per 25 Sep 2026; tanda <strong>sedang dikerjakan</strong> berarti berjalan namun belum tuntas versi finalnya.</p>
     </section>
 
     <section id="kaitan" class="section">
@@ -1552,26 +1626,35 @@ function bindMember(m) {
 
   const reset = $app.querySelector("[data-reset=" + m.id + "]");
   if (reset) reset.addEventListener("click", () => {
+    if (!confirmForeignCheck(m)) return;
     m.checklist.forEach((c) => delete savedChecks[itemKey(m, c)]);
     localStorage.setItem(CK_KEY, JSON.stringify(savedChecks));
+    pushResetToDb(m);
     navigate(m.id);
   });
 
   $app.querySelectorAll("[data-ck]").forEach((cb) =>
     cb.addEventListener("change", () => {
-      savedChecks[cb.dataset.ck] = cb.checked;
-      localStorage.setItem(CK_KEY, JSON.stringify(savedChecks));
+      if (!confirmForeignCheck(m)) { cb.checked = !cb.checked; return; }
+      const key = cb.dataset.ck;
+      const item = m.checklist.find((c) => itemKey(m, c) === key);
+      saveCheckState(key, cb.checked);
       cb.closest(".ck-item").classList.toggle("done", cb.checked);
       updateProgress(m.id);
+      pushCheckToDb(m, key, item ? item.teks : key, cb.checked);
     })
   );
 
   $app.querySelectorAll("[data-sub]").forEach((cb) =>
     cb.addEventListener("change", () => {
-      savedChecks[cb.dataset.sk] = cb.checked;
-      localStorage.setItem(CK_KEY, JSON.stringify(savedChecks));
-      cb.closest(".sub-check").classList.toggle("on", cb.checked);
+      if (!confirmForeignCheck(m)) { cb.checked = !cb.checked; return; }
+      const sk = cb.dataset.sk;
+      const box = cb.closest(".sub-check");
+      const span = box ? box.querySelector("span") : null;
+      saveCheckState(sk, cb.checked);
+      if (box) box.classList.toggle("on", cb.checked);
       updateSubProgress(cb.dataset.sub);
+      pushCheckToDb(m, sk, span ? span.textContent : sk, cb.checked);
     })
   );
 
@@ -1593,6 +1676,63 @@ function updateSubProgress(fkey) {
   const n = boxes.filter((b) => b.checked).length;
   const el = document.querySelector('[data-sp="' + fkey + '"]');
   if (el) el.textContent = n + "/" + boxes.length;
+}
+
+/* ------------------------- log checklist ------------------------- */
+
+function renderLog() {
+  return `
+    <button class="backlink" data-go="home">← Beranda</button>
+
+    <div class="section">
+      <p class="page-kicker">Riwayat perubahan</p>
+      <h1>Log checklist</h1>
+      <p class="muted">Setiap kali checklist dicentang, dibatalkan, atau direset, tercatat di sini lengkap dengan nama pelaku, tanggal, dan jam. Datanya diambil langsung dari database Supabase.</p>
+      <div class="card" id="log-body">
+        <p class="muted">Memuat log…</p>
+      </div>
+    </div>`;
+}
+
+function fmtWaktu(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  const tgl = d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  const jam = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  return tgl + " · pukul " + jam;
+}
+
+function logActionText(action) {
+  if (action === "centang") return "menandai selesai";
+  if (action === "batal") return "membatalkan centang";
+  if (action === "reset") return "mereset centang";
+  return action;
+}
+
+async function bindLog() {
+  $app.querySelectorAll("[data-go]").forEach((el) => el.addEventListener("click", () => navigate(el.dataset.go)));
+
+  const box = document.getElementById("log-body");
+  if (!box) return;
+
+  try {
+    const res = await fetch(API.LOG);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    const rows = json.data || [];
+    if (!rows.length) {
+      box.innerHTML = `<p class="muted">Belum ada log. Buka halaman salah satu anggota, centang satu item, lalu kembali ke sini untuk melihat riwayatnya.</p>`;
+      return;
+    }
+    box.innerHTML = `<div class="timeline" style="--ac:var(--ink);">` + rows.map((r) => `
+      <div class="t-item">
+        <div class="t-date">${esc(fmtWaktu(r.created_at))}</div>
+        <div class="t-title">${esc(r.actor_name)} · ${logActionText(r.action)}${r.member_name ? " — " + esc(r.member_name) : ""}</div>
+        ${r.label ? `<div class="t-body">${esc(r.label)}</div>` : ""}
+      </div>`).join("") + `</div>`;
+  } catch (e) {
+    box.innerHTML = `<p class="muted">Log tidak dapat dimuat. Halaman ini perlu dibuka lewat server aplikasi (bukan file mentah) supaya bisa membaca database.</p>`;
+  }
 }
 
 /* ------------------------- tour (panduan menunjuk ke bagian) ------------------------- */
@@ -1632,6 +1772,9 @@ function bindTour() {
       b.addEventListener("click", () => {
         const who = b.dataset.gotour;
         localStorage.setItem(WHO_KEY, who);
+        const m = MEMBERS.find((x) => x.id === who);
+        if (m) localStorage.setItem(GUIDE_KEY, m.nama);
+        else localStorage.removeItem(GUIDE_KEY);
         start.classList.remove("show");
         startTour(who);
       })
@@ -1758,4 +1901,8 @@ function tourFinish() {
 
 /* ------------------------- boot ------------------------- */
 navigate("home");
+syncChecksFromDb();
 bindTour();
+
+const logBtn = document.getElementById("log-open");
+if (logBtn) logBtn.addEventListener("click", () => navigate("log"));
