@@ -17,6 +17,14 @@
     resetCatatanChecks,
     getCatatanLog,
   } = require('../controllers/catatanController');
+  const {
+    registerUser,
+    listRegistrations,
+    approveUser,
+    rejectUser,
+    getLoginLog,
+    getActivityLog,
+  } = require('../controllers/userManagementController');
 
   const router = express.Router();
 
@@ -44,5 +52,13 @@ router.get('/catatan/checks', getCatatanChecks);   // status centang
 router.post('/catatan/check', saveCatatanCheck);   // simpan 1 centang + log
 router.post('/catatan/reset', resetCatatanChecks); // reset centang anggota + log
 router.get('/catatan/log', getCatatanLog);         // riwayat log checklist
+
+// ---- Modul Manajemen User & Log (register -> approval Manager) ----
+router.post('/register', registerUser);                       // daftar akun baru
+router.get('/users/registrations', listRegistrations);        // daftar pending (Manager)
+router.post('/users/approve', approveUser);                   // setujui + assign tim (Manager)
+router.post('/users/reject', rejectUser);                     // tolak pendaftaran (Manager)
+router.get('/log/login', getLoginLog);                        // riwayat login (Manager)
+router.get('/log/activity', getActivityLog);                  // riwayat aktivitas (Manager)
 
 module.exports = router;
