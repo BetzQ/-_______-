@@ -121,7 +121,11 @@ html, body {
   }
   .nav { flex-direction: row; flex-wrap: wrap; }
   .nav button { padding: 8px 12px; }
-  .sidebar-foot { display: none; }
+  .sidebar-foot {
+    margin-top: 14px;
+  }
+  .sidebar-foot p { margin: 0 0 6px; }
+  .sidebar-foot .guide-reopen { display: inline-block; margin: 0 16px 6px 0; }
   .content { margin-left: 0; padding: 28px 20px 60px; }
 }
 
