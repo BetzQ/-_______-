@@ -1633,15 +1633,17 @@
         long: 'Menguji validasi nilai persetujuan dan status pengadaan, aturan urgency (teknisi tidak boleh menentukan sendiri; hanya Supervisor/Manager), endpoint Layout Rak dari kolom Lokator, dan Rekapan Pengajuan yang hanya menghitung pengajuan full approve.' },
       { group: 'STOK', num: '6', title: 'Data Stok & Ringkasan KPI', short: 'Angka stok di dasbor harus benar.',
         long: 'Memverifikasi KPI ringkasan (total, critical, stok rendah, stok habis) dan daftar sparepart lengkap beserta field pentingnya sesuai data master.' },
-      { group: 'MON', num: '7', title: 'Pantau Pengajuan (Monitoring)', short: 'Semua pengajuan bisa dilihat dan ada catatan riwayatnya.',
+      { group: 'RAK', num: '7', title: 'Layout Rak (dari kolom Lokator)', short: 'Barang punya tempat di rak, dan yang belum punya kelihatan.',
+        long: 'Menerjemahkan kolom Lokator jadi grid rak: format ringkas (M3), tanda hubung (D-1-18-B), dan satu item yang punya 2+ lokasi dipecah ke tiap sel. Lokasi yang bukan kode rak (Ruang Filter, Flammable, dll) tampil sebagai zona bernama, bukan hilang. Tab "Belum Ada Lokasi" menampilkan semua sparepart yang kolom Lokator-nya kosong atau tidak bisa dipetakan, lengkap dengan pencarian dan pagination.' },
+      { group: 'MON', num: '8', title: 'Pantau Pengajuan (Monitoring)', short: 'Semua pengajuan bisa dilihat dan ada catatan riwayatnya.',
         long: 'Memastikan halaman monitoring memuat seluruh pengajuan dengan kolom lengkap, dan audit trail mencatat setiap perubahan status beserta pelakunya.' },
-      { group: 'REP', num: '8', title: 'Laporan Bulanan', short: 'Rekap per bulan bisa dipilih dan isinya benar.',
+      { group: 'REP', num: '9', title: 'Laporan Bulanan', short: 'Rekap per bulan bisa dipilih dan isinya benar.',
         long: 'Memverifikasi filter periode laporan tersedia serta jumlah pengajuan per bulan (Sep 2026, Jan & Feb 2025) sesuai data hasil impor.' },
-      { group: 'EXP', num: '9', title: 'Ekspor Excel', short: 'Tombol unduh menghasilkan file Excel yang bisa dibuka.',
+      { group: 'EXP', num: '10', title: 'Ekspor Excel', short: 'Tombol unduh menghasilkan file Excel yang bisa dibuka.',
         long: 'Menguji endpoint ekspor .xlsx: file valid, permintaan tanpa data ditolak, dan batas ukuran data dijaga agar server tidak berat.' },
-      { group: 'UI', num: '10', title: 'Uji Tampilan Aplikasi', short: 'Mengecek tampilan depan seperti yang dilihat pengguna asli.',
+      { group: 'UI', num: '11', title: 'Uji Tampilan Aplikasi', short: 'Mengecek tampilan depan seperti yang dilihat pengguna asli.',
         long: 'Menjalankan aplikasi di panel preview seperti manusia: login, membuka menu, mencari, membuka modal, dan logout. Bagian ini yang membuat preview bergerak.' },
-      { group: 'E2E', num: '11', title: 'Alur Lengkap: Buat sampai Setuju', short: 'Satu pengajuan dijalankan dari dibuat sampai disetujui penuh.',
+      { group: 'E2E', num: '12', title: 'Alur Lengkap: Buat sampai Setuju', short: 'Satu pengajuan dijalankan dari dibuat sampai disetujui penuh.',
         long: 'Menjalankan alur nyata (menulis ke database): teknisi membuat pengajuan, supervisor & manager menyetujui, officer mengubah status pengadaan, lalu mengecek riwayat. WAJIB berurutan E2E-01 s.d. E2E-08.' },
     ];
 
@@ -1878,6 +1880,10 @@
     function setStatus(test, status, message, ms) {
       var card = $('card-' + test.id);
       results[test.id] = { id: test.id, group: test.group, priority: test.priority, title: test.title, status: status, message: message || '', ms: ms || 0 };
+      // Kartu bisa hilang kalau group test tidak punya section di SECTIONS. Test
+      // tetap dicatat di results (supaya counter & export benar), tapi jangan
+      // sampai exception yang menghentikan seluruh runner.
+      if (!card) { updateCounters(); return; }
       card.dataset.status = status;
       card.className = card.className.replace(/status-\w+/g, 'status-' + status);
       card.querySelector('.sticon').innerHTML = (status === 'running')
@@ -1941,8 +1947,7 @@
       var t = makeLogger(test);
       var card = $('card-' + test.id);
       setStatus(test, 'running');
-      expandFor(test);
-      $('now').textContent = 'Menjalankan ' + test.id + ' — ' + test.title;
+      expandFor(test);      $('now').textContent = 'Menjalankan ' + test.id + ' — ' + test.title;
       var t0 = nowMs();
       try {
         await test.run(t);
@@ -2037,9 +2042,12 @@
 
     async function runAll() {
       if (running) return;
-      resetResults(false);
+      // Feedback dulu, baru kerja berat. Kalau ada yang error, tombol tetap
+      // terlihat berubah dan errornya ditulis di layar - bukan diam saja.
       setBusy(true); stopped = false; startedAt = nowMs();
       $('btn-txt').textContent = 'Menjalankan…';
+      try {
+      resetResults(false);
       consoleSection('MULAI SEMUA BAGIAN (UI=' + $('chk-ui').checked + ', E2E=' + $('chk-e2e').checked + ')');
       switchTab('tests');
 
@@ -2060,7 +2068,11 @@
         if (stopped) { $('now').textContent = 'Dihentikan oleh pengguna.'; break; }
         await pause(100);
         await ensureDeps(list[i]);
-        await runOne(list[i]);
+        // Satu test yang error fatal tidak boleh menghentikan sisa run.
+        try { await runOne(list[i]); }
+        catch (e) {
+          setStatus(list[i], 'fail', 'Error tak tertangani: ' + (e && e.message ? e.message : e));
+        }
         updateCounters();
         await pause(180);
       }
@@ -2073,9 +2085,19 @@
         else if (t.mode === 'ui' && (!$('chk-ui').checked || !UI_AVAILABLE)) setStatus(t, 'skip', UI_AVAILABLE ? 'Tes UI dimatikan' : 'Halaman dibuka sebagai file://');
       });
 
-      setBusy(false);
-      $('btn-txt').textContent = 'Jalankan Semua';
-      $('now').textContent = 'Selesai. ' + $('c-pass').textContent + ', ' + $('c-fail').textContent + ', ' + $('c-skip').textContent + '.';
+      } catch (e) {
+        // Jaring pengaman terakhir: kalau ada apa pun yang error, tampilkan
+        // di layar. Sebelumnya error di sini bikin tombol diam sepenuhnya.
+        var pesan = (e && e.message) ? e.message : String(e);
+        $('now').textContent = 'GAGAL: ' + pesan;
+        try { consoleSection('ERROR FATAL: ' + pesan); } catch (ignore) { /* abaikan */ }
+      } finally {
+        setBusy(false);
+        $('btn-txt').textContent = 'Jalankan Semua';
+      }
+      if (!stopped && !/^GAGAL:/.test($('now').textContent)) {
+        $('now').textContent = 'Selesai. ' + $('c-pass').textContent + ', ' + $('c-fail').textContent + ', ' + $('c-skip').textContent + '.';
+      }
       consoleSection('SELESAI — ' + $('c-pass').textContent + ' / ' + $('c-fail').textContent + ' / ' + $('c-skip').textContent + ' (durasi ' + ((nowMs() - startedAt) / 1000).toFixed(1) + 's)');
     }
 
@@ -2084,6 +2106,7 @@
       startedAt = 0;
       TESTS.forEach(function (test) {
         var card = $('card-' + test.id);
+        if (!card) return;
         card.dataset.status = 'pending';
         card.className = card.className.replace(/status-\w+/g, 'status-pending');
         card.querySelector('.sticon').innerHTML = '';
@@ -2180,11 +2203,35 @@
     }
 
     // ==================== INIT ====================
+    // Test yang group-nya tidak punya section di SECTIONS tidak mendapat kartu
+    // di renderSections(). Dulu ini membuat resetResults() crash di tengah
+    // jalan sehingga "Jalankan Semua" kelihatan tidak merespons sama sekali.
+    function checkOrphanTests() {
+      var orphan = TESTS.filter(function (t) { return !$('card-' + t.id); });
+      if (!orphan.length) return;
+      var groups = {};
+      orphan.forEach(function (t) { groups[t.group] = (groups[t.group] || 0) + 1; });
+      var rincian = Object.keys(groups).map(function (g) {
+        return g + ' (' + groups[g] + ' test)';
+      }).join(', ');
+      $('now').textContent = 'PERINGATAN: ' + orphan.length + ' test tidak punya kartu (group: ' +
+        rincian + '). Group tersebut belum ada di SECTIONS.';
+      consoleSection('PERINGATAN: ' + orphan.length + ' test tidak punya kartu: ' +
+        orphan.map(function (t) { return t.id; }).join(', '));
+      consoleSection('Group yang hilang dari SECTIONS: ' + rincian);
+      var badge = $('srv-badge');
+      if (badge) {
+        badge.textContent = '⚠ ' + orphan.length + ' test tanpa kartu';
+        badge.className = 'text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30';
+      }
+    }
+
     (function init() {
       if (!UI_AVAILABLE) $('file-warn').classList.remove('hidden');
       if (!UI_AVAILABLE) $('chk-ui').checked = false;
       renderSections();
       switchTab('tests');
+      checkOrphanTests();
       checkServer();
 
       $('sel-speed').addEventListener('change', function () { SPEED = parseFloat(this.value) || 1; });
