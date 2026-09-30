@@ -1369,7 +1369,13 @@
             var b = fDoc().getElementById('rak-body');
             return b && b.textContent.indexOf('Memuat layout rak') < 0 && b.textContent.length > 40;
           }, 12000);
-          t.check(loaded, 'layout rak termuat');
+          // Kalau render grid melempar exception, index.html menulis pesan error
+          // ke dalam rak-body (atau membiarkannya stuck di "Memuat layout rak.").
+          // Tampilkan pesan aslinya, jangan cuma reported "gagal".
+          var bodyTxt = fDoc().getElementById('rak-body').textContent.replace(/\s+/g, ' ').trim();
+          var errRak = /\bis not defined\b|\bis not a function\b|Gagal memuat layout rak/.exec(bodyTxt);
+          if (errRak) t.step('render rak gagal: "' + bodyTxt.slice(0, 140) + '"');
+          t.check(loaded && !errRak, 'layout rak termuat' + (errRak ? ' (' + errRak[0] + ')' : ''));
           var tabs = fDoc().querySelectorAll('#rak-tabs [data-rak-tab]');
           t.check(tabs.length > 1, 'tab rak terisi (' + tabs.length + ' tab)');
           // Struktur tab hasil perubahan: Semua -> rak A..Z -> Zona -> Belum Ada Lokasi.
@@ -1385,8 +1391,15 @@
           });
           t.check(/^Zona/.test(zonaLabel || ''), 'label tab zona: "' + zonaLabel + '"');
           t.check(/^Semua/.test(allLabel || ''), 'label tab semua: "' + allLabel + '"');
-          t.check(fDoc().getElementById('rak-body').textContent.indexOf('Baris') >= 0 ||
-                  fDoc().getElementById('rak-body').textContent.indexOf('Rak ') >= 0, 'grid rak ditampilkan');
+          // Grid benar-benar tampil: blok rak/zona, header kolom, header baris,
+          // dan ringkasan di rak-info terisi. Ringkasan ini yang kosong kalau
+          // renderRak melempar exception sebelum body.innerHTML di-assign.
+          var infoRak = fDoc().getElementById('rak-info').textContent.replace(/\s+/g, ' ').trim();
+          t.check(infoRak.length > 0, 'ringkasan layout rak terisi: "' + infoRak + '"');
+          var blokRak = fDoc().querySelectorAll('#rak-body h4');
+          t.check(blokRak.length > 0, 'blok rak/zona dirender (' + blokRak.length + ' blok)');
+          t.check(bodyTxt.indexOf('Kolom ') >= 0, 'header kolom ("Kolom ...") tampil di grid');
+          t.check(bodyTxt.indexOf('Baris') >= 0, 'header baris ("Baris ...") tampil di grid');
         } },
       { id: 'UI-19', group: 'UI', priority: 'P0', mode: 'ui', title: 'Kolom Urgency dapat diubah Supervisor', expected: 'Login INN -> tabel approval punya dropdown urgency (Normal/Urgent) per baris; Officer tidak punya dropdown itu',
         run: async function (t) {
@@ -1397,8 +1410,31 @@
           await pause(400);
           var sel = fDoc().querySelectorAll('#tbody-pengajuan select[data-urgency]');
           t.check(sel.length > 0, 'dropdown urgency tampil untuk Supervisor (' + sel.length + ' baris)');
-          t.check(!!fDoc().querySelector('#tbody-pengajuan select[data-no]:not([data-urgency])'),
-            'dropdown status pengadaan tetap ada dan terpisah dari urgency');
+          // Kolom "Status Pengadaan" harus tetap ada dan TERPISAH dari kolom Urgensi.
+          // Dropdown-nya hanya untuk role Procurement/Officer/Manager; Supervisor
+          // membaca statusnya sebagai badge. Yang diuji di sini adalah kolomnya
+          // masih ada, terpisah, dan tidak tercampur kontrol urgency.
+          var th = fDoc().querySelectorAll('#modal-approval thead th');
+          var idxUrg = -1, idxProc = -1;
+          Array.prototype.forEach.call(th, function (h, i) {
+            var x = h.textContent.toLowerCase();
+            if (x.indexOf('urgensi') >= 0 || x.indexOf('urgency') >= 0) idxUrg = i;
+            if (x.indexOf('status pengadaan') >= 0) idxProc = i;
+          });
+          t.check(idxUrg >= 0 && idxProc >= 0 && idxUrg !== idxProc,
+            'kolom Urgensi dan Status Pengadaan terpisah (idx ' + idxUrg + ' vs ' + idxProc + ')');
+          var row = fDoc().querySelector('#tbody-pengajuan tr');
+          var cells = row ? row.children : [];
+          var urgCell = cells[idxUrg], procCell = cells[idxProc];
+          t.check(!!urgCell && urgCell.querySelectorAll('select[data-urgency]').length === 1,
+            'tepat satu dropdown urgency di kolom Urgensi');
+          t.check(!!procCell && procCell.querySelectorAll('select[data-urgency]').length === 0 &&
+                  procCell.textContent.trim().length > 0,
+            'Status Pengadaan tetap tampil di kolomnya sendiri, terpisah dari urgency (isi: "' +
+            (procCell ? procCell.textContent.replace(/\s+/g, ' ').trim() : '-') + '")');
+          t.check(fDoc().querySelectorAll('#tbody-pengajuan tr').length ===
+                  fDoc().querySelectorAll('#tbody-pengajuan select[data-urgency]').length,
+            'setiap baris punya dropdown urgency sendiri');
           await uiLoginAs('officer', t);
           await clickMenu('monitoring');
           await waitFor(function () { var m = fDoc().getElementById('modal-approval'); return m && !m.classList.contains('hidden'); }, 8000);
@@ -1445,19 +1481,29 @@
           t.check(!!fDoc().querySelector('#rak-body [data-rak-blm="next"]'), 'tombol "Berikutnya" tersedia untuk pagination');
           t.check(fDoc().querySelector('#rak-body [data-rak-blm="prev"]').disabled,
             'tombol "Sebelumnya" nonaktif di halaman pertama');
-          // Pencarian tab ini server-side (debounce 350ms) -> tunggu round-trip.
-          var sebelum = fDoc().getElementById('rak-body').textContent;
+          // Pencarian tab ini server-side (debounce 350ms). Sunggu state AKHIR,
+          // jangan cuma "teks berubah": state loading "Memuat daftar..." juga
+          // membuat teks berubah dan akan ikut tertangkap, sehingga assertion
+          // salah gagal padahal daftar sebenarnya sudah termuat.
           setInput('#rak-search', 'bearing');
-          var berubah = await waitFor(function () {
+          var selesai = await waitFor(function () {
             var b = fDoc().getElementById('rak-body');
-            return b && b.textContent !== sebelum;
+            if (!b) return false;
+            var x = b.textContent;
+            // "Menampilkan ..." hanya dirender setelah daftar selesai dimuat.
+            if (x.indexOf('Memuat daftar') >= 0) return false;
+            return x.indexOf('Menampilkan') >= 0 ||
+                   /tidak ada sparepart yang belum punya lokasi/i.test(x);
           }, 15000);
-          t.check(berubah, 'pencarian memicu pemuatan ulang daftar dari server');
-          var sesudah = fDoc().getElementById('rak-body').textContent;
+          t.check(selesai, 'pencarian memicu pemuatan ulang daftar dari server');
+          var sesudah = fDoc().getElementById('rak-body').textContent.replace(/\s+/g, ' ');
+          // Pisahkan kegagalan server dari bug pencarian supaya jelas causesnya.
+          var errCari = /Gagal memuat|NetworkError|Failed to fetch|Internal Server Error/i.exec(sesudah);
+          t.check(!errCari, 'tidak ada error server saat mencari' +
+                  (errCari ? ': "' + errCari[0] + '"' : ''));
           t.check(/Tidak ada item yang cocok/.test(sesudah) || /\d+\s*pcs/.test(sesudah),
             'hasil pencarian ditampilkan (kosong atau daftar tersaring)');
-          var offsetInfo = fDoc().getElementById('rak-body').textContent;
-          t.check(/Menampilkan/.test(offsetInfo), 'baris pagination menampilkan rentang data');
+          t.check(/Menampilkan/.test(sesudah), 'baris pagination menampilkan rentang data');
         } },
       { id: 'UI-12', group: 'UI', priority: 'P0', mode: 'ui', title: 'UI Register: modal daftar akun', expected: 'Klik "Daftar di sini" -> modal terbuka; isi form -> kirim -> info "Pendaftaran berhasil" muncul',
         run: async function (t) {

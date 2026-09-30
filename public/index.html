@@ -1525,7 +1525,7 @@ const RAK_BELUM_LIMIT = 50;
       const nRak = list.filter((r) => r.tipe !== 'zona').length;
       const nZona = list.length - nRak;
       const bagian = [nRak ? nRak + ' rak' : '', nZona ? nZona + ' zona' : ''].filter(Boolean).join(' + ');
-      constdobel = rakMeta.total_penempatan > (rakMeta.total_item || 0)        ? ' · ' + (rakMeta.total_penempatan - rakMeta.total_item) + ' item punya 2+ lokasi'
+      const dobel = rakMeta.total_penempatan > (rakMeta.total_item || 0)        ? ' · ' + (rakMeta.total_penempatan - rakMeta.total_item) + ' item punya 2+ lokasi'
         : '';
       info.textContent = bagian + ' · ' + totalItem + ' item · ' + totalQty + ' pcs' + dobel;
 
