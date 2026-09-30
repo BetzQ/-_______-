@@ -154,7 +154,7 @@
       low: 356,
       out: 1887,
       pengajuan: 1481,    // jumlah awal (bisa bertambah bila ada pengajuan baru)
-      months: 21,
+      months: 22,
       pengajuanSep: 43,   // Sep 2026
       pengajuanFeb: 132,  // Feb 2025
       pengajuanJan: 63,   // Jan 2025
@@ -1078,7 +1078,7 @@
          } },
 
       // ---------- REP ----------
-      { id: 'REP-05', group: 'REP', priority: 'P0', mode: 'safe', title: 'Periode laporan tersedia', expected: 'Data mencakup ' + EXPECT.months + ' bulan (Jan 2025 - Sep 2026)',
+      { id: 'REP-05', group: 'REP', priority: 'P0', mode: 'safe', title: 'Periode laporan tersedia', expected: 'Data mencakup ' + EXPECT.months + ' bulan (Jan 2025 - Okt 2026)',
         run: async function (t) {
           var r = await callApi(t, 'GET', '/api/pengajuan/all');
           var keys = {};
@@ -1767,7 +1767,7 @@
       'MON-01': { short: 'Semua pengajuan harus muncul di halaman monitoring.', long: 'GET /api/pengajuan/all harus mengembalikan seluruh pengajuan (minimal sesuai baseline 200).' },
       'MON-02': { short: 'Tiap baris pengajuan harus punya info penting.', long: 'Data monitoring harus memuat no_registrasi, tanggal, status approval SPV/MGR, status pengadaan, dan username teknisi.' },
       'MON-09': { short: 'Perubahan status harus tercatat siapa yang mengubah.', long: 'GET /api/pengajuan/:id/log untuk BQ-2026-09-01-0001 harus mengembalikan 3 entri lengkap dengan aktor dan field yang berubah.' },
-      'REP-05': { short: 'Daftar pilihan bulan untuk laporan harus tersedia.', long: 'Endpoint laporan harus menyediakan 21 periode bulan dari data impor (Jan 2025 sampai Sep 2026).' },
+      'REP-05': { short: 'Daftar pilihan bulan untuk laporan harus tersedia.', long: 'Endpoint laporan harus menyediakan 22 periode bulan dari data impor (Jan 2025 sampai Okt 2026).' },
       'REP-06': { short: 'Rekap bulan September 2026 harus berjumlah 8.', long: 'Filter laporan bulan Sep 2026 harus menampilkan 8 pengajuan.' },
       'REP-07': { short: 'Rekap awal tahun 2025 harus benar.', long: 'Jan 2025 = 16 dan Feb 2025 = 20 pengajuan.' },
       'EXP-01': { short: 'Tombol unduh harus menghasilkan file Excel asli.', long: 'POST /api/export/xlsx harus mengembalikan file .xlsx dengan magic bytes "PK" (zip) yang bisa dibuka Excel.' },

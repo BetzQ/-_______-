@@ -1,6 +1,6 @@
 ﻿# GUIDES TEST MANUAL QA - Micropage E-Sparepart
 
-> **86 test manual** di guide ini + **102 test otomatis** di `public/qa-test.html`. Rincian per section ada di [Ringkasan](#-ringkasan-per-section). Angka lama "Total Test: 100" tidak pernah akurat dan sudah dihapus.
+> **86 test manual** di guide ini + **104 test otomatis** di `public/qa-test.html`. Rincian per section ada di [Ringkasan](#-ringkasan-per-section). Angka lama "Total Test: 100" tidak pernah akurat dan sudah dihapus.
 >
 > **Terakhir diperbarui:** 30 September 2026
 >
@@ -646,7 +646,7 @@
 | EXP *(export)* | 5 | 5 | `EXP-01`, `EXP-04`, `EXP-05`, `EXP-06`, `EXP-07` |
 | UI | 18 | 19 | `UI-01` … `UI-18`, `UI-19`*, `UI-20`*, `UI-21`* |
 | E2E | 8 | 8 | `E2E-01` … `E2E-08` |
-| **TOTAL** | **86** | **102** | |
+| **TOTAL** | **86** | **104** | |
 
 > Padanan skenario manual yang menjalankan test otomatis: `MON-01b`→`BQS-01/03`, `MON-01c`→`RAK-01..04`, `MON-01d`→`RAK-05/06`, `MON-02b`→`APP-15/16`, `RBAC-08b`→`APP-15`, `UI-15`/`UI-16`→`UI-15..18`.
 >
