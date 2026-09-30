@@ -19,7 +19,6 @@ function buildNoRegistrasi() {
     return res.status(401).json({ status: 'error', message: 'Anda harus login terlebih dahulu' });
   }
   const jenisV = String(jenis_pengajuan || 'sparepart').trim();
-  const urgencyV = String(urgency || 'Normal').trim();
 
   if (!spesifikasi || (jenisV === 'sparepart' && !itemCode)) {
     return res.status(400).json({
@@ -63,6 +62,11 @@ function buildNoRegistrasi() {
       'SELECT name, role FROM users WHERE id = $1 LIMIT 1', [user.id]
     );
     const who = whoRows[0] || { name: username, role: '-' };
+
+    // Status urgensi TIDAK lagi dipilih teknisi saat submit — ditetapkan
+    // oleh Supervisor pada tahap approval (lihat updateStatusPengajuan).
+    // Pengajuan baru selalu mulai dari "Normal".
+    const urgencyV = 'Normal';
 
     let sparepartItem = null;
     if (jenisV === 'sparepart') {
@@ -136,13 +140,23 @@ const ALIAS_APPROVAL = {
 
 // Pipeline status pengadaan. 'BQ Baru' = status awal dari createPengajuan,
 // sisanya urutan alur pengadaan sesuai spec manager.
+// WAJIB sinkron dengan CHECK constraint pengajuan_bq_status_pengadaan_check di DB,
+// kalau tidak nilai yang sah di DB akan ditolak backend (atau conversely: baris
+// existing dengan nilai yang tidak ada di sini tidak bisa dipilih ulang di UI).
 const STATUS_PENGADAAN = [
   'BQ Baru',
   'Pending',
   'Proses PO',
+  'PO Open',
+  'Mencari Penawaran',
   'Barang Dikirim',
   'Tiba di Gudang',
+  'Selesai',
 ];
+
+// Status urgensi. Menyesuaikan kolom ENUM urgency di tabel pengajuan_bq.
+// WAJIB ditetapkan oleh Supervisor (bukan oleh teknisi saat submit).
+const STATUS_URGENCY = ['Normal', 'Urgent'];
 
 // Normalisasi nilai status approval:
 // terima nilai baku ('Disetujui') ATAU alias ('approved') -> balikan nilai baku.
@@ -183,9 +197,27 @@ function allowedApprovalFields(roleKey) {
  * GET /api/pengajuan/all
  * Mengambil SELURUH pengajuan BQ dengan JOIN ke users (data teknisi)
  * dan spareparts (deskripsi barang), diurutkan dari yang paling baru.
+ *
+ * Query opsional:
+ *  - ?username=<u> : batasi hanya pengajuan milik user tersebut (dipakai
+ *    dashboard Teknisi agar hanya melihat pengajuannya sendiri).
+ *  - ?full_approved=1 : hanya pengajuan yang sudah FULL approve
+ *    (SPV = Disetujui DAN Manager = Disetujui) — dipakai "Rekapan Pengajuan".
  */
 async function getAllPengajuan(req, res) {
   try {
+    const { username, full_approved } = req.query || {};
+
+    const where = [];
+    const params = [];
+    if (username) {
+      params.push(username);
+      where.push(`u.username = $${params.length}`);
+    }
+    if (String(full_approved) === '1') {
+      where.push(`bq.status_approval_spv = 'Disetujui' AND bq.status_approval_manager = 'Disetujui'`);
+    }
+
     const { rows } = await pool.query(
        `SELECT
            bq.jenis_pengajuan,
@@ -212,7 +244,9 @@ async function getAllPengajuan(req, res) {
          FROM pengajuan_bq bq
          JOIN users      u  ON u.id = bq.user_id
          LEFT JOIN spareparts sp ON sp.item_code = bq.item_code
-         ORDER BY bq.timestamp DESC, bq.no_registrasi DESC`
+         ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+         ORDER BY bq.timestamp DESC, bq.no_registrasi DESC`,
+      params
     );
 
     return res.status(200).json({
@@ -232,12 +266,14 @@ async function getAllPengajuan(req, res) {
 
 /**
  * PUT /api/pengajuan/:id/status
- * Update status approval (SPV/Manager) DAN/ATAU status_pengadaan berdasarkan no_registrasi.
- * Body: { username, status_approval_spv?, status_approval_manager?, status_pengadaan? }
+ * Update status approval (SPV/Manager) DAN/ATAU status_pengadaan DAN/ATAU urgency
+ * berdasarkan no_registrasi.
+ * Body: { username, status_approval_spv?, status_approval_manager?, status_pengadaan?, urgency? }
  *
  * RBAC (Backend):
- *  - Supervisor hanya dapat mengubah status_approval_spv (tahap 1).
- *  - Manager    hanya dapat mengubah status_approval_manager (tahap 2/final) dan status_pengadaan.
+ *  - Supervisor dapat mengubah status_approval_spv (tahap 1) dan urgency.
+ *  - Manager    dapat mengubah status_approval_manager (tahap 2/final),
+ *                status_pengadaan, dan urgency.
  *  - Officer    hanya dapat mengubah status_pengadaan (pipeline procurement).
  *  - Teknisi    tidak memiliki hak ubah status apa pun.
  *
@@ -246,7 +282,7 @@ async function getAllPengajuan(req, res) {
 async function updateStatusPengajuan(req, res) {
   const { id } = req.params; // no_registrasi
   const {
-    username, status_approval_spv, status_approval_manager, status_pengadaan,
+    username, status_approval_spv, status_approval_manager, status_pengadaan, urgency,
   } = req.body || {};
 
   // 0) Identitas aktor wajib ada (konsisten dengan createPengajuan).
@@ -258,12 +294,14 @@ async function updateStatusPengajuan(req, res) {
   const spvVal   = normalizeApproval(status_approval_spv);
   const mgrVal   = normalizeApproval(status_approval_manager);
   const pengadaan = String(status_pengadaan == null ? '' : status_pengadaan).trim();
+  const urgensi  = String(urgency == null ? '' : urgency).trim();
 
   const hasSpv = status_approval_spv !== undefined && status_approval_spv !== null && String(status_approval_spv).trim() !== '';
   const hasMgr = status_approval_manager !== undefined && status_approval_manager !== null && String(status_approval_manager).trim() !== '';
   const hasPengadaan = pengadaan !== '';
+  const hasUrgency = urgensi !== '';
 
-  if (!hasSpv && !hasMgr && !hasPengadaan) {
+  if (!hasSpv && !hasMgr && !hasPengadaan && !hasUrgency) {
     return res.status(400).json({
       status: 'error',
       message: 'Tidak ada status yang dikirim untuk diubah',
@@ -285,6 +323,12 @@ async function updateStatusPengajuan(req, res) {
     return res.status(400).json({
       status: 'error',
       message: `status_pengadaan tidak valid. Nilai yang diizinkan: ${STATUS_PENGADAAN.join(', ')}`,
+    });
+  }
+  if (hasUrgency && !STATUS_URGENCY.includes(urgensi)) {
+    return res.status(400).json({
+      status: 'error',
+      message: `urgency tidak valid. Nilai yang diizinkan: ${STATUS_URGENCY.join(', ')}`,
     });
   }
 
@@ -327,12 +371,18 @@ async function updateStatusPengajuan(req, res) {
       message: 'Status pengadaan hanya bisa diubah oleh Officer / Manager.',
     });
   }
+  if (hasUrgency && actorRole !== 'supervisor' && actorRole !== 'manager') {
+    return res.status(403).json({
+      status: 'error',
+      message: 'Status urgensi hanya bisa ditentukan oleh Supervisor / Manager.',
+    });
+  }
 
   // 3) Ambil status terkini (untuk aturan alur + audit trail).
   let current;
   try {
     const { rows } = await pool.query(
-      'SELECT status_approval_spv, status_approval_manager, status_pengadaan FROM pengajuan_bq WHERE no_registrasi = $1',
+      'SELECT status_approval_spv, status_approval_manager, status_pengadaan, urgency FROM pengajuan_bq WHERE no_registrasi = $1',
       [id]
     );
     const row = rows[0];
@@ -376,6 +426,10 @@ async function updateStatusPengajuan(req, res) {
     sets.push(`status_pengadaan = $${paramIndex++}`);
     params.push(pengadaan);
   }
+  if (hasUrgency) {
+    sets.push(`urgency = $${paramIndex++}`);
+    params.push(urgensi);
+  }
 
   try {
     const result = await pool.query(
@@ -403,6 +457,9 @@ async function updateStatusPengajuan(req, res) {
     }
     if (hasPengadaan && String(current.status_pengadaan) !== pengadaan) {
       changes.push(['status_pengadaan', current.status_pengadaan, pengadaan]);
+    }
+    if (hasUrgency && String(current.urgency) !== urgensi) {
+      changes.push(['urgency', current.urgency, urgensi]);
     }
     try {
       for (const [field, oldV, newV] of changes) {
@@ -434,6 +491,7 @@ async function updateStatusPengajuan(req, res) {
         ...(hasSpv && { status_approval_spv: spvVal }),
         ...(hasMgr && { status_approval_manager: mgrVal }),
         ...(hasPengadaan && { status_pengadaan: pengadaan }),
+        ...(hasUrgency && { urgency: urgensi }),
       },
     });
   } catch (error) {
@@ -560,26 +618,30 @@ async function getStockAlert(req, res) {
 }
 
 // =====================================================================
-// BQ SUMMARY — Ringkasan seluruh pengajuan BQ
+// REKAP PENGAJUAN (dulu "BQ Summary")
+// Hanya menghitung pengajuan yang sudah FULL APPROVE, yaitu:
+//   status_approval_spv = 'Disetujui' DAN status_approval_manager = 'Disetujui'
 // =====================================================================
 
 /**
  * GET /api/pengajuan/bq-summary
- * BQ Summary: ringkasan lengkap seluruh pengajuan BQ.
- * - Total, per urgency, per jenis
- * - Status approval breakdown
- * - Pipeline status breakdown
- * - Bisa diakses semua role yang punya menu BQ Summary
+ * Rekapan keseluruhan pengajuan dari SEMUA teknisi yang sudah disetujui penuh.
+ * - Total pengajuan full approve, per urgency, per jenis
+ * - Rekap per teknisi (siapa yang mengajukan berapa)
+ * - Pipeline status pengadaan dari pengajuan yang sudah disetujui
+ * - Bisa diakses semua role yang punya menu Rekapan Pengajuan
  */
 async function getBqSummary(req, res) {
   try {
     const { rows } = await pool.query(
       `SELECT bq.no_registrasi, bq.jenis_pengajuan, bq.urgency,
               bq.status_approval_spv, bq.status_approval_manager, bq.status_pengadaan,
-              bq.qty_diminta, bq.timestamp,
+              bq.qty_diminta, bq.item_code, bq.mesin_area, bq.purpose, bq.timestamp,
               u.name AS nama_teknisi
          FROM pengajuan_bq bq
          JOIN users u ON u.id = bq.user_id
+        WHERE bq.status_approval_spv = 'Disetujui'
+          AND bq.status_approval_manager = 'Disetujui'
         ORDER BY bq.timestamp DESC`
     );
 
@@ -589,12 +651,17 @@ async function getBqSummary(req, res) {
     const sparepart = rows.filter(r => r.jenis_pengajuan === 'sparepart').length;
     const jasa = total - sparepart;
 
-    const menungguSPV  = rows.filter(r => r.status_approval_spv === 'Menunggu').length;
-    const disetujuiSPV = rows.filter(r => r.status_approval_spv === 'Disetujui').length;
-    const ditolakSPV   = rows.filter(r => r.status_approval_spv === 'Ditolak').length;
-    const menungguMGR  = rows.filter(r => r.status_approval_manager === 'Menunggu' && r.status_approval_spv === 'Disetujui').length;
-    const disetujuiMGR = rows.filter(r => r.status_approval_manager === 'Disetujui').length;
-    const ditolakMGR   = rows.filter(r => r.status_approval_manager === 'Ditolak').length;
+    // Rekap per teknisi: siapa sudah berapa pengajuan yang disetujui penuh.
+    const perTeknisi = {};
+    rows.forEach(r => {
+      const key = r.nama_teknisi || '-';
+      if (!perTeknisi[key]) perTeknisi[key] = { nama_teknisi: key, total: 0, urgent: 0, sparepart: 0, jasa: 0 };
+      perTeknisi[key].total += 1;
+      if (r.urgency === 'Urgent') perTeknisi[key].urgent += 1;
+      if (r.jenis_pengajuan === 'jasa') perTeknisi[key].jasa += 1;
+      else perTeknisi[key].sparepart += 1;
+    });
+    const perTeknisiList = Object.values(perTeknisi).sort((a, b) => b.total - a.total);
 
     const pipelineBreakdown = {};
     rows.forEach(r => {
@@ -608,7 +675,7 @@ async function getBqSummary(req, res) {
       data: rows,
       summary: {
         total, urgent, normal, sparepart, jasa,
-        approval: { menungguSPV, disetujuiSPV, ditolakSPV, menungguMGR, disetujuiMGR, ditolakMGR },
+        perTeknisi: perTeknisiList,
         pipeline: pipelineBreakdown,
       },
     });
@@ -616,7 +683,7 @@ async function getBqSummary(req, res) {
     console.error('[BQ Summary Error]', error.message);
     return res.status(500).json({
       status: 'error',
-      message: 'Gagal mengambil BQ Summary',
+      message: 'Gagal mengambil Rekapan Pengajuan',
       ...(process.env.NODE_ENV !== 'production' && { detail: error.message }),
     });
   }

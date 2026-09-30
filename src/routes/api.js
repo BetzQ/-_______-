@@ -1,5 +1,5 @@
  const express = require('express');
- const { getAllSpareparts, getStockSummary } = require('../controllers/sparepartController');
+ const { getAllSpareparts, getStockSummary, getRackLayout } = require('../controllers/sparepartController');
   const {
     createPengajuan,
     getAllPengajuan,
@@ -32,6 +32,7 @@
   router.get('/spareparts', getAllSpareparts);
   router.get('/spareparts/summary', getStockSummary);
   router.get('/spareparts/alert', getStockAlert);
+  router.get('/spareparts/rak', getRackLayout);
   router.post('/pengajuan', createPengajuan);
 
   // ---- Modul Manager ----

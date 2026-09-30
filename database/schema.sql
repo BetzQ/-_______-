@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS pengajuan_log (
   actor_id      INT UNSIGNED NULL,
   actor_name    VARCHAR(100) NULL,
   actor_role    VARCHAR(50)  NULL,
-  field         VARCHAR(30)  NOT NULL,   -- status_approval_spv | status_approval_manager | status_pengadaan
+  field         VARCHAR(30)  NOT NULL,   -- status_approval_spv | status_approval_manager | status_pengadaan | urgency
   old_value     VARCHAR(50)  NULL,
   new_value     VARCHAR(50)  NULL,
   created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,12 +1,45 @@
-﻿# GUIDES TEST MANUAL QA - Fonko Gemini
+﻿# GUIDES TEST MANUAL QA - Micropage E-Sparepart
 
-> **Total Test: 92** (NFR: 4, AUTH: 8, USR: 17, RBAC: 8, FORM: 6, APP: 9, STOK: 2, MON: 4, REP: 3, EXP: 5, UI: 18, E2E: 8)
+> **86 test manual** di guide ini + **102 test otomatis** di `public/qa-test.html`. Rincian per section ada di [Ringkasan](#-ringkasan-per-section). Angka lama "Total Test: 100" tidak pernah akurat dan sudah dihapus.
 >
-> **Terakhir diperbarui:** 28 September 2026
+> **Terakhir diperbarui:** 30 September 2026
 >
 > **Tips kemudahan:** Semua data yang dibutuhkan (username, password, itemCode, `no_registrasi`, dst.) **sudah dicantumkan langsung di catatan ini** — cukup **copy-paste** dari tabel/data di bawah, TANPA perlu mengambil data dari API.
 
 ---
+
+## 🆕 REVISI 30 SEPTEMBER 2026 (6 permintaan Kak Fadhil)
+
+| # | Permintaan | Yang Diubah | Test Manual |
+|---|---|---|---|
+| 1 | Ganti nama aplikasi | `Fonko Gemini` → **Micropage E-Sparepart** (login & header dashboard) | UI-02 |
+| 2 | Dashboard teknisi menampilkan data sendiri | Kartu **Pengajuan Saya** (Total/Menunggu/Disetujui/Ditolak) menggantikan KPI stok; menu baru **Status Pengajuan Saya** dengan stepper approval | MON-01, UI-03 |
+| 3 | Urgensi ditentukan atasan | Form BQ tidak lagi punya pemilih urgency; backend memaksa `Normal`. Supervisor/Manager punya dropdown urgency di tabel approval + audit trail | RBAC-08b, MON-02b, UI-20 |
+| 4 | Tampilkan lokasi rak | Menu **Layout Rak** untuk semua role; `GET /api/spareparts/rak` mengelompokkan kolom `Lokator` jadi rak/baris/kolom | MON-01c, MON-01d |
+| 5 | BQ Summary → rekapan full approve | Menu **Rekapan Pengajuan**; hanya menghitung SPV=Disetujui **Dan** MGR=Disetujui, ditambah rekap per teknisi | MON-01b |
+| 6 | Hide opsi critical untuk teknisi | Teknisi **tidak** melihat tile "Critical Part List" maupun kartu KPI Critical | UI-03 |
+
+> **Catatan menjalankan revisi ini:** server harus **direstart** setelah perubahan backend (`node server.js` dijalankan tanpa `--watch`). Endpoint baru `/api/spareparts/rak`, query baru `?username=` / `?full_approved=1`, serta mode baru `?unlocated=1` baru aktif setelah restart.
+
+---
+
+## 🔧 PERBAIKAN 30 SEPTEMBER 2026 (hasil audit data & kode)
+
+| # | Temuan | Perbaikan | Test |
+|---|---|---|---|
+| 1 | Backend hanya menerima 5 nilai `status_pengadaan`, sedangkan CHECK constraint DB (**dan** `database/supabase_schema.sql`) mengizinkan 8. Akibatnya nilai `PO Open`, `Mencari Penawaran`, dan `Selesai` ditolak backend, dan **24 baris existing** bernilai `Selesai` tidak punya opsi terpilih di dropdown (browser menampilkan `BQ Baru` padahal DB `Selesai` — rawan tertimpa) | Whitelist `STATUS_PENGADAAN` di backend, frontend, dan urutan bar pipeline diseragamkan ke 8 nilai yang sama persis dengan DB | APP-09 |
+| 2 | **2247 dari 3022** sparepart (74%) tidak punya lokasi rak yang bisa dipakai, sehingga tidak muncul di Layout Rak dan teknisi bisa mencari barang yang tidak ada | Tab **"Belum Ada Lokasi"** (`?unlocated=1`) berisi daftar server-side dengan pencarian, pagination, penanda alasan, serta badge `KRITIS` / `STOK 0` | RAK-05, RAK-06, MON-01d |
+| 3 | **154 item** dengan format ringkas `M3`, `L3`, `E1` tidak terbaca sebagai rak → tercebur ke satu wok `LAINNYA` | Parser recognizes bentuk ringkas sebagai rak + baris; cakupan grid naik dari 548 menjadi 775 item unik | RAK-04 |
+| 4 | **3 item** punya dua lokasi dalam satu kolom (`G-3-7 dan G-3-8`, `S-2-1 dan S-2-2`, `N3 dan R-3-14 dan R-3-12`) dan hilang dari grid | Lokasi dipecah per token; item tetap dihitung satu kali pada `total_item`, tapi muncul di tiap sel. Field baru `total_penempatan` | RAK-03 |
+| 5 | `D-1-18-B` gagal diparse sehingga ikut tampil literal sebagai kode kolom | Normalisasi tanda hubung di akhir → kolom `18B` | RAK-04 |
+| 6 | Typo lokasi memecah satu tempat jadi 3 grup: `Ruang Filter`(20) + `Ruang filter`(2) + `Ruang Flter`(1) | Peta `ZONA_CANONIK` menggabungkan varian yang merujuk tempat sama → satu grup `Ruang Filter` (23 item) | RAK-02 |
+| 7 | 15 lokasi non-rak ditumpuk dalam satu grup `LAINNYA` (155 item) sehingga tidak bisa dicari satu per satu | Zona jadi grup bernama sendiri bertipe `zona` (amber), diurutkan setelah rak A–Z | RAK-02 |
+| 8 | `Not Located` dan angka sisa (`0`, `1`) diperlakukan sebagai nama lokasi | Dikenali sebagai "belum ada lokasi" dan masuk tab **Tanpa Lokasi** | RAK-05 |
+
+> **Tidak ada migrasi database yang dibutuhkan.** Semua kolom (`urgency`, `lokasi_rak`) dan constraint yang dipakai sudah ada di Supabase; yang berubah hanya kode aplikasi.
+
+---
+
 
 ## ✅ CARA MULAI JALAN
 
@@ -220,23 +253,34 @@
 > 2. **Waktu** — tanggal & jam pengajuan
 > 3. **Teknisi** — nama + username + No. EJO/mesin
 > 4. **Barang** — `item_code` + deskripsi + purpose/pcs
-> 5. **Urgensi** — Normal / Urgent
+> 5. **Urgensi** — **dropdown** Normal / Urgent (hanya Supervisor & Manager) / **badge baca-saja** (Officer)
 > 6. **Qty** — jumlah diminta
 > 7. **Status Approval** — badge **SPV** (atas) + **MGR** (bawah)
 > 8. **Status Pengadaan** — **dropdown** (hanya Officer & Manager) / **badge baca-saja** (Supervisor)
 > 9. **Aksi** (paling kanan) — tombol **Approve** (hijau) / **Reject** (merah) sesuai role + ikon **Riwayat** (abu, bergambar history)
 >
+> **Revisi 30 Sep 2026 — kolom Urgensi jadi dropdown:**
+> - Setelah revisi, **teknisi tidak lagi memilih urgency saat submit**. Field "Status Urgensi" di form BQ Personal diganti teks *Diisi oleh Supervisor*, dan backend memaksa nilai `Normal` walau teknisi mengirim `Urgent`.
+> - **Supervisor & Manager** yang menentukan urgency lewat dropdown di kolom 5. **Officer** hanya melihat badge (tidak punya dropdown).
+> - Perubahan ini tercatat di audit trail dengan field `urgency` (`Normal → Urgent` atau sebaliknya).
+>
 > **Yang tampil di kolom Aksi per role:**
 > - Teknisi (`AAA`) → tidak bisa membuka menu ini (lihat RBAC-08)
-> - Supervisor (`INN`/`KAA`) → tombol hijau **Approve** + merah **Reject** (tahap SPV); kolom 8 baca-saja
-> - Officer (`ANS`) → dropdown Status Pengadaan (kolom 8); tanpa tombol approve
-> - Manager (`KSW`) → dropdown Status Pengadaan (kolom 8) + tombol hijau **Approve** + merah **Reject** (tahap MGR; redup kalau SPV belum Disetujui)
+> - Supervisor (`INN`/`KAA`) → tombol hijau **Approve** + merah **Reject** (tahap SPV) + **dropdown Urgensi**; kolom 8 baca-saja
+> - Officer (`ANS`) → dropdown Status Pengadaan (kolom 8); kolom Urgensi badge baca-saja; tanpa tombol approve
+> - Manager (`KSW`) → dropdown Status Pengadaan (kolom 8) + **dropdown Urgensi** + tombol hijau **Approve** + merah **Reject** (tahap MGR; redup kalau SPV belum Disetujui)
 > - Ikon **Riwayat** = buka kronologi audit (field, status lama → baru, aktor & waktu)
 
 **RBAC-08: Teknisi tidak punya akses ubah status**
 - Login: `AAA` / `04AAA10`
 - Langkah: lihat tile/menu di dashboard
-- Expected: menu Teknisi hanya **BQ Personal**, **On Hand Stock**, dan **BQ Summary** — **TIDAK ADA tile "Approval BQ"**. Karena tidak ada menu-nya, teknisi mustahil mengubah status apa pun. (Aturan backend 403: `Anda tidak memiliki akses untuk mengubah status pengajuan`)
+- Expected: menu Teknisi berisi **BQ Personal**, **Status Pengajuan Saya**, **On Hand Stock**, **Layout Rak**, dan **Rekapan Pengajuan** — **TIDAK ADA tile "Approval BQ"** dan **TIDAK ADA tile "Critical Part List"**. Karena tidak ada menu approval, teknisi mustahil mengubah status approval/pengadaan. (Aturan backend 403: `Anda tidak memiliki akses untuk mengubah status pengajuan`)
+
+**RBAC-08b: Teknisi tidak boleh menentukan urgency**
+- Login: `AAA` / `04AAA10` → buka **BQ Personal**
+- Langkah: isi form pengajuan baru
+- Expected: **tidak ada** pemilih "Status Urgensi"; yang tampil teks *Kamu cukup mengajukan — Supervisor yang menentukan level urgensinya*. Setelah submit, pengajuan tersimpan dengan `urgency = Normal`.
+- Verifikasi API (opsional): `PUT /api/pengajuan/:id/status` body `{"username":"AAA","urgency":"Urgent"}` → **403** `Status urgensi hanya bisa ditentukan oleh Supervisor / Manager.`
 
 **RBAC-09: Supervisor tidak bisa approve tahap Manager**
 - Login: `INN` / `30INN11` → buka **Approval BQ Tahap Supervisor**
@@ -262,8 +306,9 @@
 - Expected: `Anda harus login terlebih dahulu` (401) — tidak bisa dilakukan lewat UI
 
 **RBAC-14: Teknisi hanya melihat data sendiri**
-- Login: `AAA` / `04AAA10` → buka **BQ Summary**
-- Expected: ringkasan hanya berisi pengajuan milik `AAA` (Total Pengajuan = jumlah punya AAA); tidak ada data user lain
+- Login: `AAA` / `04AAA10`
+- Langkah: buka **Status Pengajuan Saya** (atau lihat kartu **Pengajuan Saya** di dashboard)
+- Expected: daftar hanya berisi pengajuan milik `AAA`; tidak ada data user lain. Setiap kartu menampilkan stepper `Diajukan → Supervisor → Manager → Disetujui` (atau `Ditolak` bila gagal di salah satu tahap). Pencarian & filter status berfungsi.
 
 **RBAC-15: KAA (Supervisor 2) berhasil approve SPV**
 - Login: `KAA` / `KAA1910` → buka **Approval BQ Tahap Supervisor**
@@ -277,7 +322,7 @@
 **FORM-05: Pengajuan valid berhasil dibuat**
 - Login: `AAA` / `04AAA10` → klik tile **BQ Personal** (buka Form Pengajuan BQ)
 - Item Code: di kolom Item Code **ketik "O-50834"** → di daftar hasil yang muncul klik `O-50834-00` (Autoclave Fedegari…) → kode terisi otomatis
-- Data lain: `qty: 2`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/05/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi test manual QA`, `jenis: Sparepart`, `urgency: Normal`
+- Data lain: `qty: 2`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/05/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi test manual QA`, `jenis: Sparepart` — **tidak ada** field urgency (diisi Supervisor)
 - Klik **KIRIM PENGAJUAN**
 - Expected: alert `Pengajuan Berhasil`; `no_registrasi` (bentuk `BQ-2026-09-..-....`) tampil di **Approval BQ Tahap Supervisor** (login `KAA`); qty_diminta = `2`
 
@@ -301,7 +346,7 @@
 
 **FORM-13: Pengajuan jasa (tanpa itemCode) berhasil**
 - Login: `AAA` / `04AAA10` → **BQ Personal** → pilih `jenis: Jasa (JA/BR)` → muncul kotak **Keterangan Jasa**
-- Data: item code **dibiarkan kosong**, `qty: 1`, `uom: Job`, `purpose: EJO`, `no_ejo: EJO/QA/13/2026`, `mesin_area: Mesin Capping VCM200`, `spesifikasi: Jasa kalibrasi test manual QA`, `urgency: Normal`
+- Data: item code **dibiarkan kosong**, `qty: 1`, `uom: Job`, `purpose: EJO`, `no_ejo: EJO/QA/13/2026`, `mesin_area: Mesin Capping VCM200`, `spesifikasi: Jasa kalibrasi test manual QA` — **tidak ada** field urgency (diisi Supervisor)
 - Expected: Berhasil (201); `no_registrasi` tersedia; item code tidak wajib
 
 ---
@@ -330,7 +375,7 @@
 
 **APP-13: Alur lengkap Teknisi -> SPV -> Officer -> Manager (BQS-01)**
 - Login: `AAA` / `04AAA10` → klik tile **BQ Personal**
-- Data: Item Code cari/ketik `O-50834` → pilih `O-50834-00`; `qty: 1`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi untuk test alur lengkap`, `jenis: Sparepart`, `urgency: Normal`
+- Data: Item Code cari/ketik `O-50834` → pilih `O-50834-00`; `qty: 1`, `uom: PCS`, `purpose: CONSUMABLE`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi untuk test alur lengkap`, `jenis: Sparepart` — **tidak ada** field urgency (diisi Supervisor)
 - Klik **KIRIM PENGAJUAN** → catat `no_registrasi` hasilnya sebagai `[no]`
 - Expected: Berhasil (201)
 
@@ -367,14 +412,44 @@
 
 ## 📊 SECTION 7: MON (Monitoring / Auditable)
 
-**MON-01: Ringkasan pengajuan milik Teknisi (BQ Summary)**
+**MON-01: Ringkasan pengajuan milik Teknisi (Status Pengajuan Saya)**
 - Login: `AAA` / `04AAA10`
-- Langkah: klik tile **BQ Summary**
-- Expected: ringkasan hanya dari pengajuan milik `AAA` (Total Pengajuan = jumlah punya AAA; tidak ada data user lain); isi total sesuai DB (**>= 1481**, live per 23 Sep 2026: **1493**)
+- Langkah: lihat dashboard, lalu klik tile **Status Pengajuan Saya**
+- Expected: kartu **Pengajuan Saya** tampil dengan 4 angka (Total / Menunggu Atasan / Sudah Disetujui / Ditolak Atasan) yang hanya menghitung pengajuan `AAA`. Modal menampilkan tiap pengajuan + stepper approval. KPI stok **tidak** tampil, dan kartu **Critical** disembunyikan.
+
+**MON-01b: Rekapan Pengajuan hanya menghitung yang FULL APPROVE**
+- Login: role apa pun yang punya menu **Rekapan Pengajuan** (mis. `KSW`)
+- Langkah: klik tile **Rekapan Pengajuan**
+- Expected: kartu **Total Disetujui Penuh** = jumlah pengajuan dengan SPV **Dan** Manager sama-sama `Disetujui`; blok **Rekap per Teknisi** (6 orang, diurutkan dari total terbesar); blok **Pipeline Pengadaan**. Blok **Status Approval** yang lama sudah **tidak ada**. Bila belum ada yang full approve, tampil pesan *Belum ada pengajuan disetujui penuh*.
+- Verifikasi API (opsional): `GET /api/pengajuan/bq-summary` → `summary.perTeknisi` = jumlah teknisi, jumlah `perTeknisi[].total` = `summary.total`, jumlah `pipeline` = `summary.total`.
+
+**MON-01c: Layout Rak Gudang dari kolom Lokator**
+- Login: role apa pun (mis. `AAA`)
+- Langkah: klik tile **Layout Rak**
+- Expected: modal menampilkan tab **Semua** + tab per rak (A–T) + tab **Zona** + tab **Belum Ada Lokasi**, grid **Baris × Kolom** dengan kode item, dan info jumlah rak/zona + item/pcs. Ketik di kolom cari → grid menyaring. Item kritis diberi badge **KRITIS**; stok di bawah minimum diberi ikon peringatan.
+- Expected: bila ada item dengan 2+ lokasi (mis. `G-3-7 dan G-3-8`), info bar menambahkan keterangan jumlah item tersebut, dan item itu muncul di **setiap** sel rak yang terkait.
+- Expected (normalisasi): bentuk ringkas tanpa tanda hubung (`M3`, `L3`, `E1`) terbaca sebagai rak + baris; `D-1-18-B` tampil sebagai kolom `18B` (bukan `18-B`). Varian typo yang merujuk tempat sama digabung, mis. `Ruang Filter` + `Ruang filter` + `Ruang Flter` jadi **satu** grup `Ruang Filter`.
+- Expected: grup **Zona** berisi lokasi yang bukan kode rak bernomor (`Ruang Filter`, `Flammable`, `Rak Kabel`, `Box Kennedy`, `WWTP`, …) dengan header amber. **Tidak ada lagi** grup `LAINNYA`.
+- Verifikasi API (opsional): `GET /api/spareparts/rak` → `count = 35` grup (20 rak + 15 zona), `total_item = 775`, `total_penempatan = 779`, `belum_ber_lokasi = 2247`, `total_katalog = 3022`, dan `total_item + belum_ber_lokasi = total_katalog`.
+
+**MON-01d: Tab "Belum Ada Lokasi"**
+- Login: role apa pun (mis. `AAA`)
+- Langkah: klik tile **Layout Rak** → tab **Belum Ada Lokasi**
+- Expected: banner amber menjelaskan bahwa data ini tidak muncul di grid Layout Rak karena kolom Lokator kosong/tidak bisa dipetakan; info bar menyebut jumlah item, jumlah **kritis**, dan jumlah **stok habis**. Item kritis didahulukan (badge `KRITIS`), stok 0 diberi badge `STOK 0`, dan kolom pertama menjelaskan alasannya (`kosong`, `isi sel sisa`, `tertulis "Not Located"`).
+- Expected: ketik di kolom cari → daftar menyaring **di server** (debounce ±350 ms). Tombol **Sebelumnya / Berikutnya** berpindah halaman 50 baris tanpa tumpang tindih; tombol mati di ujung.
+- Verifikasi API (opsional): `GET /api/spareparts/rak?unlocated=1&limit=50&offset=0` → `total = 2247`, `kritis = 131`, `stok_habis = 1887`; `&q=microswitch` → 7 hasil; `&limit=9999` → `limit = 200`; `&offset=-3` → `offset = 0`.
+- Catatan: angka `2247` = 2243 baris kosong + 2 `"Not Located"` + 2 angka sisa (`0`, `1`). `Not Located` sengaja tidak dijadikan grup rak supaya teknisi terdorong melengkapinya, bukan sia-sia mencari rak yang memang tidak ada.
 
 **MON-02: Tabel Approval BQ menampilkan kolom yang benar**
 - Login: `KSW` / `01KSW10` → buka **Approval BQ Urgent**
 - Expected: header tabel 9 kolom: `No. Registrasi, Waktu, Teknisi, Barang, Urgensi, Qty, Status Approval (SPV+MGR), Status Pengadaan, Aksi`; detail baris memuat `no_registrasi, timestamp, username_teknisi, nama_teknisi, item_code, deskripsi, qty_diminta, uom, purpose, no_ejo, mesin_area, status_approval_spv, status_pengadaan, status_approval_manager`
+- Kolom **Urgensi** berisi **dropdown** Normal/Urgent karena Manager boleh mengubahnya.
+
+**MON-02b: Supervisor dapat mengubah urgency**
+- Login: `INN` / `30INN11` → buka **Approval BQ Tahap Supervisor**
+- Langkah: pada satu baris, ubah dropdown **Urgensi** dari `Normal` ke `Urgent`
+- Expected: tersimpan; badge berubah jadi merah **Urgent**. Buka ikon **Riwayat** → ada entri baru `Urgensi: Normal → Urgent` oleh `INN (Supervisor 1)`.
+- Ulangi langkah yang sama dengan login `ANS` (Officer) → Expected: **tidak ada** dropdown urgency (hanya badge), dan kolom Status Pengadaan yang punya dropdown.
 
 **MON-03: Rentang data terisi otomatis**
 - Login: `KSW` / `01KSW10` → buka **Monthly Report**
@@ -447,13 +522,16 @@
 - Expected: Form login dengan field username & password, tombol Login
 
 **UI-02: Header aplikasi brand baru**
-- Expected: Header / navbar menampilkan **Fonko Gemini** (bukan Micropage E-Sparepart)
+- Expected: Header / navbar menampilkan **Micropage E-Sparepart** (bukan Fonko Gemini)
 
 **UI-03: Navigasi menu lengkap sesuai peran**
 - Login: `AAA` / `04AAA10`
-- Expected: dashboard Teknisi memuat tile: **BQ Personal**, **On Hand Stock**, **BQ Summary** — dan **tidak ada** tile "Approval BQ". (Role Supervisor/Officer/Manager menambah tile **Approval BQ Tahap Supervisor** / **Approval BQ Urgent**, **Critical Part**, **Monthly Report**, **PR Summary** sesuai role)
-- Expected tambahan (update 26 Sep 2026): login `KSW` / `01KSW10` → dashboard Manager memuat **7 tile**: **Approval User**, **Log Aktivitas**, **BQ Summary**, **Approval BQ**, **Critical Part**, **On Hand Stock**, **Monthly Report** — **tanpa** tile "BQ Personal".
-- Expected tambahan: login `ANS` / `ANS1805` (Officer) → **tidak ada** tile "Approval User" & "Log Aktivitas" (khusus Manager).
+- Expected: dashboard Teknisi memuat **5 tile**: **BQ Personal**, **Status Pengajuan Saya**, **On Hand Stock**, **Layout Rak**, **Rekapan Pengajuan** — dan **tidak ada** tile "Approval BQ" maupun "Critical Part List".
+- Expected (update 30 Sep 2026): dashboard Teknisi menampilkan kartu **Pengajuan Saya** (bukan KPI stok), dan kartu KPI **Critical** disembunyikan.
+- Expected: Role Supervisor/Officer/Manager menambah tile **Approval BQ Tahap Supervisor** / **Approval BQ Urgent**, **Critical Part**, **Monthly Report**, **PR Summary** sesuai role. Semua role punya **Layout Rak** dan **Rekapan Pengajuan**.
+- Expected tambahan (update 26 Sep 2026): login `KSW` / `01KSW10` → dashboard Manager memuat **8 tile**: **Approval User**, **Log Aktivitas**, **On Hand Stock**, **Layout Rak**, **Monthly Report**, **Rekapan Pengajuan**, **Approval BQ Urgent**, **Critical Part** — **tanpa** tile "BQ Personal".
+- Expected tambahan: login `INN` / `30INN11` (Supervisor 1) → **7 tile**; login `ANS` / `ANS1805` (Officer) → **5 tile** dan **tidak ada** tile "Approval User" & "Log Aktivitas" (khusus Manager).
+- Expected: nama menu "BQ Summary" **sudah diganti** menjadi "Rekapan Pengajuan" di semua role.
 
 **UI-04: Search monitoring berfungsi**
 - Login: `KAA` / `KAA1910` → buka **Approval BQ Tahap Supervisor**
@@ -472,7 +550,7 @@
 
 **UI-08: Dropdown bulk action**
 - Langkah: Pilih beberapa baris via checklist
-- Expected: Muncul dropdown aksi (pilihan: *Proses PO*, *Ditolak*, *PO Open*, *Mencari Penawaran*, *Barang Dikirim*, *Tiba di Gudang*, *Completed* dsb.)
+- Expected: Muncul dropdown aksi (pilihan: *Proses PO*, *Ditolak*, *PO Open*, *Mencari Penawaran*, *Barang Dikirim*, *Tiba di Gudang*, *Selesai* dsb.)
 
 **UI-09: Tombol export**
 - Login: `AAA` / `04AAA10`
@@ -494,7 +572,7 @@
 
 **E2E-01: Teknisi membuat pengajuan**
 - Login: `AAA` / `04AAA10` → klik tile **BQ Personal**
-- Item Code: **ketik "O-50834"** → klik hasil `O-50834-00`; lalu `qty: 2`, `uom: PCS`, `purpose: EJO`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi QA alur E2E`, `jenis: Sparepart`, `urgency: Normal`
+- Item Code: **ketik "O-50834"** → klik hasil `O-50834-00`; lalu `qty: 2`, `uom: PCS`, `purpose: EJO`, `no_ejo: EJO/QA/E2E/2026`, `mesin_area: Mesin Capping VCM200`, `merk: QATest`, `spesifikasi: Spesifikasi QA alur E2E`, `jenis: Sparepart` — **tidak ada** field urgency (diisi Supervisor)
 - Klik **KIRIM PENGAJUAN**
 - Expected: Berhasil (201). **Catat `no_registrasi` hasilnya → pakai sebagai `[no]` di test berikutnya**
 
@@ -550,23 +628,29 @@
 
 ## 📊 RINGKASAN PER SECTION
 
-| Section | Jumlah Test | ID Test |
-|---|---|---|
-| NFR | 4 | NFR-07, NFR-04, NFR-06, NFR-10 |
-| AUTH | 8 | AUTH-01..07, AUTH-11 |
-| **USR** *(baru)* | **17** | **USR-01..USR-17** |
-| RBAC | 8 | RBAC-08..RBAC-15 |
-| FORM | 6 | FORM-05, FORM-06, FORM-08, FORM-09, FORM-12, FORM-13 |
-| APP | 9 | APP-09..APP-13, BQS-01, BQS-02, MON-RPT, MON-RPT2 |
-| STOK | 2 | STOK-01, STOK-02 |
-| MON | 4 | MON-01, MON-02, MON-03, MON-09 |
-| REP | 3 | REP-05, REP-06, REP-07 |
-| EXP | 5 | EXP-01, EXP-04, EXP-05, EXP-06, EXP-07 |
-| UI | 18 | UI-01..UI-18 |
-| E2E | 8 | E2E-01..E2E-08 |
-| **TOTAL** | **92** | |
+> Angka di bawah dihitung dari isi file, bukan ditetapkan manual: kolom **Manual** = jumlah heading `**ID: ...**` di guide ini; kolom **Otomatis** = jumlah `{ id: '...' }` di `qa-test.html`. Tanda `*` berarti ID **hanya ada di runner otomatis** (skenarionya sudah tercakup di guide, tapi tidak punya bagian manual tersendiri).
 
-> Hasil terakhir otomatis (27 Sep 2026, `node run-qa-test.js`): **88 PASS · 0 FAIL · 0 SKIP**. Tambahan 4 tes manual baru (UI-15..UI-18: tour, `?tour=off`, favicon, "Ingat saya") belum masuk runner otomatis — jalankan manual via browser.
+| Section | Manual di guide | Otomatis di `qa-test.html` | ID |
+|---|---:|---:|---|
+| NFR *(non-functional)* | 4 | 4 | `NFR-04`, `NFR-06`, `NFR-07`, `NFR-10` |
+| AUTH | 8 | 8 | `AUTH-01`, `AUTH-02`, `AUTH-03`, `AUTH-04`, `AUTH-05`, `AUTH-06`, `AUTH-07`, `AUTH-11` |
+| USR *(user mgmt)* | 9 | 17 | `USR-01`, `USR-02`, `USR-05`, `USR-06`, `USR-07`, `USR-08`, `USR-09`, `USR-10`, `USR-13`, `USR-03`*, `USR-04`*, `USR-11`*, `USR-12`*, `USR-14`*, `USR-15`*, `USR-16`*, `USR-17`* |
+| RBAC | 9 | 8 | `RBAC-08`, `RBAC-08b`, `RBAC-09`, `RBAC-10`, `RBAC-11`, `RBAC-12`, `RBAC-13`, `RBAC-14`, `RBAC-15` |
+| FORM | 6 | 6 | `FORM-05`, `FORM-06`, `FORM-08`, `FORM-09`, `FORM-12`, `FORM-13` |
+| APP *(approval)* | 5 | 9 | `APP-09`, `APP-10`, `APP-11`, `APP-12`, `APP-13`, `APP-14`*, `APP-15`*, `APP-16`*, `APP-17`* |
+| STOK | 2 | 2 | `STOK-01`, `STOK-02` |
+| RAK *(layout rak)* | — | 6 | `RAK-01`*, `RAK-02`*, `RAK-03`*, `RAK-04`*, `RAK-05`*, `RAK-06`* |
+| MON *(monitoring)* | 8 | 4 | `MON-01`, `MON-01b`, `MON-01c`, `MON-01d`, `MON-02`, `MON-02b`, `MON-03`, `MON-09` |
+| BQS *(rekapan)* | 1 | 3 | `BQS-02`, `BQS-01`*, `BQS-03`* |
+| REP *(report)* | 3 | 3 | `REP-05`, `REP-06`, `REP-07` |
+| EXP *(export)* | 5 | 5 | `EXP-01`, `EXP-04`, `EXP-05`, `EXP-06`, `EXP-07` |
+| UI | 18 | 19 | `UI-01` … `UI-18`, `UI-19`*, `UI-20`*, `UI-21`* |
+| E2E | 8 | 8 | `E2E-01` … `E2E-08` |
+| **TOTAL** | **86** | **102** | |
+
+> Padanan skenario manual yang menjalankan test otomatis: `MON-01b`→`BQS-01/03`, `MON-01c`→`RAK-01..04`, `MON-01d`→`RAK-05/06`, `MON-02b`→`APP-15/16`, `RBAC-08b`→`APP-15`, `UI-15`/`UI-16`→`UI-15..18`.
+>
+> Hasil terakhir runner otomatis (27 Sep 2026, `node run-qa-test.js`): **88 PASS · 0 FAIL · 0 SKIP** — angka itu dari sebelum penambahan `RAK-03..06`, jadi jalankan ulang setelah restart server untuk angka terbaru.
 > Tombol hijau **"Export Hasil"** di `qa-test.html` menghasilkan file JSON berisi ringkasan + log lengkap.
 
 > Semua field input sudah disiapkan di atas. Tinggal **copy-paste data** → isi → bandingkan hasil dengan Expected.
