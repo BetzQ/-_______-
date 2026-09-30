@@ -309,7 +309,7 @@
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
         <div>
           <h3 id="stok-modal-title" class="text-white font-bold text-lg leading-tight">Daftar Stok Sparepart</h3>
-          <p id="stok-modal-sub" class="text-slate-400 text-xs mt-0.5">Data real-time dari database lokal</p>
+          <p id="stok-modal-sub" class="text-slate-400 text-xs mt-0.5">Data real-time dari server</p>
         </div>
         <button type="button" onclick="closeModal('modal-stok')"
           class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors">
@@ -966,7 +966,7 @@
     const STOK_PER_PAGE = 25;
 
     const STOK_TITLES = {
-      all: ['Daftar Stok Sparepart', 'Data real-time dari database lokal'],
+      all: ['Daftar Stok Sparepart', 'Data real-time dari server'],
       critical: ['Critical Part List', 'Sparepart kritis yang wajib tersedia on-hand'],
       low: ['Item Stok Rendah (≤ Min)', 'Item yang berada di bawah / sama dengan batas minimum'],
       out: ['Item Stok Habis', 'Item dengan stok on-hand nol'],
