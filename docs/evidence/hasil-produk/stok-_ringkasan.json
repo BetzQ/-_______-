@@ -1,0 +1,26 @@
+{
+  "base": "https://e-sparepart-system-tau.vercel.app",
+  "waktu": "2026-09-30T17:21:00.421Z",
+  "hasil": [
+    {
+      "role": "teknisi",
+      "status": "ok"
+    },
+    {
+      "role": "spv1",
+      "status": "ok"
+    },
+    {
+      "role": "spv2",
+      "status": "ok"
+    },
+    {
+      "role": "officer",
+      "status": "ok"
+    },
+    {
+      "role": "manager",
+      "status": "ok"
+    }
+  ]
+}
