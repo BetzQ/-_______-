@@ -320,7 +320,8 @@ async function listRegistrations(req, res) {
 
 /** Cari supervisor_id berdasarkan tim yang dipilih (SPV1 / SPV2 / Officer). */
 async function resolveSupervisorId(tim) {
-  const target = String(tim || '').toLowerCase();
+  const target = String(tim || '').trim().toLowerCase();
+  // Ambil supervisor yang sesuai role/tim
   const { rows } = await pool.query(
     sql`SELECT id FROM users WHERE LOWER(role) = {1} ORDER BY id ASC LIMIT 1`,
     [target]

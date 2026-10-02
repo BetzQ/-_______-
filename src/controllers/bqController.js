@@ -1,12 +1,32 @@
 const pool = require('../config/database');
 const { logActivity } = require('./userManagementController');
 
-function buildNoRegistrasi() {
+// Nomor registrasi format seragam: BQ-YYYYMMDD-NNNN dengan NNNN angka
+// urut per hari (bukan 4 digit terakhir milidetik yang bisa bentrok).
+//Suffix panjang 4 digit di-zero-pad, jadi urutan DESC pada teks = urutan angka.
+async function buildNoRegistrasi() {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   const date = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
-  const suffix = Date.now().toString().slice(-4);
-  return `BQ-${date}-${suffix}`;
+  const prefix = `BQ-${date}-`;
+  try {
+    const { rows } = await pool.query(
+      `SELECT no_registrasi FROM pengajuan_bq
+        WHERE no_registrasi LIKE $1 AND no_registrasi ~ ('^' || $2 || '[0-9]{4}$')
+        ORDER BY no_registrasi DESC LIMIT 1`,
+      [`${prefix}%`, prefix]
+    );
+    if (rows.length > 0) {
+      const lastSeq = parseInt(String(rows[0].no_registrasi).slice(prefix.length), 10);
+      if (!isNaN(lastSeq) && lastSeq >= 0) {
+        return prefix + String(lastSeq + 1).padStart(4, '0');
+      }
+    }
+    return prefix + '0001';
+  } catch (err) {
+    console.error('[buildNoRegistrasi Error]', err.message);
+    return prefix + String(Date.now()).slice(-4);
+  }
 }
 
  async function createPengajuan(req, res) {
@@ -87,18 +107,38 @@ function buildNoRegistrasi() {
       sparepartItem = sp.item_code;
     }
 
-    const noRegistrasi = buildNoRegistrasi();
-
-    await pool.query(
-      `INSERT INTO pengajuan_bq
-        (no_registrasi, user_id, item_code, qty_diminta, uom, spesifikasi_lengkap,
-         purpose, no_ejo, mesin_area, merk, referensi_penawaran,
-         jenis_pengajuan, urgency, status_approval_spv, status_approval_manager, status_pengadaan)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'Menunggu', 'Menunggu', 'BQ Baru')`,
-      [noRegistrasi, user.id, sparepartItem, qtyN, uomV, spesifikasi,
-       purposeV, noEjoV, areaV, merkV, refV,
-       jenisV, urgencyV]
-    );
+    // no_registrasi adalah primary key. Kalau dua teknisi submit persis
+    // bersamaan dan nomor sama-sama terpakai, ambil nomor berikutnya lalu
+    // coba lagi (maks 5x) supaya tidak ada pengajuan yang hilang.
+    let noRegistrasi = await buildNoRegistrasi();
+    let inserted = false;
+    for (let attempt = 0; attempt < 5 && !inserted; attempt++) {
+      try {
+        await pool.query(
+          `INSERT INTO pengajuan_bq
+            (no_registrasi, user_id, item_code, qty_diminta, uom, spesifikasi_lengkap,
+             purpose, no_ejo, mesin_area, merk, referensi_penawaran,
+             jenis_pengajuan, urgency, status_approval_spv, status_approval_manager, status_pengadaan)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'Menunggu', 'Menunggu', 'BQ Baru')`,
+          [noRegistrasi, user.id, sparepartItem, qtyN, uomV, spesifikasi,
+           purposeV, noEjoV, areaV, merkV, refV,
+           jenisV, urgencyV]
+        );
+        inserted = true;
+      } catch (insErr) {
+        if (insErr.code === '23505') {           // unique_violation
+          noRegistrasi = await buildNoRegistrasi();
+          continue;
+        }
+        throw insErr;
+      }
+    }
+    if (!inserted) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Gagal membuat nomor registrasi otomatis. Silakan coba lagi.',
+      });
+    }
 
     // Log aktivitas: buat pengajuan (aksi mengubah data).
     await logActivity(
@@ -535,60 +575,144 @@ async function getPengajuanLog(req, res) {
 
 /**
  * GET /api/pengajuan/summary
- * PR Summary: daftar pengajuan yang masih Menunggu approval SPV.
- * Dapat diakses Manager dan Supervisor 1 saja.
- * (Catatan: filter per tim membutuhkan kolom supervisor_id di tabel users — perlu migrate DB.)
+ * PR Summary (read-only): seluruh data pengajuan, bukan hanya yang Menunggu.
+ * Query param:
+ *   username   (wajib)  - penanda login
+ *   status     - 'Menunggu' | 'Disetujui' | 'Ditolak' | 'semua' (default: semua)
+ *   filterTim  - 'tim' (default Supervisor 1) | 'semua'
+ *   q          - pencarian bebas (no registrasi / teknisi / item / EJO)
+ *   page, limit- paginasi (default 25)
+ * Akses: Supervisor 1 dan Manager.
+ * Read-only: halaman ini tidak mengubah status apa pun. Approve/reject hanya
+ * di Monitoring & Approval BQ supaya Urgensi selalu ikut terisi.
  */
 async function getPengajuanSummary(req, res) {
   try {
-    const { username } = req.query;
+    const { username, status, filterTim, q } = req.query;
+    const page  = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(200, Math.max(10, parseInt(req.query.limit, 10) || 25));
+
     if (!username) {
       return res.status(401).json({ status: 'error', message: 'Anda harus login terlebih dahulu' });
     }
-    const { rows: actorRows } = await pool.query('SELECT id, role, supervisor_id FROM users WHERE username = $1', [username]);
+    const { rows: actorRows } = await pool.query('SELECT id, role FROM users WHERE username = $1', [username]);
     const actor = actorRows[0];
     if (!actor) {
       return res.status(401).json({ status: 'error', message: 'User tidak ditemukan' });
     }
     const roleKey = classifyRole(actor.role);
-    if (roleKey !== 'manager' && actor.role !== 'Supervisor 1') {
+    const isSupervisor = actor.role === 'Supervisor 1';
+    if (roleKey !== 'manager' && !isSupervisor) {
       return res.status(403).json({ status: 'error', message: 'Hanya Manager/Supervisor 1 yang dapat melihat PR Summary' });
     }
-    let query, queryParams;
-    if (actor.role === 'Supervisor 1' && actor.supervisor_id) {
-      query = `SELECT bq.no_registrasi, bq.qty_diminta, bq.spesifikasi_lengkap,
-                      bq.mesin_area, bq.purpose, bq.status_pengadaan, bq.timestamp,
-                      bq.jenis_pengajuan, bq.urgency,
-                      u.name AS nama_teknisi, u.role AS role_pengaju
-                 FROM pengajuan_bq bq
-                 JOIN users u ON u.id = bq.user_id
-                WHERE bq.status_approval_spv = 'Menunggu' AND u.supervisor_id = $1
-                ORDER BY bq.timestamp ASC`;
-      queryParams = [actor.supervisor_id];
-    } else {
-      query = `SELECT bq.no_registrasi, bq.qty_diminta, bq.spesifikasi_lengkap,
-                      bq.mesin_area, bq.purpose, bq.status_pengadaan, bq.timestamp,
-                      bq.jenis_pengajuan, bq.urgency,
-                      u.name AS nama_teknisi, u.role AS role_pengaju
-                 FROM pengajuan_bq bq
-                 JOIN users u ON u.id = bq.user_id
-                WHERE bq.status_approval_spv = 'Menunggu'
-                ORDER BY bq.timestamp ASC`;
-      queryParams = [];
-    }
-    const { rows } = await pool.query(query, queryParams);
 
-    const total = rows.length;
-    const urgent = rows.filter(r => r.urgency === 'Urgent').length;
-    const normal = rows.filter(r => r.urgency === 'Normal').length;
-    const sparepart = rows.filter(r => r.jenis_pengajuan === 'sparepart').length;
-    const jasa = rows.filter(r => r.jenis_pengajuan === 'jasa').length;
+    const whereClauses = [];
+    const params = [];
+    const push = (v) => { params.push(v); return '$' + params.length; };
+
+    // Cakupan tim harus dihitung lebih dulu supaya agregasi KPI bisa memakai
+    // clauses yang sama tanpa mengulang placeholder.
+    // Filter per tim: u.supervisor_id harus dicocokkan dengan actor.id
+    // (id supervisor yang sedang login), bukan actor.supervisor_id.
+    const perTim = isSupervisor && String(filterTim || 'tim') !== 'semua';
+    let filterTimAktif = false;
+    let tanpaBawahan = false;
+    if (perTim) {
+      whereClauses.push(`u.supervisor_id = ${push(actor.id)}`);
+      filterTimAktif = true;
+      const { rows: anakRows } = await pool.query(
+        'SELECT COUNT(*)::int AS n FROM users WHERE supervisor_id = $1',
+        [actor.id]
+      );
+      tanpaBawahan = (anakRows[0]?.n || 0) === 0;
+    }
+    const scopeWhere = whereClauses.length ? ' WHERE ' + whereClauses.join(' AND ') : '';
+
+    // Filter status approval SPV. Default 'semua' supaya supervisor bisa
+    // melihat keseluruhan data PR sesuai permintaan (bukan hanya antrean).
+    const statusV = String(status || 'semua').trim();
+    if (statusV !== 'semua') {
+      whereClauses.push(`bq.status_approval_spv = ${push(statusV)}`);
+    }
+
+    // Pencarian bebas di beberapa kolom sekaligus.
+    const qV = String(q || '').trim();
+    if (qV) {
+      const like = push('%' + qV + '%');
+      whereClauses.push(
+        `(bq.no_registrasi ILIKE ${like} OR u.name ILIKE ${like} OR bq.item_code ILIKE ${like}` +
+        ` OR bq.no_ejo ILIKE ${like} OR bq.spesifikasi_lengkap ILIKE ${like}` +
+        ` OR bq.mesin_area ILIKE ${like} OR bq.purpose ILIKE ${like})`
+      );
+    }
+
+    const whereSql = whereClauses.length ? ' WHERE ' + whereClauses.join(' AND ') : '';
+
+    // KPI memakai scope tim saja (tanpa filter status/pencarian) supaya kartu
+    // rekap tetap menampilkan gambaran utuh cakupan terpilih.
+    const { rows: aggRows } = await pool.query(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Menunggu')::int AS menunggu,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Disetujui')::int AS disetujui,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Ditolak')::int   AS ditolak,
+              COUNT(*) FILTER (WHERE bq.urgency = 'Urgent')::int                 AS urgent,
+              COUNT(*) FILTER (WHERE bq.jenis_pengajuan = 'sparepart')::int      AS sparepart,
+              COUNT(*) FILTER (WHERE bq.jenis_pengajuan = 'jasa')::int           AS jasa
+         FROM pengajuan_bq bq
+         JOIN users u ON u.id = bq.user_id${scopeWhere}`,
+      params
+    );
+    const agg = aggRows[0] || { total: 0, menunggu: 0, disetujui: 0, ditolak: 0, urgent: 0, sparepart: 0, jasa: 0 };
+
+    const { rows: countRows } = await pool.query(
+      `SELECT COUNT(*)::int AS total
+         FROM pengajuan_bq bq
+         JOIN users u ON u.id = bq.user_id${whereSql}`,
+      params
+    );
+    const totalTersaring = (countRows[0] || {}).total || 0;
+
+    const offset = (page - 1) * limit;
+    const { rows } = await pool.query(
+      `SELECT bq.no_registrasi, bq.item_code, sp.deskripsi AS deskripsi_barang,
+              bq.qty_diminta, bq.uom, bq.spesifikasi_lengkap, bq.purpose, bq.no_ejo,
+              bq.mesin_area, bq.merk, bq.status_pengadaan, bq.timestamp,
+              bq.jenis_pengajuan, bq.urgency,
+              bq.status_approval_spv, bq.status_approval_manager,
+              u.name AS nama_teknisi, u.role AS role_pengaju
+         FROM pengajuan_bq bq
+         JOIN users u ON u.id = bq.user_id
+         LEFT JOIN spareparts sp ON sp.item_code = bq.item_code${whereSql}
+        ORDER BY bq.timestamp DESC
+        LIMIT ${push(limit)} OFFSET ${push(offset)}`,
+      params
+    );
+
+    const totalHalaman = Math.max(1, Math.ceil(totalTersaring / limit));
 
     return res.status(200).json({
       status: 'ok',
-      count: total,
+      count: totalTersaring,
+      // total = baris hasil filter (untuk pagination & "X ditemukan")
+      total: totalTersaring,
+      // totalSemua = seluruh data pada cakupan tim, apa pun filter status/pencarian
+      totalSemua: agg.total,
       data: rows,
-      summary: { total, urgent, normal, sparepart, jasa }
+      page,
+      limit,
+      totalHalaman,
+      filterTimAktif,
+      tanpaBawahan,
+      summary: {
+        total: agg.total,
+        menunggu: agg.menunggu,
+        disetujui: agg.disetujui,
+        ditolak: agg.ditolak,
+        urgent: agg.urgent,
+        normal: agg.total - agg.urgent,
+        sparepart: agg.sparepart,
+        jasa: agg.jasa,
+      },
     });
   } catch (error) {
     console.error('[PR Summary Error]', error.message);
@@ -695,16 +819,18 @@ async function getBqSummary(req, res) {
 
 /**
  * GET /api/reports/monthly?year=2026&month=9
- * Laporan bulanan pengajuan BQ:
- * - Rekap per jenis pengajuan
- * - Rekap per urgency
- * - Rekap per status approval
- * - Daftar pengajuan bulan tersebut
- * - Hanya Supervisor 1 & Manager yang boleh akses
+ * GET /api/reports/monthly?all=1          -> seluruh periode
+ * Endpoint resmi Monthly Report. Halaman Monthly Report di web memakai
+ * endpoint ini, bukan menarik seluruh data pengajuan ke browser.
+ *
+ * Definisi status seragam web & backend:
+ *   menunggu / disetujui / ditolak -> status_approval_spv
+ *   fullApproved                   -> SPV disetujui DAN Manager disetujui
  */
 async function getMonthlyReport(req, res) {
   try {
     const now = new Date();
+    const wantAll = String(req.query.all || '') === '1';
     const year  = parseInt(req.query.year, 10)  || now.getFullYear();
     const month = parseInt(req.query.month, 10) || (now.getMonth() + 1);
 
@@ -717,43 +843,106 @@ async function getMonthlyReport(req, res) {
     const endYear   = month === 12 ? year + 1 : year;
     const endDate   = `${endYear}-${String(endMonth).padStart(2, '0')}-01`;
 
-    const { rows } = await pool.query(
-      `SELECT bq.no_registrasi, bq.jenis_pengajuan, bq.urgency,
+    const selectCols = `bq.no_registrasi, bq.jenis_pengajuan, bq.urgency,
               bq.status_approval_spv, bq.status_approval_manager, bq.status_pengadaan,
               bq.qty_diminta, bq.timestamp,
-              u.name AS nama_teknisi, u.role AS role_pengaju
+              u.name AS nama_teknisi, u.role AS role_pengaju`;
+
+    const rangeSql = wantAll ? '' : 'WHERE bq.timestamp >= $1 AND bq.timestamp < $2';
+    const rangeParams = wantAll ? [] : [startDate, endDate];
+
+    // Ringkasan dihitung di database, bukan di browser.
+    const { rows: sumRows } = await pool.query(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE bq.urgency = 'Urgent')::int AS urgent,
+              COUNT(*) FILTER (WHERE bq.jenis_pengajuan = 'sparepart')::int AS sparepart,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Menunggu')::int  AS waiting,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Disetujui')::int AS approved,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Ditolak')::int   AS rejected,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Disetujui'
+                                 AND bq.status_approval_manager = 'Disetujui')::int AS full_approved,
+              COUNT(*) FILTER (WHERE bq.status_approval_spv = 'Disetujui'
+                                 AND bq.status_approval_manager = 'Menunggu')::int  AS waiting_manager
          FROM pengajuan_bq bq
          JOIN users u ON u.id = bq.user_id
-        WHERE bq.timestamp >= $1 AND bq.timestamp < $2
-        ORDER BY bq.timestamp ASC`,
-      [startDate, endDate]
+         ${rangeSql}`,
+      rangeParams
+    );
+    const s = sumRows[0] || {};
+
+    // Pengelompokan grafik juga dihitung di server supaya browser tidak perlu
+    // iterasi ribuan baris setiap kali grafik digambar ulang.
+    const groupQuery = (expr, order) => pool.query(
+      `SELECT ${expr} AS kunci, COUNT(*)::int AS jumlah
+         FROM pengajuan_bq bq
+         JOIN users u ON u.id = bq.user_id
+         ${rangeSql}
+        GROUP BY 1
+        ORDER BY ${order}`,
+      rangeParams
+    );
+    const [bulanRows, approvalRows, pengadaanRows] = await Promise.all([
+      groupQuery(`to_char(date_trunc('month', bq.timestamp), 'YYYY-MM')`, '1 ASC'),
+      groupQuery('bq.status_approval_spv', '1 ASC'),
+      groupQuery(`COALESCE(NULLIF(bq.status_pengadaan, ''), 'Belum ada status')`, '1 ASC'),
+    ]);
+
+    // Rincian baris hanya dikirim bila dibutuhkan. Untuk "Semua Bulan" data
+    // bisa sangat banyak, jadi default-nya ringkasan saja; tambahkan
+    // ?detail=1 bila pemanggil benar-benar butuh baris mentah.
+    const wantDetail = String(req.query.detail || '') === '1';
+    let rows = [];
+    if (!wantAll || wantDetail) {
+      const detailCols = wantDetail
+        ? `${selectCols}, bq.item_code, sp.deskripsi AS deskripsi_barang, bq.no_ejo, bq.mesin_area,
+                   bq.purpose, bq.uom, bq.spesifikasi_lengkap`
+        : selectCols;
+      const { rows: detailRows } = await pool.query(
+        `SELECT ${detailCols}
+           FROM pengajuan_bq bq
+           JOIN users u ON u.id = bq.user_id
+           ${wantDetail ? 'LEFT JOIN spareparts sp ON sp.item_code = bq.item_code' : ''}
+           ${rangeSql}
+          ORDER BY bq.timestamp ASC`,
+        rangeParams
+      );
+      rows = detailRows;
+    }
+
+    // Daftar periode yang punya data, untuk mengisi dropdown "Periode".
+    const { rows: periodRows } = await pool.query(
+      `SELECT to_char(date_trunc('month', bq.timestamp), 'YYYY-MM') AS periode,
+              COUNT(*)::int AS jumlah
+         FROM pengajuan_bq bq
+        GROUP BY 1
+        ORDER BY 1 DESC`
     );
 
-    const total = rows.length;
-    const urgent = rows.filter(r => r.urgency === 'Urgent').length;
-    const normal = total - urgent;
-    const sparepart = rows.filter(r => r.jenis_pengajuan === 'sparepart').length;
-    const jasa = total - sparepart;
-
-    const approved = rows.filter(r => r.status_approval_manager === 'Disetujui').length;
-    const rejected = rows.filter(r => r.status_approval_manager === 'Ditolak' || r.status_approval_spv === 'Ditolak').length;
-    const waiting  = rows.filter(r => r.status_approval_manager === 'Menunggu' && r.status_approval_spv === 'Menunggu').length;
-
-    const pipelineBreakdown = {};
-    rows.forEach(r => {
-      const st = r.status_pengadaan || 'BQ Baru';
-      pipelineBreakdown[st] = (pipelineBreakdown[st] || 0) + 1;
-    });
+    const total = s.total || 0;
+    const urgent = s.urgent || 0;
+    const sparepart = s.sparepart || 0;
+    const fullApproved = s.full_approved || 0;
+    const waiting = s.waiting || 0;
+    const approved = s.approved || 0;
+    const rejected = s.rejected || 0;
+    const waitingManager = s.waiting_manager || 0;
 
     return res.status(200).json({
       status: 'ok',
-      period: { year, month },
+      period: wantAll ? { year: null, month: null, all: true } : { year, month },
+      periods: periodRows,
       count: total,
+      jumlahBaris: rows.length,
       data: rows,
+      groups: {
+        bulan: bulanRows,
+        approval: approvalRows,
+        pengadaan: pengadaanRows,
+      },
       summary: {
-        total, urgent, normal, sparepart, jasa,
+        total, urgent, normal: total - urgent, sparepart, jasa: total - sparepart,
         approved, rejected, waiting,
-        pipeline: pipelineBreakdown,
+        fullApproved, waitingManager,
       },
     });
   } catch (error) {
