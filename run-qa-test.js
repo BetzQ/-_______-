@@ -31,7 +31,9 @@ function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
     await page.click('#btn-run');
     await wait(500);
 
-    const maxWait = 180000;
+    // 114 test (banyak UI test yang login ulang ke iframe) butuh waktu lama.
+    // Batas sebelumnya 180 detik sering habis di tengah jalan.
+    const maxWait = 900000;
     const start = Date.now();
     while (Date.now() - start < maxWait) {
       const btnTxt = await page.$eval('#btn-txt', el => el.textContent.trim());

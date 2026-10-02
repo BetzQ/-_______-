@@ -1437,11 +1437,18 @@
           t.check(loaded, 'angka total antrean termuat (' + (fDoc().getElementById('aq-total-pr') || {}).textContent + ')');
           t.check(fDoc().getElementById('aq-menunggu').textContent.trim() !== '', 'KPI Menunggu terisi');
           t.check(fDoc().getElementById('aq-urgent').textContent.trim() !== '', 'KPI Urgent terisi');
-          t.check(!!fDoc().getElementById('aq-list'), 'daftar 5 terbaru tersedia');
           t.check(fDoc().getElementById('aq-scope') && !fDoc().getElementById('aq-scope').classList.contains('hidden'),
             'sakelar Tim Saya / Semua Tim tampil untuk Supervisor 1');
+          // Tunggu baris tabel benar-benar dirender. Angka KPI boleh sudah terisi
+          // duluan, jadi menunggu KPI saja tidak cukup.
+          var rowsFilled = await waitFor(function () {
+            return fDoc().querySelectorAll('#aq-list > div').length > 0;
+          }, 12000);
           var rows = fDoc().querySelectorAll('#aq-list > div').length;
+          t.check(rowsFilled, 'daftar pengajuan terbaru dirender');
           t.check(rows > 0 && rows <= 5, 'baris antrean = ' + rows + ' (maks 5)');
+          t.check(fDoc().getElementById('aq-empty').classList.contains('hidden'),
+            'pesan "tidak ada pengajuan" tidak muncul saat antrean terisi');
 
           await uiLoginAs('manager', t);
           t.check(fDoc().getElementById('approval-queue-section').classList.contains('hidden'), 'blok antrean disembunyikan untuk Manager');

@@ -627,6 +627,9 @@ async function getPengajuanSummary(req, res) {
       tanpaBawahan = (anakRows[0]?.n || 0) === 0;
     }
     const scopeWhere = whereClauses.length ? ' WHERE ' + whereClauses.join(' AND ') : '';
+    // Parameter scope tim saja. Query agregasi memakai scopeWhere, jadi hanya
+    // boleh menerima parameter yang cocok dengan placeholder di dalamnya.
+    const scopeParams = params.slice();
 
     // Filter status approval SPV. Default 'semua' supaya supervisor bisa
     // melihat keseluruhan data PR sesuai permintaan (bukan hanya antrean).
@@ -660,7 +663,7 @@ async function getPengajuanSummary(req, res) {
               COUNT(*) FILTER (WHERE bq.jenis_pengajuan = 'jasa')::int           AS jasa
          FROM pengajuan_bq bq
          JOIN users u ON u.id = bq.user_id${scopeWhere}`,
-      params
+      scopeParams
     );
     const agg = aggRows[0] || { total: 0, menunggu: 0, disetujui: 0, ditolak: 0, urgent: 0, sparepart: 0, jasa: 0 };
 
@@ -881,11 +884,15 @@ async function getMonthlyReport(req, res) {
         ORDER BY ${order}`,
       rangeParams
     );
-    const [bulanRows, approvalRows, pengadaanRows] = await Promise.all([
+    // pool.query mengembalikan objek result, jadi yang dipakai adalah .rows.
+    const [bulanRes, approvalRes, pengadaanRes] = await Promise.all([
       groupQuery(`to_char(date_trunc('month', bq.timestamp), 'YYYY-MM')`, '1 ASC'),
       groupQuery('bq.status_approval_spv', '1 ASC'),
       groupQuery(`COALESCE(NULLIF(bq.status_pengadaan, ''), 'Belum ada status')`, '1 ASC'),
     ]);
+    const bulanRows = bulanRes.rows || [];
+    const approvalRows = approvalRes.rows || [];
+    const pengadaanRows = pengadaanRes.rows || [];
 
     // Rincian baris hanya dikirim bila dibutuhkan. Untuk "Semua Bulan" data
     // bisa sangat banyak, jadi default-nya ringkasan saja; tambahkan
