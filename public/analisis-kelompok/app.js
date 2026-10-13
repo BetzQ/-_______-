@@ -18,7 +18,7 @@ const PROJEK = {
   lingkupTitik: [
     "Latar belakang masalah: pengajuan barang manual yang sering tidak lengkap (spesifikasi, merek, qty), monitoring berbasis email yang lemah, dan belum ada Critical Sparepart List terintegrasi.",
     "Bukti terukur yang dipakai tim: akumulasi downtime mesin Cartoning Marchesini 305 menit (± 5,08 jam) dari enam dokumen EJO, sebagai dasar kebutuhan sistem.",
-    "Sistem sasaran: Formulir Pengajuan Barang Digital (BQ) + alur approval berjenjang (SPV/Officer/Manager), dasbor monitoring real-time, modul Critical Sparepart List dengan On-Hand Stock, dan Monthly Report (Looker Studio).",
+    "Sistem sasaran: Formulir Pengajuan Barang Digital (BQ) + alur approval berjenjang (SPV/Administrator/Manager), dasbor monitoring real-time, modul Critical Sparepart List dengan On-Hand Stock, dan Monthly Report (Looker Studio).",
     "Tolok ukur keberhasilan: aksesibilitas data 100% real-time; pengajuan tidak terproses dan pengadaan urgent diturunkan hingga di bawah 10%.",
   ],
 };
@@ -80,7 +80,7 @@ const MEMBERS = [
           },
           {
             k: "Menguasai alur sistem & hak akses",
-            a: "Serap pemaparan flow kerja dan RBAC lima peran (teknisi, SPV 1, SPV 2, officer, manager) sebagai dasar perancangan menu berjenjang.",
+            a: "Serap pemaparan flow kerja dan RBAC lima peran (teknisi, SPV 1, SPV 2, administrator, manager) sebagai dasar perancangan menu berjenjang.",
             cara: [
               "Baca pemaparan flow dan RBAC dari ketua.",
               "Catat menu yang tampil untuk setiap peran.",
@@ -512,20 +512,20 @@ const MEMBERS = [
           },
           {
             k: "Menjawab pertanyaan kebutuhan fungsional",
-            a: "Jawab satu per satu pertanyaan developer: format Monthly Report (ada contoh + link Looker), pemakaian status Normal/Urgent, siapa saja yang boleh approval (SPV1, SPV2, Officer), pemakaian PR Summary, dan status Jenis Jasa.",
+            a: "Jawab satu per satu pertanyaan developer: format Monthly Report (ada contoh + link Looker), pemakaian status Normal/Urgent, siapa saja yang boleh approval (SPV1, SPV2, Administrator), pemakaian PR Summary, dan status Jenis Jasa.",
             cara: [
               "Kumpulkan semua pertanyaan developer menjadi satu daftar.",
               "Jawab tertulis di grup satu per satu.",
               "Sertakan link Looker Studio untuk format Monthly Report.",
-              "Jelaskan aturan: Normal/Urgent per pengajuan, approval oleh SPV/Officer, PR Summary khusus Manager & SPV1, dan Jenis Jasa juga masuk pengajuan.",
+              "Jelaskan aturan: Normal/Urgent per pengajuan, approval oleh SPV/Administrator, PR Summary khusus Manager & SPV1, dan Jenis Jasa juga masuk pengajuan.",
             ],
             hasil: "Seluruh jawaban kebutuhan fungsional tercatat di grup sebagai acuan developer.",
           },
           {
             k: "Mendokumentasikan flow & hak akses (RBAC)",
-            a: "Tuliskan menu setiap peran pengguna (Teknisi, Officer, SPV1, SPV2, Manager, Administrator), alur pengajuan barang reguler/urgent, dan alur preventive replenishment critical part — sebagai kontrak bersama antara analis, penulis Bab III, dan developer.",
+            a: "Tuliskan menu setiap peran pengguna (Teknisi, SPV1, SPV2, Administrator, Manager), alur pengajuan barang reguler/urgent, dan alur preventive replenishment critical part — sebagai kontrak bersama antara analis, penulis Bab III, dan developer.",
             cara: [
-              "Buat daftar menu & hak akses per role (Teknisi, Officer, SPV1, SPV2, Manager, Administrator).",
+              "Buat daftar menu & hak akses per role (Teknisi, SPV1, SPV2, Administrator, Manager).",
               "Tulis alur pengajuan barang reguler dan urgent.",
               "Tulis alur preventive replenishment critical sparepart.",
               "Simpan di gdoc 'Flow & RBAC' dan bagikan ke analis, penulis Bab III, developer.",
@@ -1468,7 +1468,7 @@ const MEMBERS = [
             k: "Membuat context diagram / DFD level 0",
             a: "Gambarkan interaksi sistem dengan entitas eksternal secara global.",
             cara: [
-              "Identifikasi entitas eksternal (teknisi, officer, SPV, manager, admin).",
+              "Identifikasi entitas eksternal (teknisi, administrator, SPV, manager).",
               "Gambar sistem sebagai satu proses global di DrawIO.",
               "Beri label alur data masuk dan keluar.",
             ],

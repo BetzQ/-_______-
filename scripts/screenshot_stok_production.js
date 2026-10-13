@@ -23,7 +23,7 @@ const ROLES = [
   { key: 'teknisi', user: 'AAA', pass: '04AAA10' },
   { key: 'spv1', user: 'INN', pass: '30INN11' },
   { key: 'spv2', user: 'KAA', pass: 'KAA1910' },
-  { key: 'officer', user: 'ANS', pass: 'ANS1805' },
+  { key: 'officer', user: 'ANS', pass: 'ANS1805' }, // 'officer' = key nama file bukti (stok-officer-*.png),(role DB = Administrator)
   { key: 'manager', user: 'KSW', pass: '01KSW10' },
 ];
 
@@ -39,8 +39,8 @@ const log = (m) => console.log('[SHOT] ' + m);
 
 async function disableTour(page) {
   await page.evaluate(() => {
-    ['teknisi', 'supervisor 1', 'supervisor 2', 'officer', 'manager'].forEach((r) => {
-      try { localStorage.setItem('tour_done_v2_' + r, '1'); } catch (e) {}
+    ['teknisi', 'supervisor 1', 'supervisor 2', 'administrator', 'manager'].forEach((r) => {
+      try { localStorage.setItem('tour_done_v3_' + r, '1'); } catch (e) {}
     });
     const ov = document.getElementById('tour-overlay');
     if (ov && ov.classList.contains('active')) ov.classList.remove('active');
@@ -125,6 +125,7 @@ async function shoot(page, file) {
         log(role.key + '/' + v.slug + ' via ' + opened + ' baris=' + rows + ' judul="' + info + '"');
 
         await shoot(page, 'stok-' + role.key + '-' + v.slug + '.png');
+        await sleep(3000); // Hold 3 dtk sebelum modal data ditutup
         await page.evaluate(() => { if (window.closeModal) closeModal('modal-stok'); });
         await sleep(900);
       }
@@ -139,6 +140,7 @@ async function shoot(page, file) {
       if (rak) {
         await sleep(2600);
         await shoot(page, 'stok-' + role.key + '-layout-rak.png');
+        await sleep(3000); // Hold 3 dtk sebelum modal "Layout Rak" ditutup
         await page.evaluate(() => { if (window.closeModal) closeModal('modal-rak'); });
       }
 

@@ -59,7 +59,7 @@ Total skenario inspeksi: **14 / 14 lolos**. Ditemukan **2 bug** (1 medium + 1 la
 |----|----------|--------|-----------|
 | D1 | 🔴 **Medium** | Pencocokan role Supervisor memakai `=== 'supervisor'` (eksak), namun database menyimpan **"Supervisor 1"** dan **"Supervisor 2"** → Supervisor tidak akan melihat kartu apa pun | Ganti ke `r.startsWith('supervisor')` (`:223`) + normalisasi badge (`:297`) |
 | D2 | 🟡 **Laten** | `sheetUrl()` salah logika ternary: URL non-spreadsheet akan **terduplikasi** (contoh `forms.google.com...forms.google.com...`) | Refactor menjadi `if (!url) return '#'; return url.includes('spreadsheets') ? url + '?rm=minimal' : url;` (`:175`–`:178`) |
-| D3 | 🟢 **Penyempurnaan** | Role **"Officer"** (ada di database: KES) tidak ditangani → mendapat layar "Menu tidak ditemukan" | Tambah `r === 'officer'` ke blok Supervisor/Manager (`:223`) + badge indigo (`:157`) |
+| D3 | 🟢 **Penyempurnaan** | Role **"Officer"** (waktu itu masih ada di database) tidak ditangani → mendapat layar "Menu tidak ditemukan" | Tambah `r === 'officer'` ke blok Supervisor/Manager (`:223`) + badge indigo (`:157`) |
 | D4 | 🟢 **Penyempurnaan** | Badge role "Supervisor 1/2" jatuh ke warna default abu-abu | Normalisasi key badge (`:296`–`:297`) |
 
 > **Catatan:** D1–D2 adalah bug yang **potensial menyembunyikan bug** — keduanya tidak terlihat pada pengujian manual karena kebetulan semua URL saat ini adalah Google Sheets dan penguji mungkin belum mencoba role Supervisor. Justru karena itu inspeksi statis wajib dilakukan.

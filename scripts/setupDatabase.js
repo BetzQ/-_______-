@@ -96,7 +96,7 @@ async function main() {
     console.log(GREEN + '  Contoh akun login:' + RESET);
     console.log(GREEN + '    - Teknisi      : AAA / 04AAA10' + RESET);
     console.log(GREEN + '    - Supervisor 1 : INN / 30INN11' + RESET);
-    console.log(GREEN + '    - Officer      : ANS / ANS1805' + RESET);
+    console.log(GREEN + '    - Administrator: ANS / ANS1805' + RESET);
     console.log(GREEN + '    - Manager      : KSW / 01KSW10' + RESET);
     console.log('');
     console.log(YELLOW + 'Pastikan .env menggunakan target yang sama, misalnya:' + RESET);

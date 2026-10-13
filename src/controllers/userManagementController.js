@@ -9,7 +9,7 @@ const { hashPassword, verifyPassword } = require('../utils/password');
  *   2. User pending BOLEH login, tapi hanya melihat layar "menunggu
  *      persetujuan" — tanpa menu apa pun. Login ini tetap tercatat.
  *   3. Manager menyetujui pendaftaran sekaligus menugaskan tim
- *      (Supervisor 1 / Supervisor 2 / Officer) -> akun aktif penuh.
+ *      (Supervisor 1 / Supervisor 2 / Administrator) -> akun aktif penuh.
  *   4. Setiap login sukses tercatat di login_log (termasuk yang belum
  *      di-approve, untuk keamanan) dan setiap aksi yang mengubah data
  *      tercatat di activity_log.
@@ -318,7 +318,7 @@ async function listRegistrations(req, res) {
 /* 3) APPROVE + ASSIGN TIM (Manager)                                   */
 /* ------------------------------------------------------------------ */
 
-/** Cari supervisor_id berdasarkan tim yang dipilih (SPV1 / SPV2 / Officer). */
+/** Cari supervisor_id berdasarkan tim yang dipilih (SPV1 / SPV2 / Administrator). */
 async function resolveSupervisorId(tim) {
   const target = String(tim || '').trim().toLowerCase();
   // Ambil supervisor yang sesuai role/tim
@@ -332,7 +332,7 @@ async function resolveSupervisorId(tim) {
 /**
  * POST /api/users/approve
  * Body: { username (manager), id (pendaftaran), role, tim }
- * tim: 'Supervisor 1' | 'Supervisor 2' | 'Officer'
+ * tim: 'Supervisor 1' | 'Supervisor 2' | 'Administrator'
  */
 async function approveUser(req, res) {
   const { id, role, tim, bqLink } = req.body || {};
@@ -349,10 +349,10 @@ async function approveUser(req, res) {
   const timL = timV.toLowerCase();
   const bqLinkV = String(bqLink || '').trim().slice(0, 255);
 
-  if (roleV === 'teknisi' && !['supervisor 1', 'supervisor 2', 'officer'].includes(timL)) {
+  if (roleV === 'teknisi' && !['supervisor 1', 'supervisor 2', 'administrator'].includes(timL)) {
     return res.status(400).json({
       status: 'error',
-      message: 'Pilih tim: Supervisor 1, Supervisor 2, atau Officer',
+      message: 'Pilih tim: Supervisor 1, Supervisor 2, atau Administrator',
     });
   }
 

@@ -1,7 +1,20 @@
 # CHECKLIST TUGAS AVWAN (Anggota 1 — Lead Developer / Architect)
 
 > Sumber tugas: `CP Kelompok A 127/CHECKLIST DAN TO DO LIST TUGAS CP.docx` (Rencana Kerja Mingguan Kelompok A 127).
-> Status per **26 September 2026**. Semua tanda ✅ memiliki bukti fisik di repo ini.
+> Status per **10 Oktober 2026**. Semua tanda ✅ memiliki bukti fisik di repo ini.
+
+## Update Tugas 2 & 3 (10 Okt 2026)
+
+Dari arahan Ka Fadhil (chat 3 & 5 Okt) dan notulen kelompok:
+
+| Item | Isi | Deadlin | Status |
+|---|---|---|---|
+| Tugas 2 | Laporan kemajuan — hanya menambah **Bab 3** (proses analisis data) | draft **11 Okt**, submit **12 Okt** | 🟡 draf disiapkan (data wawancara/survei & before-after dari GDrive) |
+| Review Bab 3 | Bagian perancangan implementasi + pengujian & evaluasi (berbasis web) | 11 Okt | 🟡 review diminta dari Avwan |
+| Tugas 3 | Kumpul semua dokumen + jadwal presentasi, titik berat | setelah sesi 7 | ⬜ menunggu |
+| Produk (web) | Finalisasi & sinkronisasi produk | **14 Okt** | ✅ kode + QA 114/114 (10 Okt) |
+| Footage demo | Rekaman video demo untuk Bab IV | sebelum **15 Okt** | ✅ `docs/evidence/video/demo-aplikasi.mp4` (rekam ulang bila ada perubahan) |
+| Meeting 3 | Update kemajuan + susun timeline sesi 7 | sesuai poll | ⬜ menunggu hasil vote |
 
 ## Status 8 item checklist mingguan
 

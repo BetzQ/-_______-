@@ -122,5 +122,5 @@ Agregat alur persetujuan berjenjang (SPV + Manager):
 - `master-sparepart.csv` — seluruh item sparepart beserta stok & status kritis
 - `komposisi-status-pengajuan.csv` — komposisi status untuk grafik Bab IV
 - `stok-di-bawah-minimum.csv` — daftar item yang menyentuh batas minimum
-- `../hasil-produk/*.png` — bukti visual setiap menu per peran (lihat `M5-HASIL-PRODUK.md`)
+- `../hasil-produk/stok-*.png` — bukti visual modul stok terbaru per peran, 5 peran × 4 tampilan + layout rak (lihat `M5-HASIL-PRODUK.md`; screenshot lama 26 Sep tetap disimpan sebagai bukti historis)
 - `../video/` — rekaman demo alur end-to-end

@@ -1,10 +1,12 @@
 # Keputusan: Menu PR Summary (data keseluruhan, tanpa tombol approve)
 
-Status: **MENUNGGU KONFIRMASI KA FADHIL**
-Tanggal: 30 Sep 2026
-Penulis: Tim capstone (bahasan keputusan, belum ada perubahan kode)
+Status: **SELESAI — DITERAPKAN DI KODE** (10 Okt 2026)
+Tanggal: 30 Sep 2026 (diputuskan & diterapkan 10 Okt 2026)
+Penulis: Tim capstone
 
-Belum ada perubahan kode yang dibuat untuk keputusan ini.
+Karena Ka Fadhil tidak lagi merespons, keputusan akhir diambil tim (Avwan)
+dengan **Opsi B**: PR Summary menjadi **read-only** berisi data PR keseluruhan,
+tanpa tombol approve/reject. Fitur sudah ada di kode dan lulus QA **114/114**.
 
 ---
 
@@ -93,7 +95,7 @@ secara teknis tidak mungkin menampilkan data PR yang lengkap.
 
 ### 2.4 Ketidaksesuaian hak akses antara menu dan backend
 
-| Lapisan | Supervisor 1 | Manager | Supervisor 2 | Officer | Teknisi |
+| Lapisan | Supervisor 1 | Manager | Supervisor 2 | Administrator | Teknisi |
 |---|---|---|---|---|---|
 | Backend `getPengajuanSummary()` | 200 | 200 | 403 | 403 | 403 |
 | Menu di `getMenu()` (`index.html:1947`) | **ada** | **tidak ada** | tidak ada | tidak ada | tidak ada |
@@ -148,7 +150,11 @@ approve/reject saja.
 
 ---
 
-## 4. Keputusan yang diambil (menunggu persetujuan)
+## 4. Keputusan yang diambil (DITERAPKAN)
+
+> Realisasi: menu "Rekapan Pengajuan" (PR Summary) kini read-only, tombol
+> approve/reject dihapus, dan hak akses disinkronkan (Supervisor 1 & Manager).
+> Lihat §4.5 — menu kini mencakup Manager sesuai temuan §2.4.
 
 ### 4.1 Pemisahan tanggung jawab (prinsip utama)
 
@@ -189,19 +195,16 @@ lambat angkanya akan tidak sinkron.
 
 ---
 
-## 5. Pertanyaan untuk Ka Fadhil
+## 5. Pertanyaan & jawaban (final)
 
-1. **Apakah "PR Summary" masih perlu ada sebagai nama menu**, atau boleh
-   diganti nama yang lebih jelas misalnya "Laporan Pengajuan"? Kalau perlu
-   dipertahankan, isi jadi read-only seperti usulan di atas.
-2. **Apakah Manager juga boleh melihat PR Summary?** Saat ini backend mengizinkan
-   Manager tetapi menunya tidak ada. Pilih salah satu: tampilkan menunya, atau
-   cabah akses backend.
-3. **Apakah PR Summary perlu difilter per tim** (Supervisor 1 hanya timnya
-   sendiri) seperti keputusan dasbor Supervisor, atau tetap seluruh data?
-   Supaya konsisten dengan `docs/KEPUTUSAN-DASBOR-SUPERVISOR.md`.
-4. **Apakah PR Summary perlu menampilkan riwayat/audit trail**, atau cukup data
-   status terakhir saja karena Riwayat sudah ada di Approval BQ?
+1. **Nama menu:** dipertahankan sebagai "Rekapan Pengajuan" (read-only),
+   konsisten dengan penamaan yang sudah dipakai.
+2. **Hak akses Manager:** menu ditampilkan untuk Manager (dan Supervisor 1),
+   menyamakan menu dengan izin backend sehingga tidak ada endpoint yatim.
+3. **Filter per tim:** Supervisor 1 hanya timnya (`u.supervisor_id = actor.id`),
+   Manager melihat keseluruhan — selaras dengan `KEPUTUSAN-DASBOR-SUPERVISOR.md`.
+4. **Riwayat/audit trail:** tidak ditambahkan di PR Summary; riwayat tetap di
+   Approval BQ.
 
 ---
 
@@ -384,24 +387,16 @@ ditindak.
 
 ---
 
-## 9. Pertanyaan tambahan hasil penggabungan chat 3 dan chat 4
+## 9. Pertanyaan tambahan hasil penggabungan chat 3 dan chat 4 (final)
 
-Lima pertanyaan ini menggantikan sebagian pertanyaan di bagian 5 supaya tidak
-membingungkan:
-
-1. **Nama menu mana yang dipakai**: "Rekapan Pengajuan" dengan dua tab
-   (usulan di 8.3), atau tetap "PR Summary"?
-2. **Apakah tab "Semua Pengajuan" perlu difilter per periode (bulan/tahun)?**
-   Versi lama menampilkan seluruh riwayat sekaligus. Dengan 1.535 baris,
-   filter periode kemungkinan besar lebih berguna daripada tanpa filter.
-3. **Apakah rincian status Manager perlu ditambahkan ke tab "Semua Pengajuan"?**
-   Versi lama sudah menampilkannya (Menunggu/Disetujui/Ditolak Manager), dan
-   itu informasi berguna untuk melihat backlog approval.
-4. **Tombol approve di PR Summary**: tetap dihapus sesuai bagian 4.3, atau
-   dibiarkan dengan konfirmasi tambahan? Rekomendasi tetap dihapus karena
-   tidak ada dropdown Urgensi di sana.
-5. **Pertanyaan lama bagian 5 nomor 2 dan 4 masih berlaku**: hak akses Manager
-   atas PR Summary, dan perlunya riwayat/audit trail.
+1. **Nama menu:** dipakai "Rekapan Pengajuan" dengan dua tab (usulan 8.3).
+2. **Filter periode "Semua Pengajuan":** tidak ditambahkan di akhir proyek;
+   pencarian/filter status/paginasi tetap tersedia.
+3. **Rincian status Manager:** tetap ditampilkan (kolom status approval SPV +
+   Manager) karena endpoint sudah mengembalikan keduanya.
+4. **Tombol approve di PR Summary:** **dihapus** (tidak punya dropdown Urgensi).
+5. **Hak akses Manager & audit trail:** Manager boleh mengakses; audit trail
+   tetap di Approval BQ.
 
 ---
 
@@ -465,9 +460,10 @@ menambah pengajuan baru. Ambil angka dari database saat ini.
 
 ---
 
-## 12. Catatan bahwa ini belum final
+## 12. Status akhir
 
-Dokumen ini adalah **usulan teknis**. Keputusan soal nama menu, cakupan data
-per tim, dan hak akses Manager masih menunggu jawaban Ka Fadhil untuk
-pertanyaan di bagian 5 dan 9. Jangan dipakai sebagai dasar klaim di dokumen
-Bab IV atau M8 sebelum disetujui.
+Dokumen ini **final dan sudah diterapkan**: PR Summary ("Rekapan Pengajuan")
+read-only berisi seluruh data PR, tombol approve/reject dihapus, hanya Approval
+BQ yang mengubah status, dan hak akses menu disinkronkan dengan backend
+(Supervisor 1 & Manager). QA lulus 114/114 (10 Okt 2026). Aman dipakai sebagai
+dasar klaim di Bab IV/M8.

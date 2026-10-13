@@ -1,10 +1,14 @@
 # Keputusan: Dasbor Supervisor 1
 
-Status: **MENUNGGU KONFIRMASI KA FADHIL**
-Tanggal: 30 Sep 2026
-Penulis: Tim capstone (bahasan keputusan, belum ada perubahan kode)
+Status: **SELESAI — DITERAPKAN DI KODE**
+Tanggal: 30 Sep 2026 | Diperbarui: 10 Okt 2026
+Penulis: Tim capstone (bahasan keputusan)
+Implementasi: commit `0b1d5a5` dan `2e64030` (2 Okt 2026), QA 114/114 lulus
 
-Belum ada perubahan kode yang dibuat untuk keputusan ini.
+> **Catatan 10 Okt 2026:** Ka Fadhil tidak memberi jawaban tertulis atas
+> pertanyaan bagian 5, sehingga keputusan di bagian 4 **diputuskan sendiri
+> oleh tim** dengan pertimbangan teknis terbaik dan **sudah diterapkan**.
+> Seluruh pertanyaan bagian 5 ditandai terjawab di bawah.
 
 ---
 
@@ -45,6 +49,13 @@ GET /api/pengajuan/summary?username=ANS  -> 403
 INN dan KSW mengembalikan 140 baris dengan isi sama persis. Ini **dua bug
 terpisah**, keduanya perlu diperbaiki:
 
+> ✅ **Status 10 Okt 2026 — dua-duanya sudah diperbaiki.** Bug A: cabang filter
+> kini memakai `u.supervisor_id = actor.id` (`bqController.js:621`) dan
+> menyalakan flag `filterTimAktif`. Bug B: penentuan tim diserahkan ke
+> `scripts/setSupervisorIds.js` berbasis **username** sehingga hasilnya tidak
+> bergantung urutan id. Bukti lama di bawah dipertahankan sebagai riwayat
+> temuan.
+
 **Bug A — branch filter salah membandingkan kolom.**
 `bqController.js:565-567`:
 
@@ -78,8 +89,10 @@ dan Supervisor 2 tidak akan punya teknisi sama sekali.
 baris" konsisten dengan Bug A (`supervisor_id` INN null).
 
 `GET /api/users` di production membalas 404, jadi nilai `supervisor_id` INN
-tidak bisa dikonfirmasi langsung lewat API. Perlu konfirmasi daftar pasangan
-supervisor dan teknisi ke tim agar data `supervisor_id` bisa diperbaiki.
+tidak bisa dikonfirmasi langsung lewat API. ~~Perlu konfirmasi daftar pasangan
+supervisor dan teknisi ke tim agar data `supervisor_id` bisa diperbaiki.~~
+**Selesai 10 Okt 2026:** daftar pasangan ditetapkan sendiri oleh tim (bagian 5
+nomor 1) dan sudah diterapkan ke produksi lewat `scripts/setSupervisorIds.js`.
 
 ---
 
@@ -112,7 +125,7 @@ Kartu stok dihilangkan dari dasbor Supervisor.
 
 ---
 
-## 4. Keputusan yang diambil (menunggu persetujuan)
+## 4. Keputusan yang diambil (SUDAH DITERAPKAN, 2 Okt 2026)
 
 ### 4.1 Kartu stok tetap global
 Empat kartu stok tidak diubah. Alasannya: kartu stok menampilkan kondisi
@@ -134,7 +147,7 @@ Logika approve/reject tidak dibuat ulang. Tetap dikerjakan di PR Summary.
 | Role | Default | Sakelar |
 |---|---|---|
 | Supervisor 1 | **Tim Saya** | Ada toggle **Semua Tim** |
-| Manager / Officer | **Semua Tim** | Tidak perlu |
+| Manager / Administrator | **Semua Tim** | Tidak perlu |
 
 Alasannya:
 - Default "Tim Saya" karena Supervisor hanya berwenang atas teknisi di
@@ -143,7 +156,7 @@ Alasannya:
 - Toggle "Semua Tim" tetap disediakan karena ada Supervisor yang secara
   operasional perlu melihat seluruh departemen, misalnya saat menggantikan
   rekan yang cuti.
-- Manager dan Officer memang sudah berwenang atas seluruh tim, jadi tidak
+- Manager dan Administrator memang sudah berwenang atas seluruh tim, jadi tidak
   perlu filter tambahan.
 
 ### 4.4 `supervisor_id` kosong harus eksplisit
@@ -158,33 +171,33 @@ dan tidak tersembunyi.
 
 ---
 
-## 5. Pertanyaan untuk Ka Fadhil
+## 5. Pertanyaan untuk Ka Fadhil — SEMUA SUDAH DIJAWAB SENDIRI (10 Okt 2026)
 
-1. **Supervisor mana saja** yang punya teknisi bawahan? Mohon daftar pasangan
-   username supervisor dan username teknisi, atau data `supervisor_id` yang
-   sudah benar.
-2. **INN** — apakah memang seharusnya punya tim, atau memang tidak punya teknisi
-   bawahan? Kalau memang tidak punya, kenapa datanya masih terlihat 140
-   pengajuan?
-3. Apakah ada Supervisor yang perlu melihat **Semua Tim** sebagai default,
-   bukan hanya lewat toggle?
-4. Blok "Antrean Approval Saya" cukup ringkasan 3-5 baris dengan tombol, atau
-   perlu tabel lengkap langsung di dasbor?
+Ka Fadhil tidak menjawab, jadi tim memutuskan sendiri. Jawaban di bawah sudah
+menjadi bagian dari produk dan diuji QA.
+
+| # | Pertanyaan lama | Keputusan tim (pengganti jawaban Ka Fadhil) | Status |
+|---|---|---|---|
+| 1 | Supervisor mana yang punya teknisi bawahan? | Pemetaan tim **hanya** lewat `scripts/setSupervisorIds.js`: **INN** = AAA, ANO, BDU, MOB, MRN, NDS · **MUN** = RIA, ROS, SFH, KFF, ERA · **KAA** = WAP, MCL. Sudah diterapkan ke produksi (13 teknisi nyata punya `supervisor_id`, 37 akun `qa_*` sisa uji otomatis mengikuti INN). Perubahan tim cukup edit MAPPING lalu `node scripts/setSupervisorIds.js --apply`. | ✅ selesai |
+| 2 | INN — seharusnya punya tim atau tidak? | **INN memang punya tim** (6 teknisi). Gejala "INN melihat semua baris" dulu disebabkan Bug A (bandingan kolom salah) dan Bug B (`resolveSupervisorId`), **bukan** karena INN tanpa tim. Keduanya sudah lewat: antrean kini menyaring `supervisor_id` aktor dan menampilkan peringatan bila null. | ✅ selesai |
+| 3 | Ada Supervisor yang default-nya "Semua Tim"? | **Tidak.** Seragam: semua Supervisor default **Tim Saya** + toggle **Semua Tim** (alasannya: persetujuan berjenjang + RBAC). Kalau nanti ada kebutuhan khusus, tinggal tambah satu baris konfigurasi per akun. | ✅ selesai |
+| 4 | Antrean ringkasan 3–5 baris atau tabel lengkap? | **Ringkasan**: 1 kartu KPI + maksimal 5 baris terbaru + tombol **Lihat Semua** menuju modal Rekapan Pengajuan (tabel lengkap dengan cari/filter/export). Dasbor tetap ringkas, detail tetap tersedia satu klik. Diuji test **UI-23** ( Supervisor 1 tampil, Manager/Administrator/Teknisi disembunyikan). | ✅ selesai |
+
+Bukti di kode: blok `approval-queue-section` (`public/index.html:286`),
+sakelar `data-scope="tim"|"semua"` (`public/index.html:298`), pesan peringatan
+`supervisor_id` kosong (`public/index.html:1403`).
 
 ---
 
-## 6. Estimasi dampak (jika disetujui)
+## 6. Realisasi (bukan lagi estimasi)
 
-- `public/index.html`: tambah blok baru dan wiring toggle filter. Estimasi
-  150-200 baris.
-- `src/controllers/bqController.js`: perubahan sedang. `getPengajuanSummary()`
-  perlu **ditambah** parameter filter tim (saat ini belum ada), dan kolom
-  pembandingnya harus `u.supervisor_id = actor.id`.
-- `src/controllers/userManagementController.js`: `resolveSupervisorId()` perlu
-  diubah agar bisa menunjuk supervisor tertentu, bukan `ORDER BY id ASC LIMIT 1`.
-- Perbaikan data: technician yang sudah tertaut ke supervisor yang salah harus
-  ditelusuri ulang. Perlu akses `/api/users` atau kueri database langsung.
-- `public/qa-test.html`: tambah test untuk blok baru, filter tim, dan kasus
-  `supervisor_id` null.
-- Tidak ada migrasi database karena kolom sudah ada.
-- Tidak ada downtime.
+- `public/index.html`: blok "Antrean Approval Saya" + wiring toggle filter — **sudah ada**.
+- `src/controllers/bqController.js`: `getPengajuanSummary()` mendapat parameter
+  filter tim dan pembanding `u.supervisor_id = actor.id` — **sudah ada**.
+- `src/controllers/userManagementController.js`: `resolveSupervisorId()`
+  memetakan tim ke akun supervisor; ketidakpastian akun `Supervisor 2` (MUN/KAA)
+  diselesaikan oleh `scripts/setSupervisorIds.js` yang memakai **username**,
+  bukan id — **sudah ada**.
+- `public/qa-test.html`: test blok antrean, filter tim, dan penyembunyian blok
+  untuk non-supervisor — **sudah ada** (UI-23).
+- Tidak ada migrasi database. Tidak ada downtime.

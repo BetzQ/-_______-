@@ -15,7 +15,7 @@ async function verify() {
   if (su) console.log(`  users.supervisor_id: ${su.Type} (${su.Null})`);
 
   // 2. Cek getAllPengajuan return kolom baru
-  console.log('\n--- GET /api/pengajuan/all ---');
+  console.log('\n--- GET /api/pengajuan/all?actor=KSW ---');
   const [allRows] = await pool.query(`
     SELECT bq.jenis_pengajuan, bq.urgency, bq.no_registrasi
     FROM pengajuan_bq bq LIMIT 3
@@ -101,3 +101,4 @@ async function verify() {
 }
 
 verify().catch(e => { console.error(e); process.exit(1); });
+

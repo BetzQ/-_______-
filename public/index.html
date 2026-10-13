@@ -141,11 +141,17 @@
             </div>
           </div>
         </div>
-        <!-- Kanan: Logout -->
-        <button id="btn-logout" type="button"
-          class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-red-400 text-xs font-bold transition-all pop border border-slate-700 hover:border-red-500/30 shrink-0">
-          <span class="flex items-center gap-1.5"><i data-lucide="log-out" style="width:14px;height:14px"></i> Logout</span>
-        </button>
+        <!-- Kanan: Panduan + Logout -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btn-panduan" type="button" title="Buka panduan pakai aplikasi"
+            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-blue-900/40 text-slate-300 hover:text-white text-xs font-bold transition-all pop border border-slate-700 hover:border-blue-500/40">
+            <span class="flex items-center gap-1.5"><i data-lucide="help-circle" style="width:14px;height:14px"></i> Panduan</span>
+          </button>
+          <button id="btn-logout" type="button"
+            class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-red-400 text-xs font-bold transition-all pop border border-slate-700 hover:border-red-500/30">
+            <span class="flex items-center gap-1.5"><i data-lucide="log-out" style="width:14px;height:14px"></i> Logout</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -1010,7 +1016,7 @@
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 sticky top-0 bg-slate-900 rounded-t-2xl">
         <div>
           <h3 class="text-white font-bold text-lg leading-tight">Approval User</h3>
-          <p class="text-slate-400 text-xs mt-0.5">Setujui pendaftaran &amp; tugaskan tim (Supervisor 1 / 2 / Officer)</p>
+          <p class="text-slate-400 text-xs mt-0.5">Setujui pendaftaran &amp; tugaskan tim (Supervisor 1 / 2 / Administrator)</p>
         </div>
         <button type="button" onclick="closeModal('modal-usermgmt')"
           class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors">
@@ -1067,7 +1073,7 @@
     const BADGE = {
       'teknisi':     'bg-emerald-600 text-emerald-100',
       'supervisor':  'bg-amber-600   text-amber-100',
-      'officer':     'bg-indigo-600  text-indigo-100',
+      'administrator': 'bg-indigo-600  text-indigo-100',
       'manager':     'bg-purple-600  text-purple-100',
       'pending':     'bg-yellow-600  text-yellow-100',
     };
@@ -1437,7 +1443,7 @@
       const box = $('my-bq-section');
       if (!user) return;
       try {
-        const res = await fetch(API + '/api/pengajuan/all?username=' + encodeURIComponent(user.username));
+        const res = await fetch(API + '/api/pengajuan/all?username=' + encodeURIComponent(user.username) + '&actor=' + encodeURIComponent(user.username));
         const json = await res.json();
         if (!res.ok || json.status !== 'ok') throw new Error(json.message || 'Gagal memuat pengajuan');
         myBqData = json.data || [];
@@ -1531,7 +1537,7 @@
       $('mybq-pagination').innerHTML = '';
       lucide.createIcons();
       try {
-        const res = await fetch(API + '/api/pengajuan/all?username=' + encodeURIComponent(user.username));
+        const res = await fetch(API + '/api/pengajuan/all?username=' + encodeURIComponent(user.username) + '&actor=' + encodeURIComponent(user.username));
         const json = await res.json();
         if (!res.ok || json.status !== 'ok') throw new Error(json.message || 'Gagal memuat pengajuan');
         myBqData = json.data || [];
@@ -2226,8 +2232,8 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
         });
       }
 
-      // --- OFFICER & SUPERVISOR 2 ---
-      if (r === 'officer' || r === 'supervisor 2') {
+      // --- ADMINISTRATOR & SUPERVISOR 2 ---
+      if (r === 'administrator' || r === 'supervisor 2') {
         items.push({
           action: 'bqsummary',
           title: 'Rekapan Pengajuan',
@@ -2436,7 +2442,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
           '<div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-yellow-600/20 mb-4">' +
           '<i data-lucide="clock" style="width:26px;height:26px" class="text-yellow-400"></i></div>' +
           '<h3 class="text-white font-bold text-xl mb-2">Menunggu Persetujuan Manager</h3>' +
-          '<p class="text-slate-400 text-sm leading-relaxed">Akun Anda sudah terdaftar, tapi belum diaktifkan. Manager akan menyetujui pendaftaran dan menugaskan Anda ke tim (Supervisor 1 / Supervisor 2 / Officer). Setelah disetujui, login kembali — semua menu akan tersedia.</p>' +
+          '<p class="text-slate-400 text-sm leading-relaxed">Akun Anda sudah terdaftar, tapi belum diaktifkan. Manager akan menyetujui pendaftaran dan menugaskan Anda ke tim (Supervisor 1 / Supervisor 2 / Administrator). Setelah disetujui, login kembali — semua menu akan tersedia.</p>' +
           '<p class="text-slate-500 text-xs mt-4">Upaya login ini tercatat demi keamanan sistem.</p>' +
           '</div>';
         lucide.createIcons();
@@ -2562,6 +2568,17 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
       showLogin();
     });
 
+    // =================== BUKA PANDUAN SECARA MANUAL ===================
+    //Tour guide otomatis hanya muncul sekali per role. Tombol "Panduan" di header
+    // membukanya lagi kapan saja, dan Sengaja membypass penjaga ?tour=off
+    // supayaGdP bisa tetap dipakai saatUrl demo/perekaman disables tour.
+    if ($('btn-panduan')) {
+      $('btn-panduan').addEventListener('click', function () {
+        try { localStorage.removeItem(tourKey(user && user.role)); } catch (e) {}
+        startTour(true);
+      });
+    }
+
     // =================== REGISTER (PENGGUNA BARU) ===================
     if ($('link-register')) {
       $('link-register').addEventListener('click', function (e) {
@@ -2660,7 +2677,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
                 '<option value="">Tim: — pilih —</option>' +
                 '<option value="Supervisor 1">Tim Supervisor 1</option>' +
                 '<option value="Supervisor 2">Tim Supervisor 2</option>' +
-                '<option value="Officer">Tim Officer</option>' +
+                '<option value="Administrator">Tim Administrator</option>' +
               '</select>' +
             '</div>' +
             '<div class="flex gap-2">' +
@@ -2682,7 +2699,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
       var role = roleSel ? roleSel.value : 'teknisi';
       var linkEl = document.querySelector('[data-reg-bqlink="' + id + '"]');
       var bqLink = linkEl ? linkEl.value.trim() : '';
-      if (!tim) { toast('Pilih tim dulu (Supervisor 1 / 2 / Officer)', false); return; }
+      if (!tim) { toast('Pilih tim dulu (Supervisor 1 / 2 / Administrator)', false); return; }
       try {
         var res = await fetch(API + '/api/users/approve', {
           method: 'POST',
@@ -2996,7 +3013,9 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
 
     // =================== FETCH DATA ===================
     async function fetchPengajuan() {
-      const res = await fetch(API + '/api/pengajuan/all');
+      // `actor` wajib: backend menolak permintaan tanpa identitas login
+      // (teknisi hanya boleh melihat pengajuan sendiri).
+      const res = await fetch(API + '/api/pengajuan/all?actor=' + encodeURIComponent(user ? user.username : ''));
       const json = await res.json();
       if (!res.ok || json.status !== 'ok') throw new Error(json.message || 'Gagal mengambil data pengajuan');
       return json.data || [];
@@ -3188,7 +3207,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
     function actorKey() {
       const r = ((user && user.role) || '').toLowerCase();
       if (r.startsWith('supervisor')) return 'supervisor';
-      if (r === 'officer') return 'officer';
+      if (r === 'administrator') return 'administrator';
       if (r === 'manager') return 'manager';
       return 'other';
     }
@@ -3212,7 +3231,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
       const akey = actorKey();
       const canSpv      = (akey === 'supervisor' || akey === 'manager'); // backend: manager boleh juga
       const canMgr      = (akey === 'manager');
-      const canProcure  = (akey === 'officer' || akey === 'manager');
+      const canProcure  = (akey === 'administrator' || akey === 'manager');
 
       tbody.innerHTML = rows.map((r) => {
         const spvLocked = r.status_approval_spv === 'Disetujui' || r.status_approval_spv === 'Ditolak';
@@ -3224,7 +3243,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
           '<option value="' + esc(s) + '"' + (r.status_pengadaan === s ? ' selected' : '') + '>' + esc(s) + '</option>'
         ).join('');
 
-        // Kolom 7: Status Pengadaan — Officer/Manager bisa ubah, Supervisor baca-saja.
+        // Kolom 7: Status Pengadaan — Administrator/Manager bisa ubah, Supervisor baca-saja.
         let pengadaanCell;
         if (canProcure) {
           pengadaanCell =
@@ -3390,7 +3409,7 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
       const no = e.target.dataset.no;
       const val = e.target.value;
       e.target.disabled = true;
-      // Urgensi ditentukan Supervisor/Manager; status pengadaan oleh Officer/Manager.
+      // Urgensi ditentukan Supervisor/Manager; status pengadaan oleh Administrator/Manager.
       const done = e.target.matches('[data-urgency]')
         ? setUrgency(no, val)
         : setPengadaanStatus(no, val);
@@ -3578,12 +3597,15 @@ const pipelineKeys = ['BQ Baru', 'Pending', 'Proses PO', 'PO Open', 'Mencari Pen
     // seluruh data pengajuan ke browser. Ringkasan dan pengelompokan grafik
     // dihitung di database; "Semua Bulan" memakai ?all=1 (tanpa ?detail=1)
     // sedangkan pilihan satu bulan memakai ?year=&month=.
+    // `username` wajib ikut dikirim: endpoint menolak akses tanpa login
+    // (hanya Supervisor 1 & Manager yang boleh, sama seperti menunya).
     async function loadReport() {
       const sel = $('report-month');
       const v = sel.value || 'all';
+      const who = '&username=' + encodeURIComponent(user ? user.username : '');
       const url = (v === 'all')
-        ? API + '/api/reports/monthly?all=1'
-        : API + '/api/reports/monthly?year=' + v.split('-')[0] + '&month=' + v.split('-')[1];
+        ? API + '/api/reports/monthly?all=1' + who
+        : API + '/api/reports/monthly?year=' + v.split('-')[0] + '&month=' + v.split('-')[1] + who;
       try {
         const res = await fetch(url);
         const json = await res.json();
@@ -3890,8 +3912,8 @@ const s = json.summary || {};
         { sel: '[data-action="stok"]', title: 'On Hand Stock', desc: 'Cek stok semua sparepart yang tersedia di gudang.' },
         { sel: '#btn-logout', title: 'Logout', desc: 'Klik logout saat selesai bekerja.' },
       ],
-      'officer': [
-        { sel: '#greet-title', title: 'Selamat Datang, Officer!', desc: 'Kamu bertanggung jawab proses pengadaan barang. Lihat pengajuan dan urus pembelian.' },
+      'administrator': [
+        { sel: '#greet-title', title: 'Selamat Datang, Administrator!', desc: 'Kamu bertanggung jawab proses pengadaan barang. Lihat pengajuan dan urus pembelian.' },
         { sel: '[data-action="bqsummary"]', title: 'Rekapan Pengajuan', desc: 'Lihat rekapan pengajuan tim yang sudah disetujui penuh. Dipakai jadi bahan pantau pengadaan.' },
         { sel: '[data-action="monitoring"]', title: 'Monitoring', desc: 'Pantau perjalanan setiap pengajuan. Dari diajukan sampai barang sampai. Status pengadaan kamu yang atur.' },
         { sel: '[data-action="critical"]', title: 'Critical Part', desc: 'Daftar sparepart kritis yang perlu segera diurus jika stok menipis.' },
@@ -3900,7 +3922,7 @@ const s = json.summary || {};
       ],
       'manager': [
         { sel: '#greet-title', title: 'Selamat Datang, Pak Manager!', desc: 'Dashboard ini menampilkan ringkasan seluruh aktivitas sparepart. Kamu bisa approve, pantau laporan, cek stok, dan kelola user baru.' },
-        { sel: '[data-action="usermgmt"]', title: 'Approval User (Baru!)', desc: 'Pendaftaran akun baru masuk ke sini. Setujui sekaligus tugaskan tim: Supervisor 1, Supervisor 2, atau Officer. Bisa isi link BQ personal juga.' },
+        { sel: '[data-action="usermgmt"]', title: 'Approval User (Baru!)', desc: 'Pendaftaran akun baru masuk ke sini. Setujui sekaligus tugaskan tim: Supervisor 1, Supervisor 2, atau Administrator. Bisa isi link BQ personal juga.' },
         { sel: '[data-action="logactivity"]', title: 'Log Aktivitas (Baru!)', desc: 'Riwayat login & aktivitas SEMUA user — termasuk akun pending yang coba masuk. Dua tab terpisah: Riwayat Login dan Riwayat Aktivitas.' },
         { sel: '[data-action="stok"]', title: 'On Hand Stock', desc: 'Lihat stok semua sparepart secara real-time. Filter berdasarkan kategori atau kata kunci.' },
         { sel: '[data-action="report"]', title: 'Monthly Report', desc: 'Laporan bulanan pengajuan barang. Bisa export ke Excel untuk presentasi.' },
@@ -3912,14 +3934,17 @@ const s = json.summary || {};
       ],
     };
 
-    function tourKey(role) { return 'tour_done_v3_' + (role || '').toLowerCase(); }
+function tourKey(role) { return 'tour_done_v3_' + (role || '').toLowerCase(); }
 
-    function startTour() {
+function startTour(force) {
       if (!user) return;
-      // Mode demo/perekaman: link dengan ?tour=off agar guide tidak muncul.
-      try { if (new URLSearchParams(location.search).get('tour') === 'off') return; } catch (e) {}
+      // Penjaga ?tour=off HANYA berlaku untuk tour otomatis. Tour yang dibuka
+      // manual lewat tombol "Panduan" (force = true) tetap boleh muncul.
+      if (!force) {
+        try { if (new URLSearchParams(location.search).get('tour') === 'off') return; } catch (e) {}
+      }
       var key = tourKey(user.role);
-      if (localStorage.getItem(key)) return;
+      if (!force && localStorage.getItem(key)) return;
       var steps = TOUR_STEPS[user.role];
       if (!steps || !steps.length) return;
       var idx = 0;

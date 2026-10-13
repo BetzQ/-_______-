@@ -9,7 +9,7 @@ Tujuan: 5 hal yang belum saya (AI) ketahui / belum bisa diverifikasi 100%, supay
 
 ## ITEM 1 — Isi diagram alur "Flow Data Pengajuan Barang"
 
-**Kenapa perlu:** Saya tidak bisa membaca file gambar (PNG), jadi alur sebenarnya di diagram belum saya ketahui. Saya sudah memastikan kode aplikasi mengikuti alur "Teknisi → SPV → Manager → Officer", tapi perlu dikonfirmasi kesamaan dengan diagram buatan ka Fadhil.
+**Kenapa perlu:** Saya tidak bisa membaca file gambar (PNG), jadi alur sebenarnya di diagram belum saya ketahui. Saya sudah memastikan kode aplikasi mengikuti alur "Teknisi > SPV > Manager > Administrator", tapi perlu dikonfirmasi kesamaan dengan diagram buatan ka Fadhil.
 
 **LOKASI CEK:**
 ```
@@ -71,7 +71,7 @@ Kode    : public\index.html
 ```
 Manager     : username KSW  password 01KSW10
 Supervisor 1: username INN  password 30INN11
-Officer     : username ANS  password ANS1805
+Administrator: username ANS  password ANS1805
 ```
 
 **CEK MANUAL (urutan):**

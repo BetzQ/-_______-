@@ -84,7 +84,7 @@ Catat jumlah awal (bagian 5) agar mudah membandingkan.
 | Teknisi | `ANO` `BDU` `MOB` `MRN` `NDS` `RIA` `ROS` `SFH` `KFF` `ERA` `WAP` `MCL` | lihat `database/seed.sql` | Data uji tambahan |
 | Supervisor 1 | `INN` | `30INN11` | Approval tahap 1 (SPV) |
 | Supervisor 2 | `MUN` `KAA` | lihat `database/seed.sql` | Approval tahap 1 (SPV) |
-| Officer | `ANS` | `ANS1805` | Ubah Status Pengadaan |
+| Administrator | `ANS` | `ANS1805` | Ubah Status Pengadaan |
 | Manager | `KSW` | `01KSW10` | Approval final + laporan |
 
 > Password di atas tetap sama walau di database sudah disimpan sebagai hash.
@@ -95,7 +95,7 @@ Catat jumlah awal (bagian 5) agar mudah membandingkan.
 
 | Data | Nilai |
 |---|---|
-| Total users | 18 (13 teknisi, 3 supervisor, 1 officer, 1 manager) |
+| Total users | 18 (13 teknisi, 3 supervisor, 1 administrator, 1 manager) |
 | Total spareparts | 663 |
 | Critical part (`is_critical=1`) | 155 |
 | Stok rendah (qty ≤ min, min>0) | 284 |
@@ -133,7 +133,7 @@ Screenshot bukti hasil uji ada di `tests/screenshots/`.
 |---|---|---|---|---|
 | AUTH-01 | P0 | Server jalan | Buka app, login `AAA`/`04AAA10` | Masuk dashboard teknisi, 2 menu tampil |
 | AUTH-02 | P0 | - | Login `INN`/`30INN11` | Masuk dashboard supervisor, 3 menu tampil |
-| AUTH-03 | P0 | - | Login `ANS`/`ANS1805` | Masuk dashboard officer, 3 menu tampil |
+| AUTH-03 | P0 | - | Login `ANS`/`ANS1805` | Masuk dashboard administrator, 3 menu tampil |
 | AUTH-04 | P0 | - | Login `KSW`/`01KSW10` | Masuk dashboard manager, 3 menu tampil |
 | AUTH-05 | P0 | - | Login `AAA`/`salah` | Ditolak, toast "Kombinasi Username atau Password salah", tetap di halaman login |
 | AUTH-06 | P0 | - | Login username tidak terdaftar | Ditolak dengan pesan yang sama (tidak membocorkan username ada/tidak) |
@@ -150,7 +150,7 @@ Screenshot bukti hasil uji ada di `tests/screenshots/`.
 | ID | P | Prasyarat | Langkah | Hasil Diharapkan |
 |---|---|---|---|---|
 | RBAC-01 | P0 | Login teknisi | Lihat jumlah & nama menu | 2 menu: **BQ Personal**, **On Hand Stock** |
-| RBAC-02 | P0 | Login supervisor/officer | Lihat menu | 3 menu: **PR Summary**, **BQ Monitoring**, **Critical Part List** |
+| RBAC-02 | P0 | Login supervisor/administrator | Lihat menu | 3 menu: **PR Summary**, **BQ Monitoring**, **Critical Part List** |
 | RBAC-03 | P0 | Login manager | Lihat menu | 3 menu: **BQ Monitoring**, **Monthly Report**, **Critical Part List** |
 | RBAC-04 | P0 | Login `INN` | Buka BQ Monitoring | Baris approval menampilkan tombol **Approve/Reject** (tahap SPV) |
 | RBAC-05 | P0 | Login `KSW` | Buka BQ Monitoring | Tombol **Approve/Reject** (tahap MGR); non-aktif bila SPV belum Disetujui |
@@ -193,7 +193,7 @@ Screenshot bukti hasil uji ada di `tests/screenshots/`.
 | APP-04 | P0 | Pengajuan SPV masih Menunggu, login manager | Arahkan ke tombol MGR | Tombol non-aktif + tooltip "Menunggu persetujuan Supervisor (SPV)" |
 | APP-05 | P1 | SPV sudah Disetujui/Ditolak | Lihat tombol SPV (supervisor) | Tombol terkunci (disabled) |
 | APP-06 | P1 | MGR sudah final | Lihat tombol MGR (manager) | Tombol terkunci (disabled) |
-| APP-07 | P1 | Login officer | Ubah dropdown Status Pengadaan: Pending → Proses PO → Barang Dikirim → Tiba di Gudang | Setiap perubahan tersimpan & tampil |
+| APP-07 | P1 | Login administrator | Ubah dropdown Status Pengadaan: Pending → Proses PO → Barang Dikirim → Tiba di Gudang | Setiap perubahan tersimpan & tampil |
 | APP-08 | P1 | Login manager | Ubah dropdown Status Pengadaan | Tersimpan (manager boleh update pengadaan) |
 | APP-09 | P1 | API | PUT `status_pengadaan="Selesai"` (di luar daftar) | HTTP 400 dengan daftar nilai yang diizinkan |
 | APP-10 | P1 | API | PUT `status_approval_spv="setuju"` (invalid) | HTTP 400 nilai tidak valid |
@@ -277,7 +277,7 @@ Screenshot bukti hasil uji ada di `tests/screenshots/`.
 
 | ID | P | Langkah | Kondisi Sekarang | Diperlukan |
 |---|---|---|---|---|
-| PRS-01 | P2 | Klik menu **PR Summary** (supervisor/officer) | Muncul toast "Modul ini sedang dalam pengembangan." | Konfirmasi scope PR Summary |
+| PRS-01 | P2 | Klik menu **PR Summary** (supervisor/administrator) | Muncul toast "Modul ini sedang dalam pengembangan." | Konfirmasi scope PR Summary |
 | URG-01 | P2 | Cari field Urgency di form | Tidak ada | Format & nilai (Normal/Urgent) untuk KPI <10% |
 | JA-01 | P2 | Ajukan barang Jasa (JA)/BR | Tidak bisa disimpan (Item Code wajib) | Keputusan apakah JA/BR masuk cakupan |
 | REP-11 | P2 | Bandingkan format laporan dengan Looker Studio lama | Format mengikuti versi aplikasi | Format final Monthly/Min-Max Report |

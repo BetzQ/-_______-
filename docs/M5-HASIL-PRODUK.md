@@ -58,7 +58,7 @@ yang sama.
 | AAA | Teknisi | ✔ | ditolak (403) — sesuai rancangan |
 | INN | Supervisor 1 | ✔ | diizinkan |
 | KAA | Supervisor 2 | ✔ | ditolak (403) — sesuai rancangan |
-| ANS | Officer | ✔ | ditolak (403) — sesuai rancangan |
+| ANS | Administrator | ✔ | ditolak (403) — sesuai rancangan |
 | KSW | Manager | ✔ | diizinkan |
 
 ---

@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS users (
   id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
   username   VARCHAR(50)  NOT NULL,
   password   VARCHAR(255) NOT NULL,            -- sementara plain-text, hashing nanti
-  role       VARCHAR(50)  NOT NULL,            -- teknisi / Supervisor 1 / Supervisor 2 / Officer / manager
+  role       VARCHAR(50)  NOT NULL,            -- teknisi / Supervisor 1 / Supervisor 2 / Administrator / manager
   name       VARCHAR(100) NOT NULL,
-  bqLink     TEXT NULL,                        -- NULL untuk Supervisor/Officer/Manager
+  bqLink     TEXT NULL,                        -- NULL untuk Supervisor/Administrator/Manager
   supervisor_id INT UNSIGNED NULL,             -- tim/supervisor yang menaungi teknisi ini
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),

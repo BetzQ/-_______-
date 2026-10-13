@@ -19,7 +19,7 @@ const AKUN = [
   { username: 'AAA', password: '04AAA10', role: 'Teknisi' },
   { username: 'INN', password: '30INN11', role: 'Supervisor 1' },
   { username: 'KAA', password: 'KAA1910', role: 'Supervisor 2' },
-  { username: 'ANS', password: 'ANS1805', role: 'Officer Penagihan' },
+  { username: 'ANS', password: 'ANS1805', role: 'Administrator' },
   { username: 'KSW', password: '01KSW10', role: 'Manager' },
 ];
 
@@ -132,14 +132,16 @@ function monthOf(v) {
   const totalNilaiUnit = sp.reduce((a, s) => a + s.qty_on_hand, 0);
 
   // ---------- 2. Data transaksi pengajuan ----------
-  const pengajuan = toArray(await getJSON(`${BASE}/api/pengajuan/all`));
+  const pengajuan = toArray(await getJSON(`${BASE}/api/pengajuan/all?actor=KSW`));
   const bqSummary = toArray(await getJSON(`${BASE}/api/pengajuan/bq-summary`));
   log(`Pengajuan (all)   : ${pengajuan.length} baris`);
   log(`BQ Summary        : ${bqSummary.length} baris`);
 
   let monthly = null;
   try {
-    monthly = await getJSON(`${BASE}/api/reports/monthly`);
+    // endpoint ini wajib menyertakan username dan hanya menerima
+    // Supervisor 1 / Manager — pakai akun Manager (KSW).
+    monthly = await getJSON(`${BASE}/api/reports/monthly?all=1&username=KSW`);
   } catch (e) {
     log('WARN: /api/reports/monthly gagal: ' + e.message);
   }
@@ -399,7 +401,7 @@ function monthOf(v) {
   md.push('- `master-sparepart.csv` — seluruh item sparepart beserta stok & status kritis');
   md.push('- `komposisi-status-pengajuan.csv` — komposisi status untuk grafik Bab IV');
   md.push('- `stok-di-bawah-minimum.csv` — daftar item yang menyentuh batas minimum');
-  md.push('- `../hasil-produk/*.png` — bukti visual setiap menu per peran (lihat `M5-HASIL-PRODUK.md`)');
+  md.push('- `../hasil-produk/stok-*.png` — bukti visual modul stok terbaru per peran, 5 peran x 4 tampilan + layout rak (lihat `M5-HASIL-PRODUK.md`; screenshot lama 26 Sep tetap disimpan sebagai bukti historis)');
   md.push('- `../video/` — rekaman demo alur end-to-end');
   md.push('');
 

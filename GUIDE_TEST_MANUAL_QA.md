@@ -19,7 +19,7 @@
 | Supervisor 1 | INN | 30INN11 | AUTH, RBAC, APP, MON |
 | Supervisor 2 | MUN | 2506MUN | RBAC, APP, MON |
 | Supervisor 2 | KAA | KAA1910 | RBAC, APP, MON |
-| Officer | ANS | ANS1805 | AUTH, RBAC, FORM, STOK |
+| Administrator | ANS | ANS1805 | AUTH, RBAC, FORM, STOK |
 | Manager | KSW | 01KSW10 | APP, MON, REP, UI, E2E |
 
 ---
@@ -64,7 +64,7 @@
 
 **AUTH-01: Login Teknisi (AAA)** → 200, role teknisi, ada bqLink, password tidak bocor
 **AUTH-02: Login Supervisor (INN)** → 200, role Supervisor 1
-**AUTH-03: Login Officer (ANS)** → 200, role Officer
+**AUTH-03: Login Administrator (ANS)** → 200, role Administrator
 **AUTH-04: Login Manager (KSW)** → 200, role manager
 **AUTH-05: Password salah ditolak** → 401, message "Kombinasi Username atau Password salah"
 **AUTH-06: Username tak terdaftar** → 401, pesan sama seperti AUTH-05
@@ -77,7 +77,7 @@
 
 **RBAC-08: Teknisi tidak boleh approval** → Login AAA, coba approve SPV → 403
 **RBAC-09: Supervisor tidak boleh approval MGR** → Login INN, coba approve MGR → 403 (hanya Manager yang boleh)
-**RBAC-10: Officer tidak boleh approval** → Login ANS, coba approve SPV → 403
+**RBAC-10: Administrator tidak boleh approval** → Login ANS, coba approve SPV → 403
 **RBAC-11: Manager menunggu approval SPV** → Login KSW, approve MGR saat SPV belum → 400 (pesan alur)
 **RBAC-12: User tak dikenal** → Login ghost, ubah status → 401
 **RBAC-13: Buat pengajuan tanpa login** → POST /api/pengajuan tanpa username → 401

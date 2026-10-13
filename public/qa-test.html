@@ -165,7 +165,7 @@
     var CRED = {
       teknisi:    { user: 'AAA', pass: '04AAA10' },
       supervisor: { user: 'INN', pass: '30INN11' },
-      officer:    { user: 'ANS', pass: 'ANS1805' },
+      administrator:    { user: 'ANS', pass: 'ANS1805' },
       manager:    { user: 'KSW', pass: '01KSW10' },
     };
 
@@ -440,10 +440,10 @@
           var r = await callApi(t, 'POST', '/api/login', { username: 'INN', password: '30INN11' });
           t.eq(r.status, 200, 'HTTP status'); t.eq(r.json.data.role, 'Supervisor 1', 'role');
         } },
-      { id: 'AUTH-03', group: 'AUTH', priority: 'P0', mode: 'safe', title: 'Login Officer (ANS)', expected: '200; role "Officer"',
+      { id: 'AUTH-03', group: 'AUTH', priority: 'P0', mode: 'safe', title: 'Login Administrator (ANS)', expected: '200; role "Administrator"',
         run: async function (t) {
           var r = await callApi(t, 'POST', '/api/login', { username: 'ANS', password: 'ANS1805' });
-          t.eq(r.status, 200, 'HTTP status'); t.eq(r.json.data.role, 'Officer', 'role');
+          t.eq(r.status, 200, 'HTTP status'); t.eq(r.json.data.role, 'Administrator', 'role');
         } },
       { id: 'AUTH-04', group: 'AUTH', priority: 'P0', mode: 'safe', title: 'Login Manager (KSW)', expected: '200; role "manager"',
         run: async function (t) {
@@ -624,7 +624,7 @@
       // ---------- RBAC ----------
       { id: 'RBAC-08', group: 'RBAC', priority: 'P0', mode: 'safe', title: 'Teknisi tidak boleh approval', expected: 'PUT status_approval_spv sebagai AAA -> 403',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var no = all.json.data[0].no_registrasi;
           t.info('Target: ' + no);
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'AAA', status_approval_spv: 'Disetujui' });
@@ -632,21 +632,21 @@
         } },
       { id: 'RBAC-09', group: 'RBAC', priority: 'P1', mode: 'safe', title: 'Supervisor tidak boleh approval MGR', expected: 'PUT status_approval_manager sebagai INN -> 403',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var no = all.json.data[0].no_registrasi;
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'INN', status_approval_manager: 'Disetujui' });
           t.eq(r.status, 403, 'HTTP status');
         } },
-      { id: 'RBAC-10', group: 'RBAC', priority: 'P1', mode: 'safe', title: 'Officer tidak boleh approval', expected: 'PUT status_approval_spv sebagai ANS -> 403',
+      { id: 'RBAC-10', group: 'RBAC', priority: 'P1', mode: 'safe', title: 'Administrator tidak boleh approval', expected: 'PUT status_approval_spv sebagai ANS -> 403',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var no = all.json.data[0].no_registrasi;
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'ANS', status_approval_spv: 'Disetujui' });
           t.eq(r.status, 403, 'HTTP status');
         } },
       { id: 'RBAC-11', group: 'RBAC', priority: 'P1', mode: 'safe', title: 'Manager menunggu approval SPV', expected: 'Approve MGR saat SPV!=Disetujui -> 400 (pesan alur "setelah Supervisor")',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var cand = all.json.data.filter(function (r) { return r.status_approval_spv !== 'Disetujui'; })[0];
           if (!cand) t.skip('Tidak ada pengajuan dengan SPV != Disetujui untuk diuji.');
           t.info('Target: ' + cand.no_registrasi + ' (SPV=' + cand.status_approval_spv + ')');
@@ -656,7 +656,7 @@
         } },
       { id: 'RBAC-12', group: 'RBAC', priority: 'P1', mode: 'safe', title: 'User tak dikenal -> 401', expected: 'PUT status dengan username ghost -> 401 "User tidak ditemukan"',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var no = all.json.data[0].no_registrasi;
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'QA_GHOST_XYZ', status_pengadaan: 'Proses PO' });
           t.eq(r.status, 401, 'HTTP status');
@@ -677,20 +677,45 @@
            var r3 = await callApi(t, 'GET', '/api/pengajuan/summary?username=KAA');
            t.eq(r3.status, 403, 'Supervisor 2 ditolak akses');
            var r4 = await callApi(t, 'GET', '/api/pengajuan/summary?username=ANS');
-           t.eq(r4.status, 403, 'Officer ditolak akses');
+           t.eq(r4.status, 403, 'Administrator ditolak akses');
            var r5 = await callApi(t, 'GET', '/api/pengajuan/summary?username=KSW');
            t.eq(r5.status, 200, 'Manager boleh akses');
            t.eq(r1.status, 403); t.eq(r2.status, 200); t.eq(r3.status, 403); t.eq(r4.status, 403); t.eq(r5.status, 200);
          } },
        { id: 'RBAC-15', group: 'RBAC', priority: 'P1', mode: 'write', title: 'Supervisor 2 (KAA) boleh approve SPV', expected: 'PUT status_approval_spv sebagai KAA -> 200',
          run: async function (t) {
-           var all = await callApi(t, 'GET', '/api/pengajuan/all');
+           var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
            var menunggu = all.json.data.filter(function (r) { return r.status_approval_spv === 'Menunggu'; });
            if (!menunggu.length) { t.skip('Tidak ada pengajuan Menunggu untuk uji'); return; }
            var no = menunggu[0].no_registrasi;
            var r1 = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'KAA', status_approval_spv: 'approved' });
            t.eq(r1.status, 200, 'KAA boleh approve SPV');
          } },
+        // --- RBAC penguncian Status Pengadaan (revisi role Officer -> Administrator) ---
+        { id: 'RBAC-16', group: 'RBAC', priority: 'P0', mode: 'safe', title: 'Role selain Administrator DITOLAK ubah status pengadaan (403)', expected: 'PUT status_pengadaan oleh INN / KAA / AAA -> 403 dan status tidak berubah',
+          run: async function (t) {
+            var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
+            var row = (all.json.data || [])[0];
+            if (!row) { t.skip('Tidak ada pengajuan untuk diuji'); return; }
+            var no = row.no_registrasi;
+            var before = row.status_pengadaan;
+            var bantu = ['INN', 'KAA', 'AAA'];
+            for (var i = 0; i < bantu.length; i++) {
+              var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: bantu[i], status_pengadaan: 'Proses PO' });
+              t.eq(r.status, 403, bantu[i] + ' ditolak (403)');
+              t.check(/Administrator/i.test(String(r.json.message || '')), 'pesan menyebut Administrator');
+            }
+            var cek = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
+            var stlh = cek.json.data.filter(function (r) { return r.no_registrasi === no; })[0];
+            t.eq(stlh.status_pengadaan, before, 'status procurement tidak berubah sama sekali');
+          } },
+        { id: 'RBAC-17', group: 'RBAC', priority: 'P0', mode: 'safe', title: 'Role Administrator dikenali sistem', expected: 'Login ANS -> role = Administrator (bukan Officer, bukan unknown)',
+          run: async function (t) {
+            var login = await callApi(t, 'POST', '/api/login', { username: 'ANS', password: 'ANS1805' });
+            t.eq(login.status, 200, 'login ANS berhasil');
+            var role = String(login.json.data.role || '');
+            t.check(/administrator/i.test(role), 'role ANS = ' + role + ' (harus Administrator)');
+          } },
 
       // ---------- FORM ----------
       { id: 'FORM-08', group: 'FORM', priority: 'P1', mode: 'safe', title: 'Field pelengkap wajib (UoM/Purpose/EJO/Area)', expected: 'POST tanpa uom -> 400 "UoM, Purpose, No. EJO, dan Mesin/Area wajib diisi..."',
@@ -750,7 +775,7 @@
       // ---------- APP ----------
        { id: 'APP-09', group: 'APP', priority: 'P1', mode: 'safe', title: 'Status pengadaan invalid ditolak', expected: 'PUT status_pengadaan="Belum FSA" -> 400 + daftar nilai diizinkan',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var no = all.json.data[0].no_registrasi;
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'ANS', status_pengadaan: 'Belum FSA' });
           t.eq(r.status, 400, 'HTTP status');
@@ -761,7 +786,7 @@
         } },
       { id: 'APP-10', group: 'APP', priority: 'P1', mode: 'safe', title: 'Nilai approval invalid ditolak', expected: 'PUT status_approval_spv="setuju" -> 400 nilai tidak valid',
         run: async function (t) {
-          var all = await callApi(t, 'GET', '/api/pengajuan/all');
+          var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var no = all.json.data[0].no_registrasi;
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'INN', status_approval_spv: 'setuju' });
           t.eq(r.status, 400, 'HTTP status');
@@ -769,7 +794,7 @@
         } },
        { id: 'APP-11', group: 'APP', priority: 'P2', mode: 'safe', title: 'Tanpa status -> 400', expected: 'PUT body hanya {username} -> 400 "Tidak ada status yang dikirim untuk diubah"',
          run: async function (t) {
-           var all = await callApi(t, 'GET', '/api/pengajuan/all');
+           var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
            var no = all.json.data[0].no_registrasi;
            var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status', { username: 'ANS' });
            t.eq(r.status, 400, 'HTTP status');
@@ -785,7 +810,7 @@
          } },
        { id: 'APP-12B', group: 'APP', priority: 'P0', mode: 'safe', title: 'PR Summary memuat SELURUH data PR, bukan hanya yang menunggu', expected: 'status=semua -> total == jumlah dari /api/pengajuan/all; status=Menunggu -> total lebih kecil; kolom item_code/uom/no_ejo/status_approval_manager tersedia',
          run: async function (t) {
-           var all = await callApi(t, 'GET', '/api/pengajuan/all');
+           var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
            var totalAll = all.json.count != null ? all.json.count : all.json.data.length;
            var sem = await callApi(t, 'GET', '/api/pengajuan/summary?username=KSW&status=semua');
            t.eq(sem.status, 200, 'HTTP status status=semua');
@@ -867,7 +892,7 @@
           } },
         { id: 'APP-14', group: 'APP', priority: 'P1', mode: 'safe', title: 'Supervisor boleh menentukan urgency', expected: 'PUT {username:"INN", urgency:"Urgent"} -> 200 dan tersimpan sebagai Urgent',
           run: async function (t) {
-            var all = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA');
+            var all = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA&actor=AAA');
             var row = all.json.data.filter(function (x) { return x.status_approval_spv === 'Menunggu'; })[0];
             if (!row) { t.check(true, 'skip: tidak ada pengajuan Menunggu milik AAA'); return; }
             var before = row.urgency;
@@ -875,7 +900,7 @@
             var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(row.no_registrasi) + '/status',
               { username: 'INN', urgency: target });
             t.eq(r.status, 200, 'HTTP status (' + row.no_registrasi + ' -> ' + target + ')');
-            var after = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA');
+            var after = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA&actor=AAA');
             var now = after.json.data.filter(function (x) { return x.no_registrasi === row.no_registrasi; })[0];
             t.eq(now.urgency, target, 'urgency tersimpan di database');
             // kembalikan supaya data uji tidak berubah
@@ -884,7 +909,7 @@
           } },
         { id: 'APP-15', group: 'APP', priority: 'P1', mode: 'safe', title: 'Teknisi DITOLAK saat mau mengubah urgency', expected: 'PUT {username:"AAA", urgency:"Urgent"} -> 403',
           run: async function (t) {
-            var all = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA');
+            var all = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA&actor=AAA');
             var no = all.json.data[0].no_registrasi;
             var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status',
               { username: 'AAA', urgency: 'Urgent' });
@@ -893,7 +918,7 @@
           } },
         { id: 'APP-16', group: 'APP', priority: 'P1', mode: 'safe', title: 'Nilai urgency ngawur ditolak', expected: 'PUT {username:"INN", urgency:"Super Urgent"} -> 400',
           run: async function (t) {
-            var all = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA');
+            var all = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA&actor=AAA');
             var no = all.json.data[0].no_registrasi;
             var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(no) + '/status',
               { username: 'INN', urgency: 'Super Urgent' });
@@ -901,7 +926,7 @@
           } },
         { id: 'APP-17', group: 'APP', priority: 'P1', mode: 'safe', title: 'Filter pengajuan per teknisi', expected: 'GET /api/pengajuan/all?username=AAA -> 200, semua baris milik AAA',
           run: async function (t) {
-            var r = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA');
+            var r = await callApi(t, 'GET', '/api/pengajuan/all?username=AAA&actor=AAA');
             t.eq(r.status, 200, 'HTTP status');
             var rows = r.json.data || [];
             t.check(rows.length > 0, 'ada data milik AAA (' + rows.length + ')');
@@ -1057,36 +1082,42 @@
           } },
         { id: 'BQS-03', group: 'APP', priority: 'P1', mode: 'safe', title: 'Filter full_approved di daftar pengajuan', expected: 'GET /api/pengajuan/all?full_approved=1 -> hanya pengajuan full approve',
           run: async function (t) {
-            var r = await callApi(t, 'GET', '/api/pengajuan/all?full_approved=1');
+            var r = await callApi(t, 'GET', '/api/pengajuan/all?full_approved=1&actor=KSW');
             t.eq(r.status, 200, 'HTTP status');
             var rows = r.json.data || [];
             t.check(rows.every(function (x) {
               return x.status_approval_spv === 'Disetujui' && x.status_approval_manager === 'Disetujui';
             }), 'semua baris full approve (' + rows.length + ')');
-            var all = await callApi(t, 'GET', '/api/pengajuan/all');
+            var all = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
             t.check(rows.length <= (all.json.data || []).length, 'jumlah terfilter <= total keseluruhan');
           } },
 
 
        // ---------- MONTHLY REPORT ----------
-       { id: 'MON-RPT', group: 'APP', priority: 'P1', mode: 'safe', title: 'Monthly Report per periode', expected: 'GET /api/reports/monthly?year=2026&month=9 -> 200, period=2026-9',
+       { id: 'MON-RPT', group: 'APP', priority: 'P1', mode: 'safe', title: 'Monthly Report per periode + hanya Supervisor 1/Manager', expected: 'GET /api/reports/monthly?year=2026&month=9 -> 200; tanpa username -> 401; teknisi -> 403',
          run: async function (t) {
-           var r = await callApi(t, 'GET', '/api/reports/monthly?year=2026&month=9');
+           var r = await callApi(t, 'GET', '/api/reports/monthly?year=2026&month=9&username=KSW');
            t.eq(r.status, 200, 'HTTP status');
            t.eq(r.json.period.year, 2026, 'period.year');
            t.eq(r.json.period.month, 9, 'period.month');
            t.check(r.json.summary, 'summary ada');
            t.check(typeof r.json.summary.total === 'number', 'summary.total ada');
+           var tanpaLogin = await callApi(t, 'GET', '/api/reports/monthly?all=1');
+           t.eq(tanpaLogin.status, 401, 'tanpa username ditolak 401');
+           var teknisi = await callApi(t, 'GET', '/api/reports/monthly?all=1&username=AAA');
+           t.eq(teknisi.status, 403, 'teknisi ditolak 403');
+           var spv1 = await callApi(t, 'GET', '/api/reports/monthly?all=1&username=INN');
+           t.eq(spv1.status, 200, 'Supervisor 1 (INN) diizinkan');
          } },
        { id: 'MON-RPT2', group: 'APP', priority: 'P2', mode: 'safe', title: 'Monthly Report bulan invalid ditolak', expected: 'GET /api/reports/monthly?month=13 -> 400',
          run: async function (t) {
-           var r = await callApi(t, 'GET', '/api/reports/monthly?year=2026&month=13');
+           var r = await callApi(t, 'GET', '/api/reports/monthly?year=2026&month=13&username=KSW');
            t.eq(r.status, 400, 'HTTP status');
            t.check(/bulan tidak valid/i.test(r.json.message), 'message: ' + r.json.message);
          } },
        { id: 'MON-RPT3', group: 'APP', priority: 'P0', mode: 'safe', title: 'Definisi status Monthly Report seragam dengan data', expected: 'waiting+approved+rejected == total; approved/waiting berbasis status SPV; fullApproved == SPV & MGR disetujui; groups.bulan total == summary.total',
          run: async function (t) {
-           var r = await callApi(t, 'GET', '/api/reports/monthly?all=1&detail=1');
+           var r = await callApi(t, 'GET', '/api/reports/monthly?all=1&detail=1&username=KSW');
            t.eq(r.status, 200, 'HTTP status ?all=1&detail=1');
            var s = r.json.summary;
            var rows = r.json.data || [];
@@ -1101,7 +1132,7 @@
          } },
        { id: 'MON-RPT4', group: 'APP', priority: 'P0', mode: 'safe', title: 'Monthly Report agregasi di server (tidak kirim ribuan baris ke browser)', expected: '?all=1 tanpa detail -> data kosong, groups terisi dan jumlahnya cocok dengan summary',
          run: async function (t) {
-           var r = await callApi(t, 'GET', '/api/reports/monthly?all=1');
+           var r = await callApi(t, 'GET', '/api/reports/monthly?all=1&username=KSW');
            t.eq(r.status, 200, 'HTTP status ?all=1');
            t.eq((r.json.data || []).length, 0, 'tidak mengirim baris mentah tanpa ?detail=1');
            t.eq(r.json.count, r.json.summary.total, 'count == summary.total');
@@ -1116,11 +1147,11 @@
          } },
        { id: 'MON-RPT5', group: 'APP', priority: 'P1', mode: 'safe', title: 'Monthly Report satu bulan = jumlah pada periode yang sama', expected: 'GET satu bulan -> summary.total == jumlah pada groups.bulan untuk periode itu',
          run: async function (t) {
-           var semua = await callApi(t, 'GET', '/api/reports/monthly?all=1');
+           var semua = await callApi(t, 'GET', '/api/reports/monthly?all=1&username=KSW');
            var p = (semua.json.periods || [])[0];
            if (!p) { t.skip('Tidak ada periode'); return; }
            var parts = String(p.periode).split('-');
-           var r = await callApi(t, 'GET', '/api/reports/monthly?year=' + parts[0] + '&month=' + parts[1]);
+            var r = await callApi(t, 'GET', '/api/reports/monthly?year=' + parts[0] + '&month=' + parts[1] + '&username=KSW');
            t.eq(r.status, 200, 'HTTP status ' + p.periode);
            t.eq(r.json.summary.total, p.jumlah, 'summary.total satu bulan == jumlah periode di daftar (' + p.periode + ': ' + p.jumlah + ')');
          } },
@@ -1149,17 +1180,25 @@
         } },
 
       // ---------- MON ----------
-      { id: 'MON-01', group: 'MON', priority: 'P0', mode: 'safe', title: 'Monitoring memuat seluruh pengajuan', expected: 'GET /api/pengajuan/all -> >= 200 baris, terbaru di atas, count = panjang data',
+      { id: 'MON-01', group: 'MON', priority: 'P0', mode: 'safe', title: 'Monitoring memuat seluruh pengajuan (wajib login)', expected: 'GET /api/pengajuan/all?actor=KSW -> >= 200 baris, count = panjang data; tanpa actor -> 401; teknisi tanpa filter sendiri -> 403',
         run: async function (t) {
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           t.eq(r.status, 200, 'HTTP status');
           t.eq(r.json.count, r.json.data.length, 'count = jumlah data');
           t.check(r.json.data.length >= EXPECT.pengajuan, 'jumlah pengajuan ' + r.json.data.length + ' >= baseline ' + EXPECT.pengajuan);
           t.info('Baris teratas: ' + r.json.data[0].no_registrasi + ' / ' + r.json.data[0].nama_teknisi);
+          var tanpaLogin = await callApi(t, 'GET', '/api/pengajuan/all');
+          t.eq(tanpaLogin.status, 401, 'tanpa actor ditolak 401');
+          var teknisiBocor = await callApi(t, 'GET', '/api/pengajuan/all?actor=AAA');
+          t.eq(teknisiBocor.status, 403, 'teknisi tanpa filter sendiri ditolak 403');
+          var teknisiSendiri = await callApi(t, 'GET', '/api/pengajuan/all?actor=AAA&username=AAA');
+          t.eq(teknisiSendiri.status, 200, 'teknisi boleh melihat pengajuan sendiri');
+          var teknisiOrangLain = await callApi(t, 'GET', '/api/pengajuan/all?actor=AAA&username=ANO');
+          t.eq(teknisiOrangLain.status, 403, 'teknisi tidak boleh melihat pengajuan teknisi lain');
         } },
       { id: 'MON-02', group: 'MON', priority: 'P0', mode: 'safe', title: 'Kolom monitoring lengkap', expected: 'Baris memuat no_registrasi, timestamp, teknisi, item, qty, status SPV/Manager, pengadaan',
         run: async function (t) {
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var row = r.json.data[0];
           ['no_registrasi', 'timestamp', 'nama_teknisi', 'item_code', 'deskripsi_barang', 'qty_diminta', 'status_approval_spv', 'status_approval_manager', 'status_pengadaan', 'spesifikasi_lengkap', 'no_ejo', 'mesin_area', 'uom', 'purpose', 'jenis_pengajuan', 'urgency'].forEach(function (k) {
             t.check(k in row, 'kolom "' + k + '" ada');
@@ -1178,7 +1217,7 @@
          } },
        { id: 'MON-03', group: 'MON', priority: 'P1', mode: 'safe', title: 'Kolom jenis & urgency di monitoring', expected: 'GET /api/pengajuan/all -> setiap baris punya kolom jenis_pengajuan dan urgency',
          run: async function (t) {
-           var r = await callApi(t, 'GET', '/api/pengajuan/all');
+           var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
            var row = r.json.data[0];
            t.check('jenis_pengajuan' in row, 'kolom "jenis_pengajuan" ada');
            t.check('urgency' in row, 'kolom "urgency" ada');
@@ -1189,7 +1228,7 @@
       // ---------- REP ----------
       { id: 'REP-05', group: 'REP', priority: 'P0', mode: 'safe', title: 'Periode laporan tersedia', expected: 'Data mencakup ' + EXPECT.months + ' bulan (Jan 2025 - Okt 2026)',
         run: async function (t) {
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var keys = {};
           r.json.data.forEach(function (x) { var k = monthKey(x.timestamp); if (k) keys[k] = 1; });
           var n = Object.keys(keys).length;
@@ -1198,14 +1237,14 @@
         } },
       { id: 'REP-06', group: 'REP', priority: 'P0', mode: 'safe', title: 'Rekap Sep 2026', expected: 'Jumlah pengajuan Sep 2026 >= ' + EXPECT.pengajuanSep,
         run: async function (t) {
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var n = r.json.data.filter(function (x) { return monthKey(x.timestamp) === '2026-09'; }).length;
           t.info('Sep 2026 = ' + n + ' (baseline ' + EXPECT.pengajuanSep + ')');
           t.check(n >= EXPECT.pengajuanSep, 'jumlah Sep 2026 ' + n + ' >= ' + EXPECT.pengajuanSep);
         } },
       { id: 'REP-07', group: 'REP', priority: 'P1', mode: 'safe', title: 'Rekap Jan & Feb 2025', expected: 'Jan 2025 >= 16 dan Feb 2025 >= 20',
         run: async function (t) {
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var jan = r.json.data.filter(function (x) { return monthKey(x.timestamp) === '2025-01'; }).length;
           var feb = r.json.data.filter(function (x) { return monthKey(x.timestamp) === '2025-02'; }).length;
           t.info('Jan 2025=' + jan + ', Feb 2025=' + feb);
@@ -1424,7 +1463,7 @@
           t.check(titles.indexOf('Layout Rak') >= 0, 'menu "Layout Rak" ada');
           t.check(fDoc().getElementById('my-bq-section').classList.contains('hidden'), '"Pengajuan Saya" disembunyikan untuk non-teknisi');
         } },
-      { id: 'UI-23', group: 'UI', priority: 'P0', mode: 'ui', title: 'Dashboard Supervisor 1 punya blok Antrean Approval Saya', expected: 'Login INN -> blok antrean tampil (KPI + daftar terbaru + tombol Tim Saya/Semua Tim + refresh); blok ini BQ-saja, KPI stok tetap global; blok disembunyikan untuk teknisi/Officer/Manager',
+      { id: 'UI-23', group: 'UI', priority: 'P0', mode: 'ui', title: 'Dashboard Supervisor 1 punya blok Antrean Approval Saya', expected: 'Login INN -> blok antrean tampil (KPI + daftar terbaru + tombol Tim Saya/Semua Tim + refresh); blok ini BQ-saja, KPI stok tetap global; blok disembunyikan untuk teknisi/Administrator/Manager',
         run: async function (t) {
           await uiLoginAs('supervisor', t);
           var sec = fDoc().getElementById('approval-queue-section');
@@ -1452,8 +1491,8 @@
 
           await uiLoginAs('manager', t);
           t.check(fDoc().getElementById('approval-queue-section').classList.contains('hidden'), 'blok antrean disembunyikan untuk Manager');
-          await uiLoginAs('officer', t);
-          t.check(fDoc().getElementById('approval-queue-section').classList.contains('hidden'), 'blok antrean disembunyikan untuk Officer');
+          await uiLoginAs('administrator', t);
+          t.check(fDoc().getElementById('approval-queue-section').classList.contains('hidden'), 'blok antrean disembunyikan untuk Administrator');
           await uiLoginAs('teknisi', t);
           t.check(fDoc().getElementById('approval-queue-section').classList.contains('hidden'), 'blok antrean disembunyikan untuk Teknisi');
         } },
@@ -1487,7 +1526,7 @@
           await waitFor(function () { var m = fDoc().getElementById('modal-report'); return m && !m.classList.contains('hidden'); }, 8000);
           var loaded = await waitFor(function () { return Number(fDoc().getElementById('lbl-total').textContent) > 0; }, 12000);
           t.check(loaded, 'ringkasan laporan terisi');
-          var api = await callApi(t, 'GET', '/api/reports/monthly?all=1');
+          var api = await callApi(t, 'GET', '/api/reports/monthly?all=1&username=KSW');
           t.eq(Number(fDoc().getElementById('lbl-total').textContent), api.json.summary.total,
             'lbl-total = summary.total endpoint (' + api.json.summary.total + ')');
           t.check(!!fDoc().getElementById('lbl-full'), 'kartu Full Approve ada');
@@ -1500,11 +1539,11 @@
           t.check(/Looker Studio \(laporan lama\)/.test(body), 'Looker ditandai laporan lama/manual');
           t.check(!/Looker/.test(body.replace(/Looker Studio \(laporan lama\)/g, '')), 'tidak ada teks Looker lain yang seolah sumber resmi');
         } },
-      { id: 'UI-10', group: 'UI', priority: 'P0', mode: 'ui', title: 'Menu Officer (5 modul)', expected: 'Login ANS -> 5 menu: Rekapan Pengajuan, Approval BQ Tahap Supervisor, Critical Part List, On Hand Stock, Layout Rak',
+      { id: 'UI-10', group: 'UI', priority: 'P0', mode: 'ui', title: 'Menu Administrator (5 modul)', expected: 'Login ANS -> 5 menu: Rekapan Pengajuan, Approval BQ Tahap Supervisor, Critical Part List, On Hand Stock, Layout Rak',
         run: async function (t) {
-          await uiLoginAs('officer', t);
+          await uiLoginAs('administrator', t);
           var cards = Array.prototype.slice.call(fDoc().querySelectorAll('#menu-grid [data-action]'));
-          t.eq(cards.length, 5, 'jumlah menu officer');
+          t.eq(cards.length, 5, 'jumlah menu administrator');
           var titles = cards.map(function (b) { return b.querySelector('h3').textContent.trim(); });
           t.info('Menu: ' + titles.join(' | '));
           t.check(titles.indexOf('Rekapan Pengajuan') >= 0, 'menu "Rekapan Pengajuan" ada');
@@ -1512,7 +1551,7 @@
           t.check(titles.indexOf('Critical Part List') >= 0, 'menu "Critical Part List" ada');
           t.check(titles.indexOf('On Hand Stock') >= 0, 'menu "On Hand Stock" ada');
           t.check(titles.indexOf('Layout Rak') >= 0, 'menu "Layout Rak" ada');
-          t.check(titles.indexOf('PR Summary') < 0, 'menu "PR Summary" TIDAK ada untuk Officer');
+          t.check(titles.indexOf('PR Summary') < 0, 'menu "PR Summary" TIDAK ada untuk Administrator');
         } },
       { id: 'UI-11', group: 'UI', priority: 'P1', mode: 'ui', title: 'Modal Rekapan Pengajuan terbuka (full approve + per teknisi)', expected: 'Klik Rekapan Pengajuan -> modal terbuka, menampilkan total disetujui penuh, rekap per teknisi, dan pipeline; tidak lagi menampilkan "Status Approval"',
         run: async function (t) {
@@ -1587,7 +1626,7 @@
           t.check(bodyTxt.indexOf('Kolom ') >= 0, 'header kolom ("Kolom ...") tampil di grid');
           t.check(bodyTxt.indexOf('Baris') >= 0, 'header baris ("Baris ...") tampil di grid');
         } },
-      { id: 'UI-19', group: 'UI', priority: 'P0', mode: 'ui', title: 'Kolom Urgency dapat diubah Supervisor', expected: 'Login INN -> tabel approval punya dropdown urgency (Normal/Urgent) per baris; Officer tidak punya dropdown itu',
+      { id: 'UI-19', group: 'UI', priority: 'P0', mode: 'ui', title: 'Kolom Urgency dapat diubah Supervisor', expected: 'Login INN -> tabel approval punya dropdown urgency (Normal/Urgent) per baris; Administrator tidak punya dropdown itu',
         run: async function (t) {
           await uiLoginAs('supervisor', t);
           await clickMenu('monitoring');
@@ -1597,7 +1636,7 @@
           var sel = fDoc().querySelectorAll('#tbody-pengajuan select[data-urgency]');
           t.check(sel.length > 0, 'dropdown urgency tampil untuk Supervisor (' + sel.length + ' baris)');
           // Kolom "Status Pengadaan" harus tetap ada dan TERPISAH dari kolom Urgensi.
-          // Dropdown-nya hanya untuk role Procurement/Officer/Manager; Supervisor
+          // Dropdown-nya hanya untuk role Procurement/Administrator/Manager; Supervisor
           // membaca statusnya sebagai badge. Yang diuji di sini adalah kolomnya
           // masih ada, terpisah, dan tidak tercampur kontrol urgency.
           var th = fDoc().querySelectorAll('#modal-approval thead th');
@@ -1621,13 +1660,13 @@
           t.check(fDoc().querySelectorAll('#tbody-pengajuan tr').length ===
                   fDoc().querySelectorAll('#tbody-pengajuan select[data-urgency]').length,
             'setiap baris punya dropdown urgency sendiri');
-          await uiLoginAs('officer', t);
+          await uiLoginAs('administrator', t);
           await clickMenu('monitoring');
           await waitFor(function () { var m = fDoc().getElementById('modal-approval'); return m && !m.classList.contains('hidden'); }, 8000);
           await waitFor(function () { var c = fDoc().getElementById('approval-count'); return c && c.textContent.trim() !== '0'; }, 12000);
           await pause(400);
           t.check(fDoc().querySelectorAll('#tbody-pengajuan select[data-urgency]').length === 0,
-            'Officer TIDAK punya dropdown urgency');
+            'Administrator TIDAK punya dropdown urgency');
         } },
       { id: 'UI-20', group: 'UI', priority: 'P1', mode: 'ui', title: 'Form BQ tidak lagi punya pemilih urgency', expected: 'Buka BQ Personal -> field "Status Urgensi" gone, ada teks "Diisi oleh Supervisor"; hasil submit tetap Normal',
         run: async function (t) {
@@ -1785,7 +1824,7 @@
       { id: 'E2E-02', group: 'E2E', priority: 'P0', mode: 'write', title: 'Pengajuan muncul di monitoring', expected: 'Status awal: SPV=Menunggu, MGR=Menunggu, Pengadaan=BQ Baru, data lengkap',
         run: async function (t) {
           if (!RUN.newNo) t.skip('E2E-01 belum menghasilkan pengajuan.');
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var row = r.json.data.filter(function (x) { return x.no_registrasi === RUN.newNo; })[0];
           t.check(!!row, 'pengajuan ' + RUN.newNo + ' ditemukan');
           t.eq(row.status_approval_spv, 'Menunggu', 'approval SPV');
@@ -1802,7 +1841,7 @@
           t.eq(r.status, 200, 'HTTP status');
           t.eq(r.json.data.status_approval_spv, 'Disetujui', 'SPV setelah approve');
         } },
-      { id: 'E2E-04', group: 'E2E', priority: 'P1', mode: 'write', title: 'Officer mengubah status pengadaan', expected: 'PUT oleh ANS -> Proses PO -> 200',
+      { id: 'E2E-04', group: 'E2E', priority: 'P1', mode: 'write', title: 'Administrator mengubah status pengadaan', expected: 'PUT oleh ANS -> Proses PO -> 200',
         run: async function (t) {
           if (!RUN.newNo) t.skip('E2E-01 belum menghasilkan pengajuan.');
           var r = await callApi(t, 'PUT', '/api/pengajuan/' + encodeURIComponent(RUN.newNo) + '/status', { username: 'ANS', status_pengadaan: 'Proses PO' });
@@ -1839,7 +1878,7 @@
       { id: 'E2E-08', group: 'E2E', priority: 'P0', mode: 'write', title: 'Status akhir pengajuan konsisten', expected: 'SPV=Disetujui, MGR=Disetujui, Pengadaan=Proses PO',
         run: async function (t) {
           if (!RUN.newNo) t.skip('E2E-01 belum menghasilkan pengajuan.');
-          var r = await callApi(t, 'GET', '/api/pengajuan/all');
+          var r = await callApi(t, 'GET', '/api/pengajuan/all?actor=KSW');
           var row = r.json.data.filter(function (x) { return x.no_registrasi === RUN.newNo; })[0];
           t.check(!!row, 'pengajuan masih ada');
           t.eq(row.status_approval_spv, 'Disetujui', 'SPV');
@@ -1856,9 +1895,9 @@
       { group: 'AUTH', num: '1', title: 'Masuk & Keluar (Login)', short: 'Memeriksa siapa saja yang boleh masuk ke aplikasi.',
         long: 'Menguji fitur login: akun benar, akun salah, password salah, dan batas percobaan (rate limit) supaya akun tidak bisa ditebak paksa.' },
       { group: 'USR', num: '2', title: 'Daftar Akun, Approval Manager & Log', short: 'Alur pendaftaran akun baru sampai disetujui Manager, plus riwayat login & aktivitas.',
-        long: 'User baru mendaftar sendiri (tanpa notifikasi email), menunggu persetujuan Manager yang sekaligus menugaskan tim (Supervisor 1 / Supervisor 2 / Officer). User pending boleh login tapi hanya melihat layar tunggu — upaya loginnya tetap dicatat demi keamanan. Setiap login (semua role, termasuk Manager) tercatat di riwayat login, dan setiap aksi fitur (register, approve, tambah barang, ubah status) tercatat di riwayat aktivitas dengan format ringkas: username, tanggal & jam, dan apa yang dilakukan.' },
+        long: 'User baru mendaftar sendiri (tanpa notifikasi email), menunggu persetujuan Manager yang sekaligus menugaskan tim (Supervisor 1 / Supervisor 2 / Administrator). User pending boleh login tapi hanya melihat layar tunggu — upaya loginnya tetap dicatat demi keamanan. Setiap login (semua role, termasuk Manager) tercatat di riwayat login, dan setiap aksi fitur (register, approve, tambah barang, ubah status) tercatat di riwayat aktivitas dengan format ringkas: username, tanggal & jam, dan apa yang dilakukan.' },
       { group: 'RBAC', num: '3', title: 'Hak Akses per Peran', short: 'Tiap orang hanya bisa mengerjakan tugasnya sendiri.',
-        long: 'Role-Based Access Control: teknisi tidak boleh menyetujui, supervisor tidak boleh menyetujui level manager, officer hanya mengubah status pengadaan, dan manager hanya bisa menyetujui setelah supervisor menyetujui.' },
+        long: 'Role-Based Access Control: teknisi tidak boleh menyetujui, supervisor tidak boleh menyetujui level manager, administrator hanya mengubah status pengadaan, dan manager hanya bisa menyetujui setelah supervisor menyetujui.' },
       { group: 'FORM', num: '4', title: 'Form Pengajuan Barang', short: 'Form isian tidak bisa diisi asal-asalan.',
         long: 'Memastikan data wajib terisi, jumlah tidak boleh nol atau pecahan, kode barang harus benar-benar ada di database, dan field pelengkap tidak boleh kosong.' },
       { group: 'APP', num: '5', title: 'Persetujuan, Urgency, Layout Rak & Rekapan', short: 'Tombol setuju/tolak, ubah status, dan modul baru punya aturan.',
@@ -1876,7 +1915,7 @@
       { group: 'UI', num: '11', title: 'Uji Tampilan Aplikasi', short: 'Mengecek tampilan depan seperti yang dilihat pengguna asli.',
         long: 'Menjalankan aplikasi di panel preview seperti manusia: login, membuka menu, mencari, membuka modal, dan logout. Bagian ini yang membuat preview bergerak.' },
       { group: 'E2E', num: '12', title: 'Alur Lengkap: Buat sampai Setuju', short: 'Satu pengajuan dijalankan dari dibuat sampai disetujui penuh.',
-        long: 'Menjalankan alur nyata (menulis ke database): teknisi membuat pengajuan, supervisor & manager menyetujui, officer mengubah status pengadaan, lalu mengecek riwayat. WAJIB berurutan E2E-01 s.d. E2E-08.' },
+        long: 'Menjalankan alur nyata (menulis ke database): teknisi membuat pengajuan, supervisor & manager menyetujui, administrator mengubah status pengadaan, lalu mengecek riwayat. WAJIB berurutan E2E-01 s.d. E2E-08.' },
     ];
 
     // Penjelasan tiap tes: "short" = bahasa gampang, "long" = apa fiturnya & kenapa diuji.
@@ -1887,7 +1926,7 @@
       'NFR-06': { short: 'Halaman aplikasinya benar-benar terkirim, bukan layar kosong.', long: 'Memastikan GET / mengembalikan HTML aplikasi (mengandung elemen utama), bukan halaman kosong atau 404.' },
       'AUTH-01': { short: 'Coba masuk pakai akun teknisi, harus berhasil.', long: 'Login kredensial benar mengembalikan 200 dan data user (username, role) yang sesuai, agar menu & hak akses tepat.' },
       'AUTH-02': { short: 'Coba masuk pakai akun supervisor, harus berhasil.', long: 'Memastikan akun supervisor valid dan role-nya dikenali sistem.' },
-      'AUTH-03': { short: 'Coba masuk pakai akun officer, harus berhasil.', long: 'Memastikan akun officer valid dan role-nya dikenali sistem.' },
+      'AUTH-03': { short: 'Coba masuk pakai akun administrator, harus berhasil.', long: 'Memastikan akun administrator valid dan role-nya dikenali sistem.' },
       'AUTH-04': { short: 'Coba masuk pakai akun manager, harus berhasil.', long: 'Memastikan akun manager valid dan role-nya dikenali sistem.' },
       'AUTH-05': { short: 'Masuk pakai password salah harus ditolak.', long: 'Password salah harus mengembalikan 401 dengan pesan "Kombinasi Username atau Password salah".' },
       'AUTH-06': { short: 'Masuk pakai nama akun tak ada harus ditolak tanpa bocor info.', long: 'Username tak terdaftar harus 401 dengan pesan yang sama seperti password salah, supaya penyerang tidak bisa menebak akun mana yang ada.' },
@@ -1901,7 +1940,7 @@
       'USR-06': { short: 'Login user pending tercatat di riwayat login.', long: 'GET /api/log/login?filter=<user> (Manager) harus menemukan entri accept=0 dengan note "Menunggu persetujuan Manager".' },
       'USR-07': { short: 'Manager melihat daftar pendaftaran menunggu.', long: 'GET /api/users/registrations (KSW) harus 200 dan berisi username uji dengan status pending.' },
       'USR-08': { short: 'Hanya Manager yang boleh melihat pendaftaran.', long: 'GET /api/users/registrations sebagai teknisi (AAA) harus 403 "Hanya Manager".' },
-      'USR-09': { short: 'Approve tanpa pilih tim ditolak.', long: 'POST /api/users/approve tanpa tim harus 400 "Pilih tim" — manager wajib mengassign Supervisor 1/2/Officer.' },
+      'USR-09': { short: 'Approve tanpa pilih tim ditolak.', long: 'POST /api/users/approve tanpa tim harus 400 "Pilih tim" — manager wajib mengassign Supervisor 1/2/Administrator.' },
       'USR-10': { short: 'Manager menyetujui & menugaskan tim.', long: 'POST /api/users/approve dengan tim "Supervisor 1" harus 200; akun aktif dengan role teknisi & tim tersimpan.' },
       'USR-11': { short: 'User approved bisa login penuh.', long: 'Setelah disetujui, login user uji harus 200 dengan role "teknisi" dan bqLink terisi (akses fitur penuh).' },
       'USR-12': { short: 'Login user approved tercatat (accept=1).', long: 'GET /api/log/login?filter=<user> harus memiliki entri accept=1 menandakan login sukses user yang sudah aktif.' },
@@ -1915,12 +1954,14 @@
       'UI-14': { short: 'Manager bisa lihat log login & aktivitas.', long: 'Klik menu Log Aktivitas — modal terbuka dengan 2 tab terpisah: Riwayat Login dan Riwayat Aktivitas, keduanya menampilkan data.' },
       'RBAC-08': { short: 'Teknisi tidak boleh menyetujui pengajuan.', long: 'Teknisi yang mencoba mengubah status approval harus ditolak (403), karena approval bukan tugasnya.' },
       'RBAC-09': { short: 'Supervisor tidak boleh menggantikan tugas manager.', long: 'Supervisor tidak boleh mengubah status_approval_manager; harus ditolak.' },
-      'RBAC-10': { short: 'Officer tidak boleh menyetujui/ubah approval.', long: 'Officer hanya mengelola status pengadaan, jadi perubahan approval harus ditolak.' },
+      'RBAC-10': { short: 'Administrator tidak boleh menyetujui/ubah approval.', long: 'Administrator hanya mengelola status pengadaan, jadi perubahan approval harus ditolak.' },
       'RBAC-11': { short: 'Manager hanya boleh setuju setelah supervisor setuju dulu.', long: 'Bila manager menyetujui saat SPV belum Disetujui, sistem harus menolak (400) dengan pesan bahwa SPV harus menyetujui lebih dulu.' },
       'RBAC-12': { short: 'Orang yang tidak dikenal harus diminta login dulu.', long: 'Username yang tidak ada di database harus 401 "User tidak ditemukan. Silakan login ulang."' },
       'RBAC-13': { short: 'Membuat pengajuan tanpa login harus ditolak.', long: 'Permintaan tanpa username harus 401 "Anda harus login terlebih dahulu."' },
-      'RBAC-14': { short: 'PR Summary hanya untuk Manager & Supervisor 1.', long: 'GET /api/pengajuan/summary harus 403 untuk AAA (teknisi), KAA (Supervisor 2) dan ANS (Officer), tetapi 200 untuk INN (Supervisor 1) dan KSW (Manager).' },
+      'RBAC-14': { short: 'PR Summary hanya untuk Manager & Supervisor 1.', long: 'GET /api/pengajuan/summary harus 403 untuk AAA (teknisi), KAA (Supervisor 2) dan ANS (Administrator), tetapi 200 untuk INN (Supervisor 1) dan KSW (Manager).' },
       'RBAC-15': { short: 'Supervisor 2 (KAA) boleh menyetujui tahap SPV.', long: 'PUT status_approval_spv sebagai KAA harus 200, jadi eksekusi approval SPV tidak hanya milik Supervisor 1.' },
+        'RBAC-16': { short: 'Status pengadaan hanya boleh diubah Administrator/Manager.', long: 'Setelah role Officer diganti menjadi Administrator, PUT status_pengadaan oleh role lain (Supervisor 1 INN, Supervisor 2 KAA, Teknisi AAA) harus mengembalikan 403 dengan pesan Status pengadaan hanya bisa diubah oleh Administrator / Manager, dan status di database tidak boleh berubah sama sekali.' },
+        'RBAC-17': { short: 'Role Administrator dikenali sistem.', long: 'Login memakai akun ANS harus mengembalikan role Administrator. Ini memastikan data role di tabel users sudah dimigrasikan dari Officer, kalau tidak maka akun tersebut akan terbaca sebagai role tak dikenal dan kehilangan hak akses procurement.' },
       'FORM-08': { short: 'Isian pelengkap tidak boleh kosong.', long: 'UoM/Purpose/EJO/Area wajib diisi; bila kosong harus 400.' },
 'FORM-09': { short: 'Kode barang dan spesifikasi tidak boleh kosong.', long: 'Item Code & spesifikasi wajib diisi; bila kosong harus 400 "Parameter itemCode dan spesifikasi wajib diisi".' },
        'FORM-12': { short: 'Barangnya harus benar-benar ada di daftar.', long: 'Item Code yang tidak ada di database harus ditolak 400 "Item Code ... tidak ditemukan di database."' },
@@ -1930,7 +1971,7 @@
        'APP-09': { short: 'Status pengadaan harus salah satu dari daftar resmi.', long: 'status_pengadaan di luar daftar (BQ Baru, Pending, Proses PO, PO Open, Mencari Penawaran, Barang Dikirim, Tiba di Gudang, Selesai) harus 400 dengan daftar nilai yang diizinkan.' },
        'APP-10': { short: 'Nilai setuju/tolak harus sesuai pilihan resmi.', long: 'Nilai approval di luar "approved"/"rejected" harus ditolak 400.' },
        'APP-11': { short: 'Permintaan ubah status harus menyebut status barunya.', long: 'Permintaan tanpa status apa pun harus 400 "Tidak ada status yang dikirim untuk diubah."' },
-       'APP-12': { short: 'PR Summary hanya untuk Supervisor 1 & Manager.', long: 'GET /api/pengajuan/summary harus 200 untuk Manager & Supervisor 1, 403 untuk Teknisi/Officer/Supervisor 2.' },
+       'APP-12': { short: 'PR Summary hanya untuk Supervisor 1 & Manager.', long: 'GET /api/pengajuan/summary harus 200 untuk Manager & Supervisor 1, 403 untuk Teknisi/Administrator/Supervisor 2.' },
        'APP-12B': { short: 'PR Summary memuat seluruh data, bukan hanya antrean.', long: 'PR Summary harus menampilkan semua pengajuan sesuai filter, dengan kolom penting (item_code, uom, no_ejo, status SPV/Manager/Pengadaan) dan kartu rekap per status. Angka "Total Pengajuan" (totalSemua) tetap utuh walau filter status dipakai, supaya kartu tidak ikut berubah-ubah.' },
        'APP-12C': { short: 'Filter "Tim Saya" memakai supervisor_id = id supervisor yang login.', long: 'Supervisor 1 yang memfilter "Tim Saya" hanya boleh melihat pengajuan bawahan yang supervisor_id-nya menunjuk ke dirinya, bukan ke atasannya. Kalau memang belum ada teknisi bawahan, backend harus meng mengirim flag tanpaBawahan dan hasil kosong — cakupan data TIDAK boleh dilebarkan diam-diam.' },
        'APP-12D': { short: 'Pencarian & paginasi PR Summary jalan.', long: 'Parameter q, page, dan limit harus bekerja: hasil <= limit, memuat kata kunci, dan limit dibatasi maksimal 200 baris per permintaan supaya server tidak terbebani.' },
@@ -1977,20 +2018,20 @@
       'UI-07': { short: 'Keluar harus benar-benar menghapus sesi.', long: 'Klik logout, pastikan kembali ke form login dan sessionStorage "user" terhapus.' },
       'UI-08': { short: 'Kartu angka di dasbor harus membuka daftar yang sesuai.', long: 'Klik kartu "Critical Part" harus membuka modal berjudul Critical Part List berisi 210 item.' },
       'UI-09': { short: 'Supervisor 1 harus melihat 7 menu sesuai spec.', long: 'Login UI supervisor 1, cek menu: PR Summary, Monthly Report, Rekapan Pengajuan, Approval BQ Tahap Supervisor, Critical Part List, On Hand Stock, Layout Rak. Kartu "Pengajuan Saya" khusus teknisi tidak boleh muncul.' },
-      'UI-10': { short: 'Officer harus melihat 5 menu tanpa PR Summary.', long: 'Login UI officer, cek menu: Rekapan Pengajuan, Approval BQ Tahap Supervisor, Critical Part List, On Hand Stock, Layout Rak. PR Summary tidak boleh ada.' },
+      'UI-10': { short: 'Administrator harus melihat 5 menu tanpa PR Summary.', long: 'Login UI administrator, cek menu: Rekapan Pengajuan, Approval BQ Tahap Supervisor, Critical Part List, On Hand Stock, Layout Rak. PR Summary tidak boleh ada.' },
       'UI-11': { short: 'Modal Rekapan Pengajuan hanya menghitung full approve.', long: 'Klik menu Rekapan Pengajuan harus membuka modal dengan total disetujui penuh, rekap per teknisi, dan pipeline. Blok "Status Approval" yang lama harus sudah hilang.' },
       'UI-17': { short: 'Teknisi bisa melacak status pengajuannya sendiri.', long: 'Modal "Status Pengajuan Saya" menampilkan tiap pengajuan dengan stepper Diajukan → Supervisor → Manager → Disetujui, dilengkapi pencarian dan filter status.' },
       'UI-18': { short: 'Layout rak menampilkan lokasi fisik barang.', long: 'Modal Layout Rak menampilkan tab per rak, grid baris/kolom, dan pencarian item code/nama barang supaya teknisi tahu letak sparepart di gudang.' },
-      'UI-19': { short: 'Hanya Supervisor/Manager yang bisa mengubah urgency.', long: 'Di tabel approval, Supervisor harus melihat dropdown Normal/Urgent per baris, sedangkan Officer tidak. Officer tetap punya dropdown status pengadaan.' },
+      'UI-19': { short: 'Hanya Supervisor/Manager yang bisa mengubah urgency.', long: 'Di tabel approval, Supervisor harus melihat dropdown Normal/Urgent per baris, sedangkan Administrator tidak. Administrator tetap punya dropdown status pengadaan.' },
       'UI-20': { short: 'Teknisi tidak memilih urgency saat submit.', long: 'Form BQ Personal tidak lagi punya pemilih urgency; yang tampil adalah teks "Diisi oleh Supervisor".' },
       'UI-21': { short: 'Tab "Belum Ada Lokasi" menampilkan daftar item yang belum terpetakan.', long: 'Di modal Layout Rak, tab "Belum Ada Lokasi" memuat ringkasan jumlah item + kritis + stok habis, peringatan "Data lokasi rak belum lengkap", daftar item dengan pagination, dan pencarian yang narrowing daftar dari server.' },
        'UI-22': { short: 'Angka Monthly Report di web sama dengan endpoint.', long: 'Kartu Monthly Report harus menampilkan angka yang dikembalikan backend (total dan full approve), periode terisi, dan tautan Looker hanya ditandai sebagai laporan lama — bukan sumber resmi.' },
-       'UI-23': { short: 'Supervisor 1 punya blok Antrean Approval.', long: 'Dashboard Supervisor 1 menampilkan blok antrean BQ dengan KPI, lima pengajuan terbaru, sakelar Tim Saya/Semua Tim, dan refresh. KPI stok tetap global. Blok ini tidak boleh muncul untuk teknisi, Officer, maupun Manager.' },
+       'UI-23': { short: 'Supervisor 1 punya blok Antrean Approval.', long: 'Dashboard Supervisor 1 menampilkan blok antrean BQ dengan KPI, lima pengajuan terbaru, sakelar Tim Saya/Semua Tim, dan refresh. KPI stok tetap global. Blok ini tidak boleh muncul untuk teknisi, Administrator, maupun Manager.' },
        'UI-24': { short: 'PR Summary benar-benar baca-saja.', long: 'Di dalam tabel PR Summary tidak boleh ada tombol approve/reject maupun pemilih urgensi — semuanya hanya di menu Monitoring & Approval BQ. Tabel tetap punya pencarian, filter, paginasi, dan ekspor Excel.' },
       'E2E-01': { short: 'Teknisi membuat 1 pengajuan baru (menulis data nyata).', long: 'POST /api/pengajuan lengkap harus 201 dan mengembalikan no_registrasi. Data ini dipakai tes berikutnya.' },
       'E2E-02': { short: 'Pengajuan baru tadi langsung muncul di monitoring.', long: 'Status awal harus SPV=Menunggu, MGR=Menunggu, Pengadaan=BQ Baru, dengan data yang tadi diisi.' },
       'E2E-03': { short: 'Supervisor menyetujui pengajuan tadi.', long: 'PUT status oleh INN (approved) harus 200 dan SPV menjadi Disetujui.' },
-      'E2E-04': { short: 'Officer mengubah status pengadaan menjadi Proses PO.', long: 'PUT status oleh ANS harus 200 dan status_pengadaan menjadi Proses PO.' },
+      'E2E-04': { short: 'Administrator mengubah status pengadaan menjadi Proses PO.', long: 'PUT status oleh ANS harus 200 dan status_pengadaan menjadi Proses PO.' },
       'E2E-05': { short: 'Buku catatan harus mencatat 2 langkah tadi.', long: 'Audit trail harus berisi 2 entri: approval SPV dan perubahan status pengadaan. Jalankan SEBELUM E2E-06.' },
       'E2E-06': { short: 'Manager memberi persetujuan terakhir.', long: 'PUT status oleh KSW (approved) harus 200 dan MGR menjadi Disetujui (setelah SPV setuju).' },
       'E2E-07': { short: 'Buku catatan sekarang harus 3 langkah.', long: 'Audit trail harus menjadi 3 entri (SPV, pengadaan, MGR).' },
@@ -2512,3 +2553,5 @@
   </script>
 </body>
 </html>
+
+

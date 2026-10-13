@@ -65,7 +65,7 @@ dijalankan dari link tersebut tanpa instalasi apa pun di komputer penguji.
 | Teknisi | `AAA` | `04AAA10` |
 | Supervisor 1 | `INN` | `30INN11` |
 | Supervisor 2 | `KAA` | `KAA1910` |
-| Officer Penagihan | `ANS` | `ANS1805` |
+| Administrator | `ANS` | `ANS1805` |
 | Manager | `KSW` | `01KSW10` |
 
 ---

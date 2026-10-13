@@ -26,7 +26,7 @@ INSERT INTO users (username, password, role, name, bqLink) VALUES
 ('INN', '30INN11', 'Supervisor 1', 'INN', NULL),
 ('MUN', '2506MUN', 'Supervisor 2', 'MUN', NULL),
 ('KAA', 'KAA1910', 'Supervisor 2', 'KAA', NULL),
-('ANS', 'ANS1805', 'Officer', 'ANS', NULL),
+('ANS', 'ANS1805', 'Administrator', 'ANS', NULL),
 ('KSW', '01KSW10', 'manager', 'KSW', NULL);
 
 -- ==================== SPAREPARTS (663 items) ====================
@@ -921,5 +921,5 @@ INSERT INTO pengajuan_bq (no_registrasi, user_id, item_code, qty_diminta, spesif
 INSERT INTO pengajuan_log (no_registrasi, actor_id, actor_name, actor_role, field, old_value, new_value, created_at) VALUES
 ('BQ-2026-09-01-0001', 1, 'AAA', 'teknisi', 'status_approval_spv', NULL, 'Menunggu', '2026-09-01T08:00:00+07:00'),
 ('BQ-2026-09-01-0001', 14, 'INN', 'Supervisor 1', 'status_approval_spv', 'Menunggu', 'Disetujui', '2026-09-01T10:30:00+07:00'),
-('BQ-2026-09-01-0001', 18, 'ANS', 'Officer', 'status_pengadaan', 'BQ Baru', 'Proses PO', '2026-09-01T14:00:00+07:00');
+('BQ-2026-09-01-0001', 18, 'ANS', 'Administrator', 'status_pengadaan', 'BQ Baru', 'Proses PO', '2026-09-01T14:00:00+07:00');
 

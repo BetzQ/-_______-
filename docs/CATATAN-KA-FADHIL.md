@@ -1,9 +1,10 @@
 # Catatan Chat Ka Fadhil (Micropage E-Sparepart)
 
-Status dokumen: **BERJALAN** — updated 30 Sep 2026
-Aturan: semua chat dicatat di sini dulu. **Tidak ada kode yang diubah** sampai
-Ka Fadhil memberi jawaban. Setelah ada jawaban, dokumen terkait di-update dan
-statusnya diubah dari "menunggu" menjadi "disetujui".
+Status dokumen: **SELESAI — semua chat terjawab & diterapkan di kode** (QA 114/114, 10 Okt 2026)
+Aturan (berlaku selama proses): semua chat dicatat di sini dulu. Selama Ka Fadhil
+belum memberi jawaban, tidak ada kode yang diubah. Karena Ka Fadhil tidak lagi
+merespons, keputusan akhir diambil oleh tim (Avwan) dengan opsi paling aman,
+lalu semua fitur usulan (chat 1–3) diterapkan dan diuji ulang.
 
 > **Pengecualian (chat 5).** Satu perubahan kode tetap dilakukan: teks subjudul
 > modal stok yang salah ("database lokal") diganti "server" (commit `386cdbf`).
@@ -16,11 +17,20 @@ statusnya diubah dari "menunggu" menjadi "disetujui".
 
 | # | Isi chat | Tanggal | Status | Dokumen keputusan |
 |---|---|---|---|---|
-| 1 | Dasbor Supervisor perlu ditambah antrean approval | 30 Sep | Menunggu jawaban | `KEPUTUSAN-DASBOR-SUPERVISOR.md` |
-| 2 | Monthly Report: grafik di web atau Looker Studio | 30 Sep | Menunggu jawaban | `KEPUTUSAN-MONTHLY-REPORT.md` |
-| 3 | PR Summary harus data keseluruhan, approve sudah ada di Approval BQ | 30 Sep | Menunggu jawaban | `KEPUTUSAN-PR-SUMMARY.md` |
+| 1 | Dasbor Supervisor perlu ditambah antrean approval | 30 Sep | **Selesai** — antrean approval diterapkan | `KEPUTUSAN-DASBOR-SUPERVISOR.md` |
+| 2 | Monthly Report: grafik di web atau Looker Studio | 30 Sep | **Selesai** — grafik web + Looker berlabel | `KEPUTUSAN-MONTHLY-REPORT.md` |
+| 3 | PR Summary harus data keseluruhan, approve sudah ada di Approval BQ | 30 Sep | **Selesai** — PR Summary read-only keseluruhan | `KEPUTUSAN-PR-SUMMARY.md` |
 | 4 | "ini kaya kemaren ya, tapi dikasih kaya gini juga gapapa sih" | 30 Sep | **Terjawab** — versi lama BQ Summary | digabung ke `KEPUTUSAN-PR-SUMMARY.md` |
 | 5 | "ini juga kaya kemaren kasih gambar kalau bisa" | 30 Sep | **Selesai** — bukti stok diperbarui | tidak ada (permintaan bukti) |
+
+> **Realisasi (10 Okt 2026).** Fitur chat 1–3 seluruhnya sudah ada di kode dan
+> lulus QA 114/114: blok "Antrean Approval" di dasbor Supervisor
+> (`approval-queue-section`, toggle Tim Saya/Semua Tim), Monthly Report Chart.js
+> dengan tautan Looker Studio berlabel "laporan lama", dan PR Summary read-only
+> ("Rekapan Pengajuan") untuk Supervisor 1 & Manager. Perbaikan pendukung:
+> filter tim berbasis `u.supervisor_id = actor.id` dan endpoint
+> `/api/reports/monthly` serta `/api/pengajuan/all` kini mewajibkan identitas
+> pemanggil (`username`/`actor`) — lihat `KEPUTUSAN-DASBOR-SUPERVISOR.md` §4–6.
 
 ---
 
@@ -35,7 +45,8 @@ statusnya diubah dari "menunggu" menjadi "disetujui".
 "Antrean Approval Saya" di bawahnya, Supervisor 1 default "Tim Saya" dengan
 toggle "Semua Tim", `supervisor_id` null harus tampil peringatan.
 
-**Butuh jawaban Ka Fadhil:** 4 pertanyaan (lihat bagian 5 dokumen terkait).
+**Jawaban (diambil tim, Ka Fadhil tidak merespons):** 4 pertanyaan dijawab di
+bagian 5 dokumen terkait, dan fitur **sudah diterapkan** (lihat `KEPUTUSAN-DASBOR-SUPERVISOR.md` §4–6).
 
 ---
 
@@ -53,7 +64,8 @@ dijamin sama dengan angka aplikasi.
 **Temuan sampingan yang perlu diputuskan:** ada dua definisi "disetujui" yang
 berbeda antara web dan backend.
 
-**Butuh jawaban Ka Fadhil:** 4 pertanyaan (lihat bagian 5 dokumen terkait).
+**Jawaban (diambil tim, Ka Fadhil tidak merespons):** 4 pertanyaan dijawab di
+bagian 5 dokumen terkait, dan fitur **sudah diterapkan** (lihat `KEPUTUSAN-MONTHLY-REPORT.md`).
 
 ---
 
@@ -71,7 +83,8 @@ PR (bukan hanya 140 dari 1.535 baris), dengan pencarian, filter, paginasi, dan
 export. Tombol approve/reject dihapus karena duplikat dengan Approval BQ dan
 berbahaya: PR Summary tidak punya dropdown Urgensi.
 
-**Butuh jawaban Ka Fadhil:** 4 pertanyaan (lihat bagian 5 dokumen terkait).
+**Jawaban (diambil tim, Ka Fadhil tidak merespons):** 4 pertanyaan dijawab di
+bagian 5 dokumen terkait, dan fitur **sudah diterapkan** (lihat `KEPUTUSAN-PR-SUMMARY.md`).
 
 ---
 
@@ -141,7 +154,7 @@ disetujui, lalu dideploy (commit `386cdbf`) **sebelum** screenshot diambil.
 | Teknisi (AAA) | `stok-teknisi-{dashboard,semua,kritis,rendah,habis,layout-rak}.png` |
 | Supervisor 1 (INN) | `stok-spv1-*.png` |
 | Supervisor 2 (KAA) | `stok-spv2-*.png` |
-| Officer (ANS) | `stok-officer-*.png` |
+| Administrator (ANS) | `stok-officer-*.png` *(nama file bukti tidak diubah)* |
 | Manager (KSW) | `stok-manager-*.png` |
 
 Direkam oleh `scripts/screenshot_stok_production.js`; angka diverifikasi ulang
@@ -189,22 +202,24 @@ baru. Selalu ambil ulang dari database sebelum dipakai di presentasi.
 
 ## Temuan teknis yang belum ikut ada di keputusan
 
-Daftar ini ditemukan saat membuat dokumen keputusan dan belum masuk ke
-keputusan mana pun. Perlu dibahas dengan Ka Fadhil atau diperbaiki langsung.
+Daftar ini ditemukan saat membuat dokumen keputusan. Status per 10 Okt 2026:
 
 1. **Format nomor registrasi tidak konsisten.** Tiga format berjalan
    bersamaan: `BQ-YYYYMMDD-NNNN` (70 baris), `BQ-YYYY-MM-DD-NNNN` (200 baris),
-   dan format impor `WAPBR0012` (1.265 baris). 95% data masih format lama.
-2. **Risiko nomor registrasi bertabrakan.**
-   `buildNoRegistrasi()` memakai `Date.now().toString().slice(-4)`, yaitu 4
-   digit terakhir milidetik, tanpa penomoran berurutan di database.
-3. **Filter tim Supervisor belum efektif.** `INN` dan `KSW` sama-sama melihat
-   140 baris identik, indikasi `supervisor_id` null. Sudah dibahas di chat 1.
+   dan format impor `WAPBR0012` (1.265 baris). **Keputusan: tidak migrasi** —
+   nomor lama tetap sebagai identitas historis, format baru hanya untuk baris
+   baru. Tidak ada baris duplikat (semua `no_registrasi` unik).
+2. **Risiko nomor registrasi bertabrakan.** **Sudah diperbaiki**:
+   `buildNoRegistrasi()` kini menomori secara sekuensial per hari dan
+   mengulang otomatis saat terjadi `unique_violation` (primary key).
+3. **Filter tim Supervisor belum efektif.** **Sudah diperbaiki**: filter kini
+   memakai `u.supervisor_id = actor.id`, dan pemetaan resmi diisi lewat
+   `scripts/setSupervisorIds.js` (`--apply`). Sudah dibahas di chat 1.
 4. **Definisi status "disetujui" berbeda antara web dan backend.** Sudah
-   dibahas di chat 2.
-5. **Modul `src/config/googleSheets.js` tidak dipakai.** Tidak di-require di
-   mana pun pada `src/`, dan tidak ada job terjadwal. Modul ini sisa kode lama
-   yang sebaiknya dihapus atau diaktifkan.
+   dibahas di chat 2 dan diputuskan di `KEPUTUSAN-MONTHLY-REPORT.md`.
+5. **Modul `src/config/googleSheets.js` tidak dipakai.** **Keputusan: dibiarkan
+   apa adanya sambil didokumentasikan** sebagai sisa kode lama; tidak dihapus
+   agar tidak menyentuh modul lain di akhir proyek.
 6. **74% sparepart belum punya lokasi rak** (2.243 dari 3.022). Kalau filter
    "Semua Item" dibuka saat demo, sebagian besar baris menampilkan "-" di kolom
    Lokasi Rak. Perlu diputuskan: isi Massal, atau sembunyikan kolom, atau

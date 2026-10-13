@@ -84,7 +84,7 @@ Sistem **Micropage E-Sparepart** dikembangkan ulang dari sistem lama berbasis **
 | id | INT PK AI | identitas user |
 | username | VARCHAR(50) UNIQUE | dipakai login (contoh: `AAA`, `KSW`) |
 | password | VARCHAR(255) | hash scrypt (upgrade otomatis dari plaintext lama) |
-| role | VARCHAR(50) | teknisi / Supervisor 1 / Supervisor 2 / Officer / manager |
+| role | VARCHAR(50) | teknisi / Supervisor 1 / Supervisor 2 / Administrator / manager |
 | name | VARCHAR(100) | nama tampilan |
 | bqLink | TEXT NULL | tautan form BQ pribadi teknisi (warisan Apps Script) |
 | supervisor_id | INT NULL FK→users.id | tim/ supervisor yang menaungi teknisi |
@@ -130,8 +130,8 @@ Mencatat setiap perubahan status (siapa, kapan, aksi apa) → sumber fitur **Riw
 | `/api/spareparts/summary` | GET | KPI ringkasan stok untuk dashboard | semua |
 | `/api/spareparts/alert` | GET | item di bawah min-stock (defisit terbesar) | semua |
 | `/api/pengajuan` | POST | buat pengajuan BQ baru (sparepart/jasa) | teknisi |
-| `/api/pengajuan/all` | GET | monitoring & tabel approval | SPV/Officer/Manager |
-| `/api/pengajuan/:no/status` | PUT | ubah status approval/pengadaan | SPV/Officer/Manager (sesuai tahap) |
+| `/api/pengajuan/all` | GET | monitoring & tabel approval | SPV/Administrator/Manager |
+| `/api/pengajuan/:no/status` | PUT | ubah status approval/pengadaan | SPV/Administrator/Manager (sesuai tahap) |
 | `/api/pengajuan/:no/log` | GET | riwayat approval (audit trail) | semua |
 | `/api/pengajuan/summary` | GET | PR Summary | **Manager & Supervisor 1 saja** |
 | `/api/pengajuan/bq-summary` | GET | BQ Summary seluruh pengajuan | semua |
@@ -144,7 +144,7 @@ Mencatat setiap perubahan status (siapa, kapan, aksi apa) → sumber fitur **Riw
 
 Menu yang benar-benar tampil per peran (terverifikasi otomatis, lihat `docs/evidence/hasil-produk/`):
 
-| Menu | Teknisi | Supervisor 1 | Supervisor 2 | Officer | Manager |
+| Menu | Teknisi | Supervisor 1 | Supervisor 2 | Administrator | Manager |
 |---|:---:|:---:|:---:|:---:|:---:|
 | Form BQ (pengajuan) | ✔ | – | – | – | – |
 | On Hand Stock | ✔ | ✔ | ✔ | ✔ | ✔ |
@@ -157,7 +157,7 @@ Menu yang benar-benar tampil per peran (terverifikasi otomatis, lihat `docs/evid
 | Ubah status pengadaan | – | – | – | ✔ | ✔ |
 
 Bukti proteksi (uji otomatis 26 Sep 2026): PR Summary mengembalikan **403 Forbidden** untuk
-Teknisi, Supervisor 2, dan Officer — hanya Manager & Supervisor 1 yang diizinkan, sesuai rancangan.
+Teknisi, Supervisor 2, dan Administrator - hanya Manager & Supervisor 1 yang diizinkan, sesuai rancangan.
 
 ---
 
@@ -188,9 +188,9 @@ Wireframe per layar (untuk dipetakan ke use case / activity diagram Bab III):
 
 Agar diagram di Bab III konsisten dengan produk, gunakan rujukan berikut:
 
-- **DFD Level 0 (Context):** Teknisi/SPV/Officer/Manager → [Sistem BQ Digital] → data dari master sparepart; keluaran: status pengajuan, laporan.
+- **DFD Level 0 (Context):** Teknisi/SPV/Administrator/Manager → [Sistem BQ Digital] → data dari master sparepart; keluaran: status pengajuan, laporan.
 - **DFD Level 1 proses:** (1) Autentikasi role; (2) Cek stok; (3) Buat pengajuan BQ; (4) Approval tahap SPV (Normal/Urgent); (5) Approval tahap Manager (khusus Urgent); (6) Update status pengadaan; (7) BQ/PR Summary & Monthly Report; (8) Ekspor Excel. Semua proses menulis ke `pengajuan_log`.
-- **Use case diagram:** aktor = Teknisi, Supervisor 1/2, Officer, Manager; use case lihat §5 matriks RBAC; relasi «include» login untuk semua.
+- **Use case diagram:** aktor = Teknisi, Supervisor 1/2, Administrator, Manager; use case lihat §5 matriks RBAC; relasi «include» login untuk semua.
 - **Activity diagram alur utama:** cek stok → (ada? ambil : buat BQ) → approval SPV → (Urgent? approval MGR) → eksekusi pengadaan → barang tiba → selesai. Skema persis kolom `status_approval_spv`/`status_approval_manager`/`status_pengadaan` di §3.3.
 - **Flowchart data:** mengikuti endpoint §4.
 - **ERD:** 4 tabel §3 dengan relasinya.

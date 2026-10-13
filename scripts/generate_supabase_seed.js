@@ -42,7 +42,7 @@ const USERS = [
   { username: 'INN', password: '30INN11', role: 'Supervisor 1', name: 'INN', bqLink: null },
   { username: 'MUN', password: '2506MUN', role: 'Supervisor 2', name: 'MUN', bqLink: null },
   { username: 'KAA', password: 'KAA1910', role: 'Supervisor 2', name: 'KAA', bqLink: null },
-  { username: 'ANS', password: 'ANS1805', role: 'Officer', name: 'ANS', bqLink: null },
+  { username: 'ANS', password: 'ANS1805', role: 'Administrator', name: 'ANS', bqLink: null },
   { username: 'KSW', password: '01KSW10', role: 'manager', name: 'KSW', bqLink: null }
 ];
 
@@ -290,7 +290,7 @@ INSERT INTO users (username, password, role, name, bqLink) VALUES
   const logs = [
     { no_reg: EXPECT.FIXED_LOG_NO, actor_id: 1, actor_name: 'AAA', actor_role: 'teknisi', field: 'status_approval_spv', old_value: null, new_value: 'Menunggu', created_at: '2026-09-01T08:00:00+07:00' },
     { no_reg: EXPECT.FIXED_LOG_NO, actor_id: 14, actor_name: 'INN', actor_role: 'Supervisor 1', field: 'status_approval_spv', old_value: 'Menunggu', new_value: 'Disetujui', created_at: '2026-09-01T10:30:00+07:00' },
-    { no_reg: EXPECT.FIXED_LOG_NO, actor_id: 18, actor_name: 'ANS', actor_role: 'Officer', field: 'status_pengadaan', old_value: 'BQ Baru', new_value: 'Proses PO', created_at: '2026-09-01T14:00:00+07:00' }
+    { no_reg: EXPECT.FIXED_LOG_NO, actor_id: 18, actor_name: 'ANS', actor_role: 'Administrator', field: 'status_pengadaan', old_value: 'BQ Baru', new_value: 'Proses PO', created_at: '2026-09-01T14:00:00+07:00' }
   ];
   
   logs.forEach((log, i) => {

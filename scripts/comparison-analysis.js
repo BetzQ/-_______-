@@ -7,7 +7,7 @@ const folder = 'C:\\0000-Universitas_Terbuka\\semester8\\capstoneproject\\App-li
 const dbSchema = {
   users: {
     columns: ['id', 'username', 'password', 'role', 'name', 'bqLink', 'supervisor_id', 'created_at'],
-    description: 'Tabel pengguna (teknisi, supervisor, officer, manager)'
+    description: 'Tabel pengguna (teknisi, supervisor, administrator, manager)'
   },
   spareparts: {
     columns: ['item_code', 'deskripsi', 'qty_on_hand', 'min_stock', 'max_stock', 'is_critical', 'lokasi_rak'],

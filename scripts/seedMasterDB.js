@@ -19,7 +19,7 @@ const USERS_DB = [
   { username: 'INN', password: '30INN11', role: 'Supervisor 1', name: 'INN', bqLink: '' },
   { username: 'MUN', password: '2506MUN', role: 'Supervisor 2', name: 'MUN', bqLink: '' },
   { username: 'KAA', password: 'KAA1910', role: 'Supervisor 2', name: 'KAA', bqLink: '' },
-  { username: 'ANS', password: 'ANS1805', role: 'Officer', name: 'ANS', bqLink: '' },
+  { username: 'ANS', password: 'ANS1805', role: 'Administrator', name: 'ANS', bqLink: '' },
   { username: 'KSW', password: '01KSW10', role: 'manager', name: 'KSW', bqLink: '' }
 ];
 

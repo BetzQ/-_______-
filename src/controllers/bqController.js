@@ -212,13 +212,14 @@ function normalizeApproval(value) {
 // RBAC: pembagian hak akses aksi monitoring & approval.
 //  - Supervisor : hanya SPV approval (tahap 1)
 //  - Manager    : final approval + boleh ikut update status pengadaan
-//  - Officer    : hanya status pengadaan (pipeline procurement)
+//  - Administrator : hanya status pengadaan (pipeline procurement)
 // =====================================================================
 function classifyRole(role) {
   const r = String(role || '').toLowerCase();
   if (r.startsWith('supervisor')) return 'supervisor';
-  if (r === 'officer')          return 'officer';
+  if (r === 'administrator')      return 'administrator';
   if (r === 'manager')          return 'manager';
+  if (r === 'teknisi')          return 'teknisi';
   return 'other';
 }
 
@@ -246,7 +247,28 @@ function allowedApprovalFields(roleKey) {
  */
 async function getAllPengajuan(req, res) {
   try {
-    const { username, full_approved } = req.query || {};
+    const { username, full_approved, actor } = req.query || {};
+
+    // Identitas pemanggil wajib (query `actor`). Dipisah dari `username`
+    // karena `username` di endpoint ini berarti filter "pengajuan milik
+    // teknisi X", sedangkan `actor` adalah akun yang sedang login.
+    // Teknisi hanya boleh melihat pengajuannya sendiri; peran lain
+    // (Supervisor 1/2, Administrator, Manager) boleh melihat antrean tim.
+    if (!actor) {
+      return res.status(401).json({ status: 'error', message: 'Anda harus login terlebih dahulu' });
+    }
+    const { rows: actorRows } = await pool.query('SELECT role FROM users WHERE username = $1', [actor]);
+    if (!actorRows[0]) {
+      return res.status(401).json({ status: 'error', message: 'User tidak ditemukan' });
+    }
+    if (classifyRole(actorRows[0].role) === 'teknisi') {
+      if (username !== actor) {
+        return res.status(403).json({
+          status: 'error',
+          message: 'Teknisi hanya dapat melihat pengajuan milik sendiri',
+        });
+      }
+    }
 
     const where = [];
     const params = [];
@@ -314,7 +336,7 @@ async function getAllPengajuan(req, res) {
  *  - Supervisor dapat mengubah status_approval_spv (tahap 1) dan urgency.
  *  - Manager    dapat mengubah status_approval_manager (tahap 2/final),
  *                status_pengadaan, dan urgency.
- *  - Officer    hanya dapat mengubah status_pengadaan (pipeline procurement).
+ *  - Administrator hanya dapat mengubah status_pengadaan (pipeline procurement).
  *  - Teknisi    tidak memiliki hak ubah status apa pun.
  *
  * Aturan alur: Manager TIDAK bisa memberi keputusan final sebelum SPV menyetujui.
@@ -405,10 +427,10 @@ async function updateStatusPengajuan(req, res) {
       message: 'Role Anda tidak memiliki hak untuk melakukan approval ini.',
     });
   }
-  if (hasPengadaan && actorRole !== 'manager' && actorRole !== 'officer') {
+  if (hasPengadaan && actorRole !== 'manager' && actorRole !== 'administrator') {
     return res.status(403).json({
       status: 'error',
-      message: 'Status pengadaan hanya bisa diubah oleh Officer / Manager.',
+      message: 'Status pengadaan hanya bisa diubah oleh Administrator / Manager.',
     });
   }
   if (hasUrgency && actorRole !== 'supervisor' && actorRole !== 'manager') {
@@ -826,12 +848,34 @@ async function getBqSummary(req, res) {
  * Endpoint resmi Monthly Report. Halaman Monthly Report di web memakai
  * endpoint ini, bukan menarik seluruh data pengajuan ke browser.
  *
+ * Akses: hanya Supervisor 1 dan Manager (sama dengan ketersediaan menu),
+ * lewat query `username` wajib — tanpa login endpoint ini menolak, supaya
+ * ringkasan dan baris `?detail=1` (berisi nama teknisi) tidak terbuka
+ * untuk publik.
+ *
  * Definisi status seragam web & backend:
  *   menunggu / disetujui / ditolak -> status_approval_spv
  *   fullApproved                   -> SPV disetujui DAN Manager disetujui
  */
 async function getMonthlyReport(req, res) {
   try {
+    const { username } = req.query;
+    if (!username) {
+      return res.status(401).json({ status: 'error', message: 'Anda harus login terlebih dahulu' });
+    }
+    const { rows: actorRows } = await pool.query('SELECT id, role FROM users WHERE username = $1', [username]);
+    const actor = actorRows[0];
+    if (!actor) {
+      return res.status(401).json({ status: 'error', message: 'User tidak ditemukan' });
+    }
+    const roleKey = classifyRole(actor.role);
+    if (roleKey !== 'manager' && actor.role !== 'Supervisor 1') {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Hanya Manager/Supervisor 1 yang dapat melihat Monthly Report',
+      });
+    }
+
     const now = new Date();
     const wantAll = String(req.query.all || '') === '1';
     const year  = parseInt(req.query.year, 10)  || now.getFullYear();

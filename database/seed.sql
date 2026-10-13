@@ -26,7 +26,7 @@ INSERT INTO users (username, password, role, name, bqLink) VALUES
 ('INN', '30INN11', 'Supervisor 1', 'INN', NULL),
 ('MUN', '2506MUN', 'Supervisor 2', 'MUN', NULL),
 ('KAA', 'KAA1910', 'Supervisor 2', 'KAA', NULL),
-('ANS', 'ANS1805', 'Officer', 'ANS', NULL),
+('ANS', 'ANS1805', 'Administrator', 'ANS', NULL),
 ('KSW', '01KSW10', 'manager', 'KSW', NULL);
 
 -- ==================== SPAREPARTS ====================

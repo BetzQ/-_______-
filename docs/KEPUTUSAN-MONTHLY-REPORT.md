@@ -1,10 +1,13 @@
 # Keputusan: Monthly Report (Chart.js di Web atau Looker Studio)
 
-Status: **MENUNGGU KONFIRMASI KA FADHIL**
-Tanggal: 30 Sep 2026
-Penulis: Tim capstone (bahasan keputusan, belum ada perubahan kode)
+Status: **SELESAI — DITERAPKAN DI KODE** (10 Okt 2026)
+Tanggal: 30 Sep 2026 (diputuskan & diterapkan 10 Okt 2026)
+Penulis: Tim capstone
 
-Belum ada perubahan kode yang dibuat untuk keputusan ini.
+Karena Ka Fadhil tidak lagi merespons, keputusan akhir diambil tim (Avwan)
+dengan **Opsi A** (chart di web + Looker berlabel). Fitur sudah ada di kode dan
+lulus QA **114/114**. Endpoint `/api/reports/monthly` kini dipakai dan
+dilindungi (wajib `username`, hanya Manager/Supervisor 1).
 
 ---
 
@@ -122,7 +125,11 @@ Tombol Monthly Report langsung membuka Looker di tab baru.
 
 ---
 
-## 4. Keputusan yang diambil (menunggu persetujuan)
+## 4. Keputusan yang diambil (DITERAPKAN)
+
+> Label rujukan bulan-bulan laporan sudah diberi **"Looker Studio (laporan lama,
+> dikelola mgmt)"**, dan kartu "Menunggu/Disetujui/Ditolak" memakai definisi
+> status SPV dengan metrik terpisah untuk full approve.
 
 ### 4.1 Monthly Report resmi tetap di dalam web
 Chart.js di `index.html` menjadi sumber laporan bulanan yang dipakai saat
@@ -191,9 +198,18 @@ jalur data aplikasi.
 
 ---
 
-## 7. Catatan bahwa ini belum final
+## 7. Status akhir
 
-Dokumen ini adalah **usulan teknis**, bukan keputusan final. Angka dan definisi
-status yang dipakai masih menunggu jawaban Ka Fadhil untuk pertanyaan di
-bagian 5. Jangan dipakai sebagai dasar klaim di dokumen Bab IV/M8 sebelum
-disetujui.
+Dokumen ini **final dan sudah diterapkan**. Empat pertanyaan di bagian 5
+diputuskan sendiri oleh tim (Ka Fadhil tidak merespons):
+
+1. Format final = empat kartu rekap + grafik (Chart.js) seperti sekarang.
+2. Looker Studio tetap dipakai manajemen sebagai arsip, tidak dijadikan sumber
+   angka aplikasi, dan diberi label "laporan lama".
+3. Cakupan data: Supervisor 1 melihat timnya (selaras dengan
+   `KEPUTUSAN-DASBOR-SUPERVISOR.md`), Manager melihat keseluruhan.
+4. Ekspor data mentah tetap sebatas rekap (label + jumlah); tidak ditambah di
+   akhir proyek.
+
+Endpoint `/api/reports/monthly` dan `/api/pengajuan/all` kini mewajibkan
+identitas pemanggil. QA lulus 114/114 (10 Okt 2026).

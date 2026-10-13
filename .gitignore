@@ -21,8 +21,24 @@ build/
 npm-debug.log*
 .DS_Store
 
+# File runtime (PID server lokal)
+server_pid.txt
+
 # Dokumen Capstone (tidak dibutuhkan saat runtime/deploy)
 CP Kelompok A 127/
 
 # Arsip kirim ke anggota (hasil duplikasi folder evidence, kirim via WA/Drive)
 docs/evidence/**/*.zip
+
+# Video demo & rekaman layar — JANGAN masuk repo.
+# Repo ini untuk kodingan; video dikirim lewat Drive/WA (jauh lebih kecil
+# daripada video, dan YouTube/Google Drive bisa diputar juri).
+*.mp4
+*.webm
+*.mov
+*.avi
+docs/evidence/video/
+
+# Dokumen binary besar (.docx tugas, .pptx) — kirim terpisah, bukan lewat repo
+docs/BAB 3 Tugas CP/
+*.pptx

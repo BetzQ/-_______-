@@ -23,18 +23,26 @@ const MODALS = [
   'modal-approval', 'modal-prsummary', 'modal-report', 'modal-riwayat',
 ];
 
+/* Modal berisi data yang wajib dibiarkan terlihat statis sebelum ditutup. */
+const DATA_MODALS = ['modal-bqsummary', 'modal-riwayat', 'modal-report', 'modal-stok', 'modal-rak'];
+const HOLD = {
+  MODAL_CLOSE: 3000, // Hold 3 dtk TEPAT SEBELUM tutup modal data
+  SUBMIT: 1500,      // Hold 1,5 dtk TEPAT SEBELUM klik Submit / Approve / Reject
+  TOAST: 2000,       // Hold 2 dtk SETELAH aksi penting (toast hijau terbaca)
+};
+
 const ROLES = [
   { key: '01-teknisi',  user: 'AAA', pass: '04AAA10', label: 'Teknisi' },
   { key: '02-spv1',     user: 'INN', pass: '30INN11', label: 'Supervisor 1' },
   { key: '03-spv2',     user: 'KAA', pass: 'KAA1910', label: 'Supervisor 2' },
-  { key: '04-officer',  user: 'ANS', pass: 'ANS1805', label: 'Officer Penagihan' },
+  { key: '04-officer',  user: 'ANS', pass: 'ANS1805', label: 'Administrator' },
   { key: '05-manager',  user: 'KSW', pass: '01KSW10', label: 'Manager' },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const log = (m) => console.log('[SHOT] ' + m);
 
-const ROLES_LS = ['teknisi', 'supervisor 1', 'supervisor 2', 'officer', 'manager'];
+const ROLES_LS = ['teknisi', 'supervisor 1', 'supervisor 2', 'administrator', 'manager'];
 
 /** Matikan panduan (tour) agar bukti visual tidak tertutup overlay guide. */
 async function disableTour(page) {
@@ -202,6 +210,7 @@ async function captureRole(page, role) {
       await waitModalReady(page, mid);
       if (mid === 'modal-report') await sleep(1600); // Chart.js render
       await screenshot(page, `${role.key}-${menu.act}.png`);
+      if (DATA_MODALS.indexOf(mid) >= 0) await sleep(HOLD.MODAL_CLOSE); // Hold 3 dtk sebelum modal data ditutup
     } catch (e) {
       log(`  WARN ${menu.act}: ${e.message}`);
     }
@@ -316,6 +325,7 @@ async function alurEndToEnd(page) {
     }, EJO);
     await sleep(1500);
     await screenshot(page, '06-alur-bqsummary-teknisi.png');
+    await sleep(HOLD.MODAL_CLOSE); // Hold 3 dtk - "Rekapan Pengajuan" dibiarkan statis sebelum ditutup
   } catch (e) { log('  WARN bqsummary teknisi: ' + e.message); }
   await closeAllModals(page);
   await logout(page);
@@ -335,6 +345,7 @@ async function alurEndToEnd(page) {
     await screenshot(page, '06-alur-approval-spv-sebelum.png');
 
     // Klik tombol Approve pada baris pertama yang aktif (.btn-approve)
+    await sleep(HOLD.SUBMIT); // Hold 1,5 dtk sebelum klik Approve (Supervisor)
     const clicked = await page.evaluate(() => {
       const btn = Array.from(document.querySelectorAll('#tbody-pengajuan .btn-approve'))
         .find((b) => !b.disabled);
@@ -342,7 +353,7 @@ async function alurEndToEnd(page) {
       return { ok: false, info: 'tombol Approve tidak ditemukan/terkunci' };
     });
     if (clicked.ok) {
-      await sleep(2200);
+      await sleep(HOLD.TOAST); // Hold 2 dtk setelah Approve -> toast terbaca
       await screenshot(page, '06-alur-approval-spv-sesudah.png');
       log('  Tombol persetujuan SPV diklik: ' + clicked.info);
     } else {
@@ -366,6 +377,7 @@ async function alurEndToEnd(page) {
     await sleep(1800);
     await screenshot(page, '06-alur-approval-manager-sebelum.png');
 
+    await sleep(HOLD.SUBMIT); // Hold 1,5 dtk sebelum klik Approve (Manager)
     const clickedMgr = await page.evaluate(() => {
       const btn = Array.from(document.querySelectorAll('#tbody-pengajuan .btn-approve'))
         .find((b) => !b.disabled);
@@ -373,7 +385,7 @@ async function alurEndToEnd(page) {
       return { ok: false, info: 'tombol Approve manager tidak tersedia (mungkin sudah final)' };
     });
     if (clickedMgr.ok) {
-      await sleep(2200);
+      await sleep(HOLD.TOAST); // Hold 2 dtk setelah Approve -> toast terbaca
       await screenshot(page, '06-alur-approval-manager-sesudah.png');
       log('  Tombol persetujuan Manager diklik: ' + clickedMgr.info);
     } else {
@@ -389,6 +401,7 @@ async function alurEndToEnd(page) {
     if (riwayat) {
       await sleep(1500);
       await screenshot(page, '06-alur-riwayat-approval.png');
+      await sleep(HOLD.MODAL_CLOSE); // Hold 3 dtk - "Riwayat Approval" (log audit) dibiarkan terbuka
     }
   } catch (e) { log('  WARN approval manager: ' + e.message); }
   await closeAllModals(page);
@@ -399,6 +412,7 @@ async function alurEndToEnd(page) {
     for (let i = 0; i < 40; i++) { if (await visibleModal(page)) break; await sleep(200); }
     await sleep(3000);
     await screenshot(page, '06-alur-monthly-report.png');
+    await sleep(HOLD.MODAL_CLOSE); // Hold 3 dtk - grafik "Monthly Report" dibiarkan terbaca sebelum ditutup
   } catch (e) { log('  WARN monthly report: ' + e.message); }
   await closeAllModals(page);
   await logout(page);
